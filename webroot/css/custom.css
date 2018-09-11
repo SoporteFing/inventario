@@ -1,0 +1,16 @@
+a[data-toggle="collapse"] {
+    position: relative;
+}
+
+a[aria-expanded="false"]::before, a[aria-expanded="true"]::before {
+    content: '\f063';
+    display: block;
+    position: absolute;
+    right: 30px;
+    font-family: 'FontAwesome';
+    font-size: 1.0em;
+}
+
+a[aria-expanded="true"]::before {
+    content: '\f062';
+}

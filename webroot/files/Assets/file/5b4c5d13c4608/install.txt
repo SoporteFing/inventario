@@ -1,0 +1,29 @@
+1- Instalar apache
+2- Instalar php
+3- En el archivo php.ini eliminar el comentario en la linea con la extension intl: ;extension=php_intl.dll
+4- Instalar libreria intl, dependiendo de la version de php: sudo apt-get install php7.0-intl
+5- Install git: sudo apt-get install git-core
+5.1- Acceder a hmtl: cd /var/www/html
+6- Clonar el repositorio: sudo git clone https://github.com/josevj93/Decanatura.git
+7- Activar el mod_write: sudo a2enmod rewrite
+8- Reiniciar apache: systemctl restart apache2
+9- Permitir cambios a .htaccess editando: sudo nano /etc/apache2/sites-available/000-default.conf
+
+y agregando lo siguiente:
+
+<VirtualHost *:80>
+ ...
+    <Directory /var/www/html>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Require all granted
+    </Directory>
+ ...
+</VirtualHost>
+
+10- Reiniciar apache: systemctl restart apache2
+11- Crear el archivo .htaccess en la raiz de directorio html: sudo nano /var/www/html/.htaccess
+
+y agregar lo siguiente en la primera linea:
+
+RewriteEngine on
