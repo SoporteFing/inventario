@@ -24,6 +24,12 @@ class RolesController extends AppController
         $this->Roles = $this->loadModel('Roles');
         $this->Permissions = $this->loadModel('Permissions');
         $this->RolesPermissions = $this->loadModel('RolesPermissions');
+
+
+        if($this->request->getParam('action') == 'delete' && $this->request->getParam('pass')[0] == 1){
+            $this->Flash->error(__('Este Rol no se puede eliminar'));
+            return false;
+        }
         
         $query = $this->Roles->find('all', array(
                     'conditions' => array(
@@ -37,6 +43,7 @@ class RolesController extends AppController
                 return false;
             }
         } 
+
         $this->set('allowI',$allowI);
         $this->set('allowM',$allowM);
         $this->set('allowE',$allowE);

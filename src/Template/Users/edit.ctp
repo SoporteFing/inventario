@@ -30,7 +30,7 @@
 
   </style>
 
-    <script type='text/javascript' src='../..f/js/plugins/jQuery-Mask-Plugin-master/src/jquery.mask.js'></script>
+    <script type='text/javascript' src='../../js/plugins/jQuery-Mask-Plugin-master/src/jquery.mask.js'></script>
 </head>
 
 <body>
