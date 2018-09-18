@@ -117,7 +117,6 @@ class UsersController extends AppController
     {
         $this->viewBuilder()->setLayout('default');
 
-
         $user = $this->Users->get($id, [
             'contain' => []
         ]);
@@ -134,8 +133,15 @@ class UsersController extends AppController
             $rol = $items['nombre'];
         }
 
-        $this->set('rol', $rol);
 
+        $estado = 'Activo';
+
+        if(!$user['account_status']){
+            $estado = 'Inoperante';
+        }
+
+        $this->set('rol', $rol);
+        $this->set('estado', $estado);
         $this->set('user', $user);
     }
 
@@ -183,9 +189,6 @@ class UsersController extends AppController
                 $user->setError('password', ['Las contraseñas no coinciden.']);
                 $user->setError('password2', ['Las contraseñas no coinciden.']);
             }
-
-            debug($user);
-            die();
 
             $user = $this->Users->patchEntity($user, $this->request->getData());
             

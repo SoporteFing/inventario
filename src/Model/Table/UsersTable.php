@@ -106,7 +106,6 @@ class UsersTable extends Table
             ->maxLength('id', 15,'La identificación debe contener 15 dígitos máximo' )
             ->minLength('id', 9,'La identificación debe contener 9 dígitos mínimo. Asegúrese de incluir los 0 en su identificación.' )
             ->requirePresence('id', 'create')
-            ->requirePresence('id', 'update')
             ->add('id',[ 
                 [
                 'rule'=>['custom', ' /^[a-zA-Z0-9]+$/ '],
@@ -129,14 +128,12 @@ class UsersTable extends Table
             ->maxLength('password', 60)
             ->minLength('password', 8, 'La constraseña debe tener mínimo 8 caracteres')
             ->requirePresence('password', 'create')
-            ->requirePresence('password', 'update')
             ->notEmpty('residues_id', 'La constraseña es requerida.');
 
         $validator
             ->scalar('password2')
             ->maxLength('password2', 60)
             ->requirePresence('password', 'create')
-            ->requirePresence('password', 'update')
             ->notEmpty('residues_id', 'La confirmación de constraseña es requerida.');
 
         $validator

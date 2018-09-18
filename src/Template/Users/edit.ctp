@@ -29,6 +29,8 @@
         }
 
   </style>
+
+    <script type='text/javascript' src='../..f/js/plugins/jQuery-Mask-Plugin-master/src/jquery.mask.js'></script>
 </head>
 
 <body>
@@ -175,7 +177,7 @@
 
         <div class="row">
                     <div class="col-sm-6">
-            <label> <b>Contraseña:</b><b style="color:red;">*</b> (mínimo 8 caracteres)</label>
+            <label> <b>Contraseña:</b><b style="color:red;"></b> (mínimo 8 caracteres)</label>
             <?php 
                   echo $this->Form->control('password', 
                       [
@@ -186,14 +188,13 @@
                         'label'=>['text'=>''],
                         'type'=>'password',
                         'value'=>'',
-                        "required"=>"required",
                         'class'=>'form-control col-md-11',
                       ]);
             ?>
           </div>
 
           <div class="col-sm-6">
-            <label> <b>Confirmar Contraseña:</b><b style="color:red;">*</b> </label>
+            <label> <b>Confirmar Contraseña:</b><b style="color:red;"></b> </label>
             <?php 
                   echo $this->Form->control('password2', 
                       [
@@ -204,7 +205,6 @@
                         'label'=>['text'=>''],
                         'type'=>'password',
                         'value'=>'',
-                        "required"=>"required",
                         'class'=>'form-control col-md-11',
                       ]);
             ?>
@@ -219,6 +219,7 @@
   <?= $this->Form->button(__('Aceptar'), ['class' => 'btn btn-primary']) ?>
 
 <?= $this->Form->end(); ?>
+
 
 
 <script>
@@ -246,5 +247,8 @@ $("#send").on('click',function(){
 });
 
 </script>
+
+</body>
+
 
 </body>
