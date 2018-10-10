@@ -56,7 +56,7 @@
 	  	  
 	  <div class="row">
         <label> <b>Tipo:</b><b style="color:red;">*</b> </label>
-        <?php echo $this->Form->select('type_id', $types, array('empty' => '-- Seleccione Tipo --', 'class' => 'form-control col-md-9')); ?>            
+        <?php echo $this->Form->select('type_id', $types, ['id' => 'type-list', 'onChange' => 'getBrands(this.value);', 'empty' => '-- Seleccione Tipo --',  'class'=>'form-control col-md-9']); ?>
       </div>
         
 		
@@ -67,7 +67,7 @@
 
       <div class="row">
         <label>Marca:</label>
-        <?php echo $this->Form->select('brand', $brands, ['id' => 'brand-list', 'onChange' => 'getBrand(this.value);', 'empty' => '-- Seleccione Marca --',  'class'=>'form-control col-md-9']); ?>        
+        <?php echo $this->Form->select('brands_id', '', ['id' => 'brand-list', 'onChange' => 'getModels(this.value);', 'empty' => '-- Seleccione Marca --',  'class'=>'form-control col-md-9']); ?>        
       </div>
       
       <div class="row">
@@ -165,17 +165,40 @@
 </body>
 
 <script>
-    function getBrand(val) {
+    function getBrands(val) {
         console.log(val);
         $.ajax({
             type: "GET",
-            url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'dependentList' ]); ?>',
+            url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'brandsList' ]); ?>',
+            data:{type_id:val},
+            
+            success: function(data){
+               console.log(data);
+                $("#brand-list").html(data);
+                $("#model-list").empty();
+                $("#model-list").append('<option selected="selected" value>-- Seleccione Modelo --</option>');
+            },
+
+            error: function(e) {
+                    alert("Ocurrió un error: artículo no encontrado.");
+                    console.log(e);
+                    $("#brand-list").html('Introduzca otro número de placa.');
+                    }
+        
+        });
+    }
+
+    function getModels(val) {
+        console.log(val);
+        $.ajax({
+            type: "GET",
+            url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'modelsList' ]); ?>',
             data:{brand_id:val},
             
             success: function(data){
+                console.log(data);
                 $("#model-list").html(data);
             },
-
             error: function(e) {
                     alert("Ocurrió un error: artículo no encontrado.");
                     console.log(e);

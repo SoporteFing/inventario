@@ -90,6 +90,55 @@ class AssetsController extends AppController
      */
     public function add()
     {
+
+        /*
+            BORRAR
+        
+         *
+
+
+        $this->loadModel('Models');
+        $this->loadModel('Brands');
+        $this->loadModel('Types');
+
+        $type_id = '5b9fcbe7bb7a6';
+        
+        $models = $this->Models->find('list')
+            ->where(['Models.id_brand' => '5ba4369fe1f6c']);
+
+        
+        $brands = $this->Brands->find('list')          
+            ->select([
+                'Brands.id',
+                'Brands.name'
+            ])
+            ->distinct(['Brands.name'])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'RIGHT',
+        'conditions' => 'Models.id_brand = Brands.id',
+            ])
+            ->where(['Models.id_type' => $type_id]);
+
+    debug($brands);
+
+        foreach ($brands as $brand) {
+            debug($brand);
+        }
+
+
+        die();
+
+
+
+        /*
+            BORRAR
+
+
+        */
+
+
         $asset = $this->Assets->newEntity();
         if ($this->request->is('post')) {
             
@@ -244,7 +293,63 @@ class AssetsController extends AppController
     /**
      * Método para mostrar listas dependientes
      */
-    public function dependentList()
+    public function brandsList()
+    {
+        $this->loadModel('Models');
+        $this->loadModel('Brands');
+        $this->loadModel('Types');
+
+        $type_id = $_GET['type_id'];
+        
+        $type = $this->Types->get($type_id);
+
+        if($type == NULL)
+        {
+            throw new NotFoundException(__('Tipo no encontrado') );      
+        }
+        
+        $brands = $this->Brands->find('list')          
+            ->select([
+                'Brands.id',
+                'Brands.name'
+            ])
+            ->distinct(['Brands.name'])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'RIGHT',
+        'conditions' => 'Models.id_brand = Brands.id',
+            ])
+            ->where(['Models.id_type' => $type_id]);
+
+        /*
+            ORIGINAL
+
+        $brands = $this->Models->find('list')            
+            ->select([
+                'Brands.id',
+                'Brands.name'
+            ])
+            ->distinct(['Brands.name'])
+            ->contain(['Brands'])
+            ->where(['Models.id_type' => $type_id]);
+        */
+
+        if(empty($brands))
+        {
+            throw new NotFoundException(__('Marcas no encontradas') );      
+        }
+
+        $this->set('brands', $brands);
+
+        /*Asocia esta función a la vista /Templates/Layout/model_list.ctp*/
+        $this->render('/Layout/brand_list');
+    }
+    
+    /**
+     * Método para mostrar listas dependientes
+     */
+    public function modelsList()
     {
         $this->loadModel('Models');
         $this->loadModel('Brands');
@@ -252,26 +357,25 @@ class AssetsController extends AppController
         $brand_id = $_GET['brand_id'];
         
         $brand = $this->Brands->get($brand_id);
-
         if($brand == NULL)
         {
             throw new NotFoundException(__('Marca no encontrada') );      
         }
         
         $models = $this->Models->find('list')
-            ->where(['models.id_brand' => $brand->id]);
+            ->where(['Models.id_brand' => $brand->id]);
         
         if(empty($models))
         {
             throw new NotFoundException(__('Modelos no encontrados') );      
         }
-
         $this->set('models', $models);
-
         /*Asocia esta función a la vista /Templates/Layout/model_list.ctp*/
         $this->render('/Layout/model_list');
     }
     
+
+
 
     /**
      * Método para agregar activos por lotes

@@ -87,7 +87,7 @@ class RolesController extends AppController
             'conditions' => array(
                 'id' => $id
             )
-        ))->contain(['Permissions']);;
+        ))->contain(['Permissions']);
         foreach ($query as $roles) {
             $rls = $roles['permissions'];
             foreach ($rls as $item){
