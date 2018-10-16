@@ -495,6 +495,8 @@ class AssetsController extends AppController
         //$types = $this->Assets->Types->find('list', ['limit' => 200]);
         $users = $this->Assets->Users->find('list', ['limit' => 200]);
         $locations = $this->Assets->Locations->find('list', ['limit' => 200]);
-        $this->set(compact('asset', 'brands', 'users', 'locations','models'));
+        $types = $this->Assets->Types->find('list', ['limit' => 200]);
+        $this->set(compact('asset', 'types', 'brands', 'users', 'locations','models'));
+
     }
 }

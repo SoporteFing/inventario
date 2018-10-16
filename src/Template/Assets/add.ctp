@@ -47,14 +47,14 @@
     <legend><?= __('Insertar activo') ?></legend>
     <br>
 
-    <div class="form-control sameLine" >
+    <div class="row" >
 	
-    <div class="row">
+    <div class="col-md-4">
         <label> <b>Placa:</b><b style="color:red;">*</b> </label>
     <?php echo $this->Form->imput('plaque', ['class'=>'form-control col-md-9']); ?> 
     </div>
 	  	  
-	  <div class="row">
+	  <div class="col-md-4 ">
         <label> <b>Tipo:</b><b style="color:red;">*</b> </label>
         <?php echo $this->Form->select('type_id', $types, ['id' => 'type-list', 'onChange' => 'getBrands(this.value);', 'empty' => '-- Seleccione Tipo --',  'class'=>'form-control col-md-9']); ?>
       </div>
@@ -63,19 +63,19 @@
 	  <div class="col-lg-3">   </div>
     </div> <br>
 	
-	<div class="form-control sameLine" >
+	<div class="row" >
 
-      <div class="row">
+      <div class="col-md-4">
         <label>Marca:</label>
         <?php echo $this->Form->select('brands_id', '', ['id' => 'brand-list', 'onChange' => 'getModels(this.value);', 'empty' => '-- Seleccione Marca --',  'class'=>'form-control col-md-9']); ?>        
       </div>
       
-      <div class="row">
+      <div class="col-md-4">
         <label>Modelo:</label>
-        <?php echo $this->Form->select('models_id', '', ['id' => 'model-list', 'empty' => '-- Seleccione Modelo --', 'class'=>'form-control col-md-8']); ?>        
+        <?php echo $this->Form->select('models_id', '', ['id' => 'model-list', 'empty' => '-- Seleccione Modelo --', 'class'=>'form-control col-md-9']); ?>        
       </div>
 	  
-	  <div class="row">
+	  <div class="col-md-4">
         <label>Serie:</label>
         <?php echo $this->Form->imput('series', ['label' => 'Serie:', 'class'=>'form-control col-md-9']); ?>        
     </div>
@@ -88,21 +88,21 @@
     <?php echo $this->Form->textarea('description', ['class'=>'form-control col-md-8']); ?>
   </div> <br>
 	
-	<div class="form-control sameLine" >
+	<div class="row" >
 
-      <div class="row">
+      <div class="col-md-4">
         <label> <b>Responsable:</b><b style="color:red;">*</b> </label>
-        <?php echo $this->Form->select('responsable_id', $users, array('empty' => '-- Seleccione Responsable --', 'class' => 'form-control col-md-7')); ?>            
+        <?php echo $this->Form->select('responsable_id', $users, array('empty' => '-- Seleccione Responsable --', 'class' => 'form-control col-md-9')); ?>            
       </div>
       
-      <div class="row">
+      <div class="col-md-4">
         <label><b>Asignado a:</b><b style="color:red;">*</b> </label>
-        <?php echo $this->Form->select('assigned_to', $users, ['empty' => '-- Seleccione Asignado --', 'class'=>'form-control col-md-7']); ?>        
+        <?php echo $this->Form->select('assigned_to', $users, ['empty' => '-- Seleccione Asignado --', 'class'=>'form-control col-md-9']); ?>        
       </div>
 	  
-	  <div class="row">
+	  <div class="col-md-4">
         <label> <b>Ubicación:</b><b style="color:red;">*</b></label>
-        <?php echo $this->Form->select('location_id', $locations, ['empty' => '-- Seleccione Ubicación --', 'label' => 'Serie:', 'class'=>'form-control col-md-7']); ?>        
+        <?php echo $this->Form->select('location_id', $locations, ['empty' => '-- Seleccione Ubicación --', 'label' => 'Serie:', 'class'=>'form-control col-md-9']); ?>        
       </div>
 
   </div> 
