@@ -115,14 +115,15 @@
       
       <br>
       
-      <div class="form-control sameLine" >
+      <div class="row" >
       
-      <div class="row">
-        <label class="col-lg-3"> <b>Año:</b><b style="color:red;">*</b> </label>
-        <?php echo $this->Form->imput('year',['class'=>'form-control col-md-7']); ?>        
+      <div class="col-md-8">
+        <label class="col-lg-3"> <b>Año de Ingreso:</b><b style="color:red;">*</b> </label>
+        <?php echo $this->Form->imput('year',['class'=>'form-control col-md-4']); ?>        
       </div>
 	  
 	  <div class="row col-lg-1">
+      <br>
         <div class="custom-control custom-checkbox">
 			    <?php echo $this->Form->checkbox('lendable',  array('id' => 'customCheck1', 'class' => 'custom-control-input', 'checked' => 'checked')); ?>
 			    <label class="custom-control-label" for="customCheck1">Prestable</label>
@@ -173,7 +174,6 @@
             data:{type_id:val},
             
             success: function(data){
-               console.log(data);
                 $("#brand-list").html(data);
                 $("#model-list").empty();
                 $("#model-list").append('<option selected="selected" value>-- Seleccione Modelo --</option>');
@@ -196,7 +196,6 @@
             data:{brand_id:val},
             
             success: function(data){
-                console.log(data);
                 $("#model-list").html(data);
             },
             error: function(e) {

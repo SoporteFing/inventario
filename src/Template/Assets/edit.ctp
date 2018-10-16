@@ -48,16 +48,16 @@
     <legend><?= __('Editar activo') ?></legend>
     <br>
 
-    <div class="form-control sameLine" >
+    <div class="row" >
 	
-      <div class="row">
+      <div class="col-md-4">
           <label> <b>Placa:</b><b style="color:red;">*</b> </label>
 		  <?php echo $this->Form->imput('plaque', ['class'=>'form-control col-md-9', 'disabled']); ?> 
       </div>
 	  
-	  <div class="row">
+	  <div class="col-md-4">
         <label> <b>Tipo:</b><b style="color:red;">*</b> </label>
-        <?php echo $this->Form->select('type_id', $types, array('empty' => '-- Seleccione Tipo --', 'class' => 'form-control col-md-9')); ?>            
+        <?php echo $this->Form->select('type_id', $types, ['id' => 'type-list', 'onChange' => 'getBrands(this.value);', 'empty' => '-- Seleccione Tipo --',  'class'=>'form-control col-md-9']); ?>
       </div>
         
 		
@@ -65,19 +65,19 @@
         
     </div> <br>
 	
-	<div class="form-control sameLine" >
+	<div class="row" >
 
-  <div class="row">
+  <div class="col-md-4">
         <label>Marca:</label>
-        <?php echo $this->Form->select('brand', $brands, ['id' => 'brand-list', 'onChange' => 'getBrand(this.value);', 'empty' => '-- Seleccione Marca --',  'class'=>'form-control col-md-9']); ?>        
+        <?php echo $this->Form->select('brand', $brands, ['id' => 'brand-list', 'onChange' => 'getModels(this.value);', 'empty' => '-- Seleccione Marca --',  'class'=>'form-control col-md-9']); ?>        
       </div>
       
-      <div class="row">
+      <div class="col-md-4">
         <label>Modelo:</label>
-        <?php echo $this->Form->select('models_id', '', ['id' => 'model-list', 'empty' => '-- Seleccione Modelo --', 'class'=>'form-control col-md-8']); ?>        
+        <?php echo $this->Form->select('models_id', $models, ['id' => 'model-list', 'empty' => '-- Seleccione Modelo --', 'class'=>'form-control col-md-9']); ?>        
       </div>
 	  
-	  <div class="row">
+	  <div class="col-md-4">
         <label>Serie:</label>
         <?php echo $this->Form->imput('series', ['label' => 'Serie:', 'class'=>'form-control col-md-9']); ?>        
       </div>
@@ -89,21 +89,21 @@
       <?php echo $this->Form->textarea('description', ['class'=>'form-control col-md-8']); ?>
     </div> <br>
 	
-	<div class="form-control sameLine" >
+	<div class="row" >
 
-      <div class="row">
+      <div class="col-md-4">
         <label> <b>Responsable:</b><b style="color:red;">*</b> </label>
-        <?php echo $this->Form->select('responsable_id', $users, ['class'=>'form-control col-md-7', 'disabled']); ?>
+        <?php echo $this->Form->select('responsable_id', $users, ['class'=>'form-control col-md-9', 'disabled']); ?>
       </div>
       
-      <div class="row">
+      <div class="col-md-4">
         <label><b>Asignado a:</b><b style="color:red;">*</b> </label>
-        <?php echo $this->Form->select('assigned_to', $users, ['empty' => true, 'class'=>'form-control col-md-7']); ?>        
+        <?php echo $this->Form->select('assigned_to', $users, ['empty' => true, 'class'=>'form-control col-md-9']); ?>        
       </div>
 	  
-	  <div class="row">
+	  <div class="col-md-4">
         <label> <b>Ubicación:</b><b style="color:red;">*</b></label>
-        <?php echo $this->Form->select('location_id', $locations, ['empty' => true, 'label' => 'Serie:', 'class'=>'form-control col-md-7']); ?>        
+        <?php echo $this->Form->select('location_id', $locations, ['empty' => true, 'label' => 'Serie:', 'class'=>'form-control col-md-9']); ?>        
       </div>
 
     </div> <br>
@@ -115,11 +115,11 @@
         <?php echo $this->Form->textarea('sub_location', ['class'=>'form-control col-md-7']); ?>       
       </div>
       
-      <div class="form-control sameLine" >
+      <div class="row" >
       
-      <div class="row">
+      <div class="col-md-8">
         <label class="col-lg-3"> <b>Año:</b><b style="color:red;">*</b> </label>
-        <?php echo $this->Form->imput('year',['class'=>'form-control col-md-7']); ?>        
+        <?php echo $this->Form->imput('year',['class'=>'form-control col-md-4']); ?>        
       </div>
 	  
 	  <div class="row col-lg-1">
@@ -161,17 +161,42 @@
 </body>
 
 <script>
-    function getBrand(val) {
+
+
+    function getBrands(val) {
         console.log(val);
         $.ajax({
             type: "GET",
-            url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'dependentList' ]); ?>',
+            url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'brandsList' ]); ?>',
+            data:{type_id:val},
+            
+            success: function(data){
+               console.log(data);
+                $("#brand-list").html(data);
+                $("#model-list").empty();
+                $("#model-list").append('<option selected="selected" value>-- Seleccione Modelo --</option>');
+            },
+
+            error: function(e) {
+                    alert("Ocurrió un error: artículo no encontrado.");
+                    console.log(e);
+                    $("#brand-list").html('Introduzca otro número de placa.');
+                    }
+        
+        });
+    }
+
+    function getModels(val) {
+        console.log(val);
+        $.ajax({
+            type: "GET",
+            url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'modelsList' ]); ?>',
             data:{brand_id:val},
             
             success: function(data){
+                console.log(data);
                 $("#model-list").html(data);
             },
-
             error: function(e) {
                     alert("Ocurrió un error: artículo no encontrado.");
                     console.log(e);

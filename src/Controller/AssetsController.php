@@ -54,7 +54,7 @@ class AssetsController extends AppController
             return $allowI;
         }else if($this->request->getParam('action') == 'edit'){
             return $allowM;
-        }else if($this->request->getParam('action') == 'delete'){
+        }else if($this->request->getParam('action') == 'softDelete'){
             return $allowE;
         }else if($this->request->getParam('action') == 'view'){
             return $allowC;
@@ -149,20 +149,22 @@ class AssetsController extends AppController
             $asset->created = $fecha;
             $asset->modified = $fecha;
             $asset->unique_id = $random;
-            $asset->deletable = true;
+            $asset->deletable = false;
             $asset->deleted = false;
             $asset->state = "Disponible";
             $asset = $this->Assets->patchEntity($asset, $this->request->getData());
 
-            //print_r($asset);
-            //die();
 
 			if ($_POST['models_id'] == '') {
 				$asset->models_id = null;
 			}
 
+            if ($_POST['brands_id'] != '') {
+                $asset->brand = $_POST['brands_id'];
+            }
 
-            /** varifica que el id no sea repetido y se setea el error manualmente */
+
+            /** verifica que el id no sea repetido y se setea el error manualmente */
             $returnId = $this->Assets->find('all')
             ->where([
             'Assets.plaque' => $asset->plaque
@@ -184,10 +186,19 @@ class AssetsController extends AppController
         
         $this->loadModel('Brands');
         $brands = $this->Brands->find('list', ['limit' => 200]);
-        $users = $this->Assets->Users->find('list', ['limit' => 200]);
+
+        $users = $this->Assets->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
+
         $locations = $this->Assets->Locations->find('list', ['limit' => 200]);
 		$types = $this->Assets->Types->find('list', ['limit' => 200]);
-        
         
         $this->set(compact('asset', 'brands', 'users', 'locations', 'models', 'types'));
     }
@@ -199,6 +210,8 @@ class AssetsController extends AppController
         $asset = $this->Assets->get($id, [
             'contain' => []
         ]);
+
+
         if ($this->request->is(['patch', 'post', 'put'])) {
             $fecha = date('Y-m-d H:i:s');
             $asset->modified = $fecha;
@@ -218,12 +231,41 @@ class AssetsController extends AppController
         }
 
         $this->loadModel('Brands');
-        $brands = $this->Brands->find('list', ['limit' => 200]);
-        $users = $this->Assets->Users->find('list', ['limit' => 200]);
+
+        $brands = $this->Brands->find('list')          
+            ->select([
+                'Brands.id',
+                'Brands.name'
+            ])
+            ->distinct(['Brands.name'])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'RIGHT',
+        'conditions' => 'Models.id_brand = Brands.id',
+            ])
+            ->where(['Models.id_type' => $asset->type_id]);
+
+        $this->loadModel('Models');
+        $models = $this->Models->find('list')
+            ->where(['Models.id_brand' => $asset->brand]);
+
+        
+        $users = $this->Assets->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
+
         $locations = $this->Assets->Locations->find('list', ['limit' => 200]);
 		$types = $this->Assets->Types->find('list', ['limit' => 200]);
 		
         $this->set(compact('asset', 'brands', 'users', 'locations', 'models', 'types'));
+
     }
 
     /**
@@ -283,11 +325,14 @@ class AssetsController extends AppController
      */
     public function delete($asset)
     {
-        if ($this->Assets->delete($asset)) {
-            return 1;
-        } else {
-            return 0;
-        }
+        /* 
+        DEPRECATED 
+            if ($this->Assets->delete($asset)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        */
     }
 
     /**
@@ -321,19 +366,6 @@ class AssetsController extends AppController
         'conditions' => 'Models.id_brand = Brands.id',
             ])
             ->where(['Models.id_type' => $type_id]);
-
-        /*
-            ORIGINAL
-
-        $brands = $this->Models->find('list')            
-            ->select([
-                'Brands.id',
-                'Brands.name'
-            ])
-            ->distinct(['Brands.name'])
-            ->contain(['Brands'])
-            ->where(['Models.id_type' => $type_id]);
-        */
 
         if(empty($brands))
         {
