@@ -185,7 +185,7 @@ class UsersController extends AppController
                 $user->setError('username', ['El usuario ya existe.']);
             }
 
-            if($user->password != $user->password2){
+            if(strcmp($this->request->getData()['password'], $this->request->getData()['password']) != 0){
                 $user->setError('password', ['Las contraseñas no coinciden.']);
                 $user->setError('password2', ['Las contraseñas no coinciden.']);
             }

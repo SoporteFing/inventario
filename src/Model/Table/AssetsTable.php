@@ -158,10 +158,12 @@ class AssetsTable extends Table
 
         $validator
             ->scalar('year')
-            ->add('year', 'validFormat',[
-                'rule' => array('custom', '/^[0-9]{4}$/'),
-                'message' => 'El año debe de tener el formato yyyy'
-                ])
+            ->add('year',[ 
+                [
+                'rule'=>['custom', ' /^[0-9]{4}$/ '],
+                'message'=>'El año debe de tener el formato yyyy. Ejemplo: 2010'
+                ]
+            ])
             ->notEmpty('year','Debe ingresar un año');
 
         $validator
@@ -222,8 +224,10 @@ class AssetsTable extends Table
 		$validator
             ->scalar('type_id')
 			->maxLength('type_id', 255)
-            ->allowEmpty('type_id');
-            
+            ->requirePresence('type_id', 'create')
+            ->requirePresence('type_id', 'update')
+            ->notEmpty('type_id');
+
         return $validator;
     }
 

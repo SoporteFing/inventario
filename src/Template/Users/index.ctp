@@ -80,7 +80,7 @@
 </style>
 
 <?= $this->Html->link(__('Nuevo Usuario'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
-<?= $this->Form->button(__('PROBAR'), ['class' => 'btn btn-primary', 'id' => 'boton1']) ?>
+<!--<?= $this->Form->button(__('PROBAR'), ['class' => 'btn btn-primary', 'id' => 'boton1']) ?>-->
 <?= $this->Form->end() ?>
 
 <!--    TEST     -->
@@ -217,7 +217,7 @@
           $('#edit-item').modal("show");
           var table2 = $('#select-users-grid').DataTable( {
             dom: 'Bfrtip',
-            buttons: [
+            buttons: [  
             'pdfHtml5'
             ],
             "iDisplayLength": 10,

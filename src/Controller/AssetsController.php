@@ -91,53 +91,6 @@ class AssetsController extends AppController
     public function add()
     {
 
-        /*
-            BORRAR
-        
-         *
-
-
-        $this->loadModel('Models');
-        $this->loadModel('Brands');
-        $this->loadModel('Types');
-
-        $type_id = '5b9fcbe7bb7a6';
-        
-        $models = $this->Models->find('list')
-            ->where(['Models.id_brand' => '5ba4369fe1f6c']);
-
-        
-        $brands = $this->Brands->find('list')          
-            ->select([
-                'Brands.id',
-                'Brands.name'
-            ])
-            ->distinct(['Brands.name'])
-            ->join([
-        'table' => 'models',
-        'alias' => 'Models',
-        'type' => 'RIGHT',
-        'conditions' => 'Models.id_brand = Brands.id',
-            ])
-            ->where(['Models.id_type' => $type_id]);
-
-    debug($brands);
-
-        foreach ($brands as $brand) {
-            debug($brand);
-        }
-
-
-        die();
-
-
-
-        /*
-            BORRAR
-
-
-        */
-
 
         $asset = $this->Assets->newEntity();
         if ($this->request->is('post')) {
@@ -181,7 +134,7 @@ class AssetsController extends AppController
                 return $this->redirect(['action' => 'index']);
             }
             AppController::insertLog($asset['plaque'], FALSE);
-            $this->Flash->error(__('El activo no se pudo guardar, por favor intente nuevamente. Placa existente'));
+            $this->Flash->error(__('El activo no se pudo guardar, por favor intente nuevamente.'));
         }
         
         $this->loadModel('Brands');
@@ -217,14 +170,14 @@ class AssetsController extends AppController
             $asset->modified = $fecha;
             
             $asset = $this->Assets->patchEntity($asset, $this->request->getData());
-			/*if ($_POST['models_id'] == '') {
+			if ($_POST['models_id'] == '') {
 				$asset->models_id = null;
 			}
             if ($this->Assets->save($asset)) {
                 AppController::insertLog($asset['plaque'], TRUE);
                 $this->Flash->success(__('El activo fue guardado exitosamente.'));
                 return $this->redirect(['action' => 'index']);
-            }*/
+            }
             debug($asset);
             AppController::insertLog($asset['plaque'], FALSE);
             $this->Flash->error(__('El activo no se pudo guardar, por favor intente nuevamente.'));
@@ -417,12 +370,14 @@ class AssetsController extends AppController
         $asset = $this->Assets->newEntity();
         //$asset = $this->Assets->newEntity();
         if ($this->request->is('post')) {
-
+            debug($this->request->getData());
+            die();
             //guarda en variables todos los campos reutilizables
             $cantidad = $this->request->getData('quantity');
             $placa = $this->request->getData('plaque');
             $marca = $this->request->getData('brand');
             $modelo = $this->request->getData('models_id');
+            $tipo = $this->request->getData('type_id');
 			//$type = $this->request->getData('type_id');
             if ($_POST['brand'] == '') {
                 $marca = null;
@@ -477,6 +432,7 @@ class AssetsController extends AppController
                         'plaque' => $placa,
                         'brand' => $marca,
                         'models_id' => $modelo,
+                        'type_id' => $type,
                         'series' => $serie,
                         'description' => $descripcion,
                         'owner_id' => $dueno,
@@ -498,6 +454,7 @@ class AssetsController extends AppController
                         'plaque' => $predicado . $numero,
                         'brand' => $marca,
                         'models_id' => $modelo,
+                        'type_id' => $type,
                         'series' => $serie,
                         'description' => $descripcion,
                         'owner_id' => $dueno,
@@ -525,7 +482,16 @@ class AssetsController extends AppController
         $this->loadModel('Brands');
         $brands = $this->Brands->find('list', ['limit' => 200]);
         //$types = $this->Assets->Types->find('list', ['limit' => 200]);
-        $users = $this->Assets->Users->find('list', ['limit' => 200]);
+        $users = $this->Assets->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
+
         $locations = $this->Assets->Locations->find('list', ['limit' => 200]);
         $types = $this->Assets->Types->find('list', ['limit' => 200]);
         $this->set(compact('asset', 'types', 'brands', 'users', 'locations','models'));

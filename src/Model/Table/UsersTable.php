@@ -55,7 +55,7 @@ class UsersTable extends Table
             ->requirePresence('correo', 'update')
             ->add('correo',[ 
                 [
-                'rule'=>['custom', ' /^.+@.+\.com$/ '],
+                'rule'=>['custom', ' /^.+@.+\..+$/ '],
                 'message'=>'Debe seguir el formato: correo@ejemplo.com'
                 ]
             ])
@@ -133,7 +133,7 @@ class UsersTable extends Table
         $validator
             ->scalar('password2')
             ->maxLength('password2', 60)
-            ->requirePresence('password', 'create')
+            ->requirePresence('password2', 'create')
             ->notEmpty('residues_id', 'La confirmación de constraseña es requerida.');
 
         $validator
