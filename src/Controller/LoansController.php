@@ -114,7 +114,7 @@ class LoansController extends AppController
                 $this->Flash->error(__('Error al subir el archivo'));
                 return $this->redirect(['action' => 'view', $loan->id]);
             }
-            $assets = $this->Loans->Assets->find('list', ['limit' => PHP_INT_MAX]);
+            $assets = $this->Loans->Assets->find('list');
             $users = $this->Loans->Users->find('list', ['limit' => PHP_INT_MAX ]);
             $this->set(compact('assets', 'loan', 'users'));
 

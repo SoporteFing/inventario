@@ -222,19 +222,19 @@ class TransfersController extends AppController
             $this->Flash->error(__('No se pudo realizar la transferencia.'));
         }
 
-
         // obtengo la tabla assets
         $assets_transfers = TableRegistry::get('AssetsTransfers');
+
 
         // reallizo un join  a assets_tranfers para obtener los activos
         //asosiados a un traslado
         $query = $assets_transfers->find()
-                    ->select(['Assets.plaque'])
+                    ->select(['assets.plaque'])
                     ->join([
                       'assets'=> [
                         'table'=>'assets',
                         'type'=>'INNER',
-                        'conditions'=> [ 'Assets.plaque= AssetsTransfers.assets_id']
+                        'conditions'=> [ 'assets.plaque= AssetsTransfers.assets_id']
                         ]
                     ])
                     ->toList();
@@ -248,6 +248,7 @@ class TransfersController extends AppController
         }
 
         //Buscca los activos para cargarlos en el grid.
+
         $assetsQuery = TableRegistry::get('Assets');
         $assetsQuery = $assetsQuery->find()
                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.state'])
@@ -286,7 +287,7 @@ class TransfersController extends AppController
         /** obtengo una lista de usuarios para cargar un dropdown list en la vista */
         $usersTable= TableRegistry::get('Users');
         $queryUsers = $usersTable->find()
-                        ->select(['users.nombre','users.apellido1','users.apellido2'])
+                        ->select(['Users.nombre','Users.apellido1','Users.apellido2'])
                         ->toList();
 
         $size = count($queryUsers);

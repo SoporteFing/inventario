@@ -206,7 +206,7 @@ class TechnicalReportsController extends AppController
         }// if post
         
         // En caso de que la acción sea simplemente cargar la vista
-        $assets = $this->TechnicalReports->Assets->find('list', ['limit' => 200]);
+        $assets = $this->Assets->find('all');
         
         // Le paso a la vista los valores de assets y el ID que se va a desplegar.
         $this->set(compact('technicalReport', 'assets','CompleteID'));
