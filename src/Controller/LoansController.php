@@ -128,8 +128,8 @@ class LoansController extends AppController
         $this->loadModel('Assets');
         $query = $this->Assets->find()
 
-                        ->select(['assets.plaque', 'assets.models_id', 'assets.series'])
-                        ->where(['assets.loan_id' => $id])
+                        ->select(['Assets.plaque', 'Assets.models_id', 'Assets.series'])
+                        ->where(['Assets.loan_id' => $id])
                         ->toList();
 
         $size = count($query);
@@ -190,11 +190,11 @@ class LoansController extends AppController
 
         $this->loadModel('Assets');
 
-        $query = $this->Assets->find()
-                        ->select(['assets.plaque', 'assets.models_id', 'assets.series'])
-                        ->where(['assets.state' => "Disponible"])
-                        ->where(['assets.lendable' => true])
-                        ->where(['assets.deleted' => false])
+        $query = $this->Assets->find('all')
+                        ->select(['Assets.plaque', 'Assets.models_id', 'Assets.series'])
+                        ->where(['Assets.state' => "Disponible"])
+                        ->where(['Assets.lendable' => true])
+                        ->where(['Assets.deleted' => false])
                         ->toList();
 
         $size = count($query);
@@ -206,10 +206,21 @@ class LoansController extends AppController
             $result[$i] =(object)$query[$i]->assets;
         }
 
-        $assets = $this->Assets->find('list', [
-            'conditions' => ['assets.state' => 'Disponible']
+
+
+        $assets = $this->Assets->find('all', [
+            'conditions' => ['Assets.state' => 'Disponible']
         ]);
-        $users = $this->Loans->Users->find('list', ['limit' => PHP_INT_MAX ]);
+
+        $users = $this->Assets->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
         $this->set(compact('assets', 'loan', 'users', 'result'));
     }
 
@@ -240,8 +251,8 @@ class LoansController extends AppController
         $this->loadModel('Assets');
         $query = $this->Assets->find()
 
-                        ->select(['assets.plaque', 'assets.models_id', 'assets.series'])
-                        ->where(['assets.loan_id' => $id])
+                        ->select(['Assets.plaque', 'Assets.models_id', 'Assets.series'])
+                        ->where(['Assets.loan_id' => $id])
                         ->toList();
 
         $size = count($query);
@@ -270,7 +281,7 @@ class LoansController extends AppController
         if ($this->Loans->save($loan)){
             
             $assets = $this->Assets->find()
-            ->where(['assets.loan_id' => $id])
+            ->where(['Assets.loan_id' => $id])
             ->toList();
                 
             foreach($assets as $asset){

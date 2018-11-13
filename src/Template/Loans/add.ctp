@@ -84,7 +84,7 @@
                 <thead>
                 <tbody>
                     <?php 
-                      foreach ($result as $a): ?>
+                      foreach ($assets as $a): ?>
                       <tr>
                           <td><?= h($a->plaque) ?></td>
                           <td><?= h($a->models_id) ?></td>  

@@ -111,12 +111,12 @@ class TechnicalReportsController extends AppController
         //variable para cargar los datos del activo ya asignado
         $Assets = TableRegistry::get('Assets');
         $assetsQuery = $Assets->find()
-                         ->select(['assets.plaque','brands.name','models.name','assets.series','assets.description'])
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.description'])
                          ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -126,7 +126,7 @@ class TechnicalReportsController extends AppController
                                     'conditions' => ['models.id_brand = brands.id']
                                 ]
                                 ])
-                         ->where(['assets.plaque' => $technicalReport->assets_id ])
+                         ->where(['Assets.plaque' => $technicalReport->assets_id ])
                         ->toList();
 
 
@@ -245,12 +245,12 @@ class TechnicalReportsController extends AppController
         //variable para cargar los datos del activo ya asignado
         $Assets = TableRegistry::get('Assets');
         $assetsQuery = $Assets->find()
-                         ->select(['assets.plaque','brands.name','models.name','assets.series','assets.description'])
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.description'])
                          ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -260,7 +260,7 @@ class TechnicalReportsController extends AppController
                                     'conditions' => ['models.id_brand = brands.id']
                                 ]
                                 ])
-                         ->where(['assets.plaque' => $technicalReport->assets_id ])
+                         ->where(['Assets.plaque' => $technicalReport->assets_id ])
                         ->toList();
 
 
@@ -308,12 +308,12 @@ class TechnicalReportsController extends AppController
         $assets = TableRegistry::get('Assets');
         //$searchedAsset= $assets->get($id);
         $assetsQuery = $assets->find()
-                         ->select(['assets.plaque','brands.name','models.name','assets.series','assets.description'])
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.description'])
                          ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -323,7 +323,7 @@ class TechnicalReportsController extends AppController
                                     'conditions' => ['models.id_brand = brands.id']
                                 ]
                                 ])
-                         ->where(['assets.plaque' => $id])
+                         ->where(['Assets.plaque' => $id])
                          ->toList();
         
         if(empty($assetsQuery) )
@@ -381,12 +381,12 @@ class TechnicalReportsController extends AppController
         //variable para cargar los datos del activo ya asignado
         $Assets = TableRegistry::get('Assets');
         $assetsQuery = $Assets->find()
-                         ->select(['assets.plaque','brands.name','models.name','assets.series','assets.description'])
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.description'])
                          ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -396,7 +396,7 @@ class TechnicalReportsController extends AppController
                                     'conditions' => ['models.id_brand = brands.id']
                                 ]
                                 ])
-                         ->where(['assets.plaque' => $technicalReport->assets_id ])
+                         ->where(['Assets.plaque' => $technicalReport->assets_id ])
                         ->toList();
 
 

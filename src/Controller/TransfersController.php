@@ -106,19 +106,19 @@ class TransfersController extends AppController
         // reallizo un join  a assets_tranfers para obtener los activos
         //asosiados a un traslado
         $query = $assets_transfers->find()
-                    ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
+                    ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.state'])
                     ->join([
                       'assets'=> [
                         'table'=>'assets',
                         'type'=>'INNER',
-                        'conditions'=> [ 'assets.plaque= AssetsTransfers.assets_id']
+                        'conditions'=> [ 'Assets.plaque= AssetsTransfers.assets_id']
                         ]
                     ])
                     ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                     ->join([
@@ -229,12 +229,12 @@ class TransfersController extends AppController
         // reallizo un join  a assets_tranfers para obtener los activos
         //asosiados a un traslado
         $query = $assets_transfers->find()
-                    ->select(['assets.plaque'])
+                    ->select(['Assets.plaque'])
                     ->join([
                       'assets'=> [
                         'table'=>'assets',
                         'type'=>'INNER',
-                        'conditions'=> [ 'assets.plaque= AssetsTransfers.assets_id']
+                        'conditions'=> [ 'Assets.plaque= AssetsTransfers.assets_id']
                         ]
                     ])
                     ->toList();
@@ -250,12 +250,12 @@ class TransfersController extends AppController
         //Buscca los activos para cargarlos en el grid.
         $assetsQuery = TableRegistry::get('Assets');
         $assetsQuery = $assetsQuery->find()
-                        ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
+                        ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.state'])
                         ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                         ->join([
@@ -265,7 +265,7 @@ class TransfersController extends AppController
                                    'conditions' => ['models.id_brand = brands.id']
                                 ]
                         ])
-                        ->where(['assets.state = "Disponible"'])
+                        ->where(['Assets.state = "Disponible"'])
                         ->toList();
         $size = count($assetsQuery);
         $asset=   array_fill(0, $size, NULL);
@@ -320,12 +320,12 @@ class TransfersController extends AppController
         //asosiados a un traslado
         $query = $assets_transfers
                     ->find('all')
-                    ->select(['assets.plaque'])
+                    ->select(['Assets.plaque'])
                     ->join([
                       'assets'=> [
                         'table'=>'assets',
                         'type'=>'INNER',
-                        'conditions'=> [ 'assets.plaque= AssetsTransfers.assets_id']
+                        'conditions'=> [ 'Assets.plaque= AssetsTransfers.assets_id']
                         ]
                     ])
 
@@ -421,12 +421,12 @@ class TransfersController extends AppController
 
         $assetsQuery = TableRegistry::get('Assets');
         $assetsQuery = $assetsQuery->find()
-                        ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
+                        ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.state'])
                         ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                         ->join([
@@ -440,10 +440,10 @@ class TransfersController extends AppController
                       'assets_transfers'=> [
                         'table'=>'assets_transfers',
                         'type'=>'LEFT',
-                        'conditions'=> [ 'assets.plaque= assets_transfers.assets_id']
+                        'conditions'=> [ 'Assets.plaque= assets_transfers.assets_id']
                         ]
                         ])
-                        ->where(['assets.state = "Disponible" or assets_transfers.transfer_id = "'.$id.'"'])
+                        ->where(['Assets.state = "Disponible" or assets_transfers.transfer_id = "'.$id.'"'])
                         ->toList();
         $size = count($assetsQuery);
         $asset=   array_fill(0, $size, NULL);
@@ -552,19 +552,19 @@ class TransfersController extends AppController
         // reallizo un join  a assets_tranfers para obtener los activos
         //asosiados a un traslado
         $query = $assets_transfers->find()
-                    ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
+                    ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.state'])
                     ->join([
                       'assets'=> [
                         'table'=>'assets',
                         'type'=>'INNER',
-                        'conditions'=> [ 'assets.plaque= AssetsTransfers.assets_id']
+                        'conditions'=> [ 'Assets.plaque= AssetsTransfers.assets_id']
                         ]
                     ])
                     ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                     ->join([
@@ -644,7 +644,7 @@ public function download($id = null)
             $plaques= explode(',',$this->request->data('plaques') );
 
             //  las placas se pasan a un formato de string de manera que seaan válidas en
-            //el where assets.plaque in
+            //el where Assets.plaque in
             $plaqueList;
             $plaqueList.="'".$plaques[0]."'";
             $size=count($plaques);

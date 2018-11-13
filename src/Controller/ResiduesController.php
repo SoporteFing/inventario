@@ -105,7 +105,7 @@ class ResiduesController extends AppController
         $assets = TableRegistry::get('Assets');
         //busco los datos que necesito
         $assetsquery = $assets->find()
-                        ->select(['assets.plaque'])
+                        ->select(['Assets.plaque'])
                         ->where(['residues_id'=>$id])
                         ->toList();
 
@@ -208,19 +208,19 @@ class ResiduesController extends AppController
         //Hace la seleccion de los Activos usando Join para unir los datos
         $technical_reports = TableRegistry::get('TechnicalReports');
         $assetsQuery = $technical_reports->find()
-                         ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.state'])
                          ->join([
                             'assets' => [
                                     'table' => 'assets',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.plaque= TechnicalReports.assets_id']
+                                    'conditions' => ['Assets.plaque= TechnicalReports.assets_id']
                                 ]
                                 ])
                          ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -230,8 +230,8 @@ class ResiduesController extends AppController
                                     'conditions' => ['models.id_brand = brands.id']
                                 ]
                                 ])
-                         ->where(['TechnicalReports.recommendation' => "D", 'assets.state' => "Disponible"])
-                         ->group (['assets.plaque'])
+                         ->where(['TechnicalReports.recommendation' => "D", 'Assets.state' => "Disponible"])
+                         ->group (['Assets.plaque'])
                          ->toList();
 
         $size = count($assetsQuery);
@@ -270,8 +270,8 @@ class ResiduesController extends AppController
 
         //Obtengo los activos que estan en el acta de residuos
         $query2 = $assets->find()
-                        ->select(['assets.plaque'])
-                        ->where(['assets.residues_id' => $id])
+                        ->select(['Assets.plaque'])
+                        ->where(['Assets.residues_id' => $id])
                         ->toList();
 
         //lo paso a objeto para manejarlo en vista
@@ -369,19 +369,19 @@ class ResiduesController extends AppController
         /** se obtienen los datos de los activos que se quieren desechar*/
         $technical_reports = TableRegistry::get('TechnicalReports');
         $query = $technical_reports->find()
-                        ->select(['assets.plaque', 'brands.name', 'models.name', 'assets.series', 'assets.state'])
+                        ->select(['Assets.plaque', 'brands.name', 'models.name', 'Assets.series', 'Assets.state'])
                         ->join ([
                             'assets'=> [
                                 'table'=>'assets',
                                 'type'=>'INNER',
-                                'conditions'=> ['assets.plaque= TechnicalReports.assets_id']
+                                'conditions'=> ['Assets.plaque= TechnicalReports.assets_id']
                             ]
                         ])
                         ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -394,16 +394,16 @@ class ResiduesController extends AppController
                         ->where(['OR'=>[
                                         ['AND'=>[
                                                  ['TechnicalReports.recommendation' => "D"],
-                                                 ['assets.state' => 'Disponible']
+                                                 ['Assets.state' => 'Disponible']
                                                 ]
                                         ],
-                                        ['assets.plaque in'=>array_column($result2, 'plaque')]
+                                        ['Assets.plaque in'=>array_column($result2, 'plaque')]
                                        ]
                                 ])
-                        //->where(['assets.state not like' => 'Des%'])
+                        //->where(['Assets.state not like' => 'Des%'])
                         //->where(['TechnicalReports.recommendation' => "D"])
-                        //->where(['or assets.plaque in'=>$result2 ])
-                        ->group(['assets.plaque'])
+                        //->where(['or Assets.plaque in'=>$result2 ])
+                        ->group(['Assets.plaque'])
                         ->toList();
         //debug($query);
         $size = count($query);
@@ -494,7 +494,7 @@ class ResiduesController extends AppController
         $assets = TableRegistry::get('Assets');
         //busco los datos que necesito
         $assetsquery = $assets->find()
-                        ->select(['assets.plaque'])
+                        ->select(['Assets.plaque'])
                         ->where(['residues_id'=>$id])
                         ->toList();
 
@@ -536,7 +536,7 @@ class ResiduesController extends AppController
     {
         /*$conn = ConnectionManager::get('default');
         $stmt = $conn->execute('SELECT * FROM assets
-            inner join residues on assets.residues_id = residues.residues_id
+            inner join residues on Assets.residues_id = residues.residues_id
             where residues.residues_id =\'' . $id . '\';');
         $results = $stmt ->fetchAll('assoc');
          require_once 'dompdf/autoload.inc.php';
@@ -578,7 +578,7 @@ class ResiduesController extends AppController
             $plaques= explode(',',$this->request->data('plaques') );
 
             //  las placas se pasan a un formato de string de manera que seaan válidas en
-            //el where assets.plaque in
+            //el where Assets.plaque in
             $plaqueList;
             $plaqueList.="'".$plaques[0]."'";
             $size=count($plaques);
@@ -589,7 +589,7 @@ class ResiduesController extends AppController
             
             $conn = ConnectionManager::get('default');
             $stmt = $conn->execute("SELECT description, plaque FROM assets
-            where assets.plaque in (". $plaqueList .");");
+            where Assets.plaque in (". $plaqueList .");");
             $results = $stmt ->fetchAll('assoc');
 
             require_once 'dompdf/autoload.inc.php';
@@ -706,7 +706,7 @@ class ResiduesController extends AppController
 
             $conn = ConnectionManager::get('default');
             $stmt = $conn->execute("SELECT description, plaque FROM assets
-            where assets.residues_id = '". $id ."';");
+            where Assets.residues_id = '". $id ."';");
             $results = $stmt ->fetchAll('assoc');
             $size = count($results);
             require_once 'dompdf/autoload.inc.php';
