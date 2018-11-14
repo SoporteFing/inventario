@@ -18,7 +18,7 @@ class TransfersController extends AppController
 {
 
 
-    private $UnidadAcadémica='Ingeniería';
+    private $UnidadAcademica='Ingeniería';
 
 
  public function isAuthorized($user)
@@ -249,56 +249,25 @@ class TransfersController extends AppController
 
         //Buscca los activos para cargarlos en el grid.
 
-        $assetsQuery = TableRegistry::get('Assets');
-        $assetsQuery = $assetsQuery->find()
-                        ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.state'])
-                        ->join([
-                            'models' => [
-                                    'table' => 'models',
-                                    'type'  => 'LEFT',
-                                    'conditions' => ['Assets.models_id= models.id']
-                                ]
-                                ])
-                        ->join([
-                            'brands' => [
-                                    'table' => 'brands',
-                                    'type'  => 'LEFT',
-                                   'conditions' => ['models.id_brand = brands.id']
-                                ]
-                        ])
-                        ->where(['Assets.state = "Disponible"'])
-                        ->toList();
-        $size = count($assetsQuery);
-        $asset=   array_fill(0, $size, NULL);
-        
-        for($i=0;$i<$size;$i++)
-        {
-            //* se acomodan los valores dentro de un mismo [$i]
-            $asset[$i]['plaque']= $assetsQuery[$i]->assets['plaque'];
-            $asset[$i]['brand']= $assetsQuery[$i]->brands['name'];
-            $asset[$i]['model']= $assetsQuery[$i]->models['name'];
-            $asset[$i]['series']= $assetsQuery[$i]->assets['series'];
-            $asset[$i]['state']= $assetsQuery[$i]->assets['state'];
+        $this->loadModel('Assets');
 
-            // se realiza una conversion a objeto para que la vista lo use sin problemas
-            $asset[$i]= (object)$asset[$i];
-        }
+        $asset = $this->Assets->find('all', [
+            'conditions' => ['Assets.state' => 'Disponible']
+        ]);
 
         /** obtengo una lista de usuarios para cargar un dropdown list en la vista */
-        $usersTable= TableRegistry::get('Users');
-        $queryUsers = $usersTable->find()
-                        ->select(['Users.nombre','Users.apellido1','Users.apellido2'])
-                        ->toList();
-
-        $size = count($queryUsers);
-        $users= array_fill(0, $size, NULL);
-        /** se concatena el nombre y se coloca en un mismo array*/
-        for($i=0;$i<$size;$i++)
-        {
-            $users[$i] =$queryUsers[$i]->users['nombre'] ." ".$queryUsers[$i]->users['apellido1']." ".$queryUsers[$i]->users['apellido2'];
-        }
+        $this->loadModel('Users');
+        $users = $this->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
         // variable para colocar la unidad que entrega
-        $paramUnidad = $this->UnidadAcadémica;
+        $paramUnidad = $this->UnidadAcademica;
         $this->set(compact('transfer', 'asset', 'result','tmpId','users','paramUnidad'));
 
     }

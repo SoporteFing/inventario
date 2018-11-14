@@ -173,7 +173,7 @@
                     <?php 
                     echo $this->Form->select('functionary',
                       $users,
-                      ['empty' => '(Escoja un usuario)','class'=>'form-control', 'style'=>'width:220px;']
+                      ['empty' => '(Escoja un usuario)','class'=>'form-control','onChange' => 'fillID(this.value);', 'style'=>'width:220px;']
                     );
                     ?>
                 </div>
@@ -191,7 +191,8 @@
                                 "required"=>"required",
                             'label'=>['text' => '' ,'style'=>'margin-left:7px;'],
                             'id' =>'identification',
-                            'class'=>'form-control col-sm-6'
+                            'class'=>'form-control col-sm-8',
+                            'Disabled'
                             ]);
                     ?>
 
@@ -240,7 +241,7 @@
                                 "required"=>"required",
                             'label'=>['text' => '' ,'style'=>'margin-left:7px;'],
                             'id' =>'identification_recib',
-                            'class'=>'form-control col-sm-6'
+                            'class'=>'form-control col-sm-8'
                             ]);
                     ?>
 
@@ -300,6 +301,11 @@
 </body>
 
 <script>
+
+    function fillID(val) {
+        $('#identification').val(val);
+    }
+
   $( function Picker() {
     $( "#datepicker" ).datepicker({ 
             dateFormat: 'y-mm-dd',
