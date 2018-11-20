@@ -4,7 +4,7 @@ namespace App\Controller;
 use App\Controller\AppController;
 
 /**
- * Brands Controller
+ * Brands ControllerSSS
  *
  * @property \App\Model\Table\BrandsTable $Brands
  *

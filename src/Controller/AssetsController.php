@@ -370,8 +370,6 @@ class AssetsController extends AppController
         $asset = $this->Assets->newEntity();
         //$asset = $this->Assets->newEntity();
         if ($this->request->is('post')) {
-            debug($this->request->getData());
-            die();
             //guarda en variables todos los campos reutilizables
             $cantidad = $this->request->getData('quantity');
             $placa = $this->request->getData('plaque');
@@ -432,7 +430,7 @@ class AssetsController extends AppController
                         'plaque' => $placa,
                         'brand' => $marca,
                         'models_id' => $modelo,
-                        'type_id' => $type,
+                        'type_id' => $tipo,
                         'series' => $serie,
                         'description' => $descripcion,
                         'owner_id' => $dueno,
@@ -454,7 +452,7 @@ class AssetsController extends AppController
                         'plaque' => $predicado . $numero,
                         'brand' => $marca,
                         'models_id' => $modelo,
-                        'type_id' => $type,
+                        'type_id' => $tipo,
                         'series' => $serie,
                         'description' => $descripcion,
                         'owner_id' => $dueno,

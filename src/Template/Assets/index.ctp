@@ -32,8 +32,8 @@
                     <?php foreach ($assets as $asset): ?>
                         <tr>
                             <td class="actions">
-                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $asset->plaque], array('escape'=> false)) ?>
-                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $asset->plaque],  array('escape'=> false)) ?>
+                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $asset->plaque], array('escape'=> false, 'target' => '_blank')) ?>
+                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $asset->plaque],  array('escape'=> false, 'target' => '_blank')) ?>
                                 <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'softDelete', $asset->plaque],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar este activo? # {0}?', $asset->id)]) ?>
                             </td>
                             
