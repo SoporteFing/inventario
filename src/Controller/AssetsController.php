@@ -70,7 +70,7 @@ class AssetsController extends AppController
     public function index()
     {
         $this->paginate = [
-            'contain' => ['Users', 'Locations','Models']
+            'contain' => ['Users', 'Locations','Models','Types']
         ];
         $assets = $this->paginate($this->Assets);
         $this->set(compact('assets'));
@@ -80,6 +80,7 @@ class AssetsController extends AppController
      */
     public function view($id = null)
     {
+
         $asset = $this->Assets->get($id, [
             'contain' => ['Users', 'Locations', 'Models', 'Types']
         ]);

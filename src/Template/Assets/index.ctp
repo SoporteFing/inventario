@@ -16,11 +16,12 @@
                 <thead>
                     <tr>
                         <th scope="col" class="actions"><?= __('') ?></th>        
-                        <th scope="col">Placa</th>        
+                        <th scope="col">Placa</th>
+                        <th scope="col">Tipo</th>        
                         <th scope="col">Marca</th>
                         <th scope="col">Modelo</th>
                         <th scope="col">Serie</th>
-                        <th scope="col">Descripción</th>
+                        <!--th scope="col">Descripción</th-->
                         <th scope="col">Estado</th>
                         <th scope="col">Asignado</th>
                         <th scope="col">Ubicación</th>                
@@ -38,10 +39,11 @@
                             </td>
                             
                             <td><?= h($asset->plaque) ?></td>
+                            <td><?= $asset->has('type') ? h($asset->type->name) : '' ?></td>
                             <td><?= h($asset->brand) ?></td>
                             <td><?= $asset->has('model') ? h($asset->model->name) : '' ?></td>
                             <td><?= h($asset->series) ?></td>
-                            <td><?= h($asset->description) ?></td>
+                            <!--td><?= h($asset->description) ?></td-->
                             <td><?= h($asset->state) ?></td>
                             <td><?= h($asset->user->nombre . " " . $asset->user->apellido1) ?></td>
                             <td><?= $asset->has('location') ? $this->Html->link($asset->location->nombre, ['controller' => 'Locations', 'action' => 'view', $asset->location->location_id]) : '' ?></td>
@@ -54,10 +56,11 @@
                     <tr>
                         <td></td>
                         <th>Placa</th>
+                        <th>Tipo</th>
                         <th>Marca</th>
                         <th>Modelo</th>
                         <th>Serie</th>
-                        <th>Descripción</th>
+                        <!--th>Descripción</th-->
                         <th>Estado</th>
                         <th>Asignado a</th>
                         <th>Ubicación</th>
