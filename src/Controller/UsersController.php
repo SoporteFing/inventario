@@ -239,6 +239,9 @@ class UsersController extends AppController
 
 
         if ($this->request->is(['patch', 'post', 'put'])) {
+
+            //debug($this->request->getData());
+            //die();
             if($this->request->getData()['password'] == $this->request->getData()['password2']){
                     
                 $user = $this->Users->patchEntity($user, $this->request->getData());

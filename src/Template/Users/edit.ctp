@@ -94,13 +94,13 @@
 
         <div class="row">
 
-          <div class="col-sm-4">
+          <!--div class="col-sm-4">
             <label> <b>Tipo de Identificación:</b><b style="color:red;">*</b> </label>
             <?php echo $this->Form->select('type_id', array('0' => 'Cédula', '1' => 'Otro Documento'), array('empty' => '-- Seleccione Tipo --', 'class' => 'form-control col-md-10', 'id' => 'type_id')); ?>
-          </div>  
+          </div-->  
 
           <div class="col-sm-4">
-            <label> <b>Identificación:</b><b style="color:red;">*</b> </label>
+            <label> <b>Identificación:</b><b style="color:red;"></b> </label>
             <?php 
                   echo $this->Form->control('id', 
                       [
@@ -113,6 +113,7 @@
                         'maxlenght' => '15',
                         "required"=>"required",
                         'class'=>'form-control col-sm-6 col-md-10 col-lg-10',
+                        "disabled"
                       ]);
             ?>
           </div>
@@ -129,7 +130,7 @@
                         'label'=>['text'=>''],
                         'placeholder' => 'correo@ejemplo.com',
                         "required"=>"required",
-                        'class'=>'form-control col-sm-6 col-md-10 col-lg-11',
+                        'class'=>'form-control col-sm-6 col-md-10 col-lg-10',
                       ]);
             ?>
           </div>
@@ -145,7 +146,7 @@
 
 
           <div class="col-sm-4">
-            <label> <b>Usuario:</b><b style="color:red;">*</b> </label>
+            <label> <b>Usuario:</b><b style="color:red;"></b> </label>
             <?php 
                   echo $this->Form->control('username', 
                       [
@@ -154,8 +155,8 @@
                           'inputContainerError' => '{{content}} {{error}}'
                         ], 
                         'label'=>['text'=>''],
-                        "required"=>"required",
                         'class'=>'form-control col-sm-6 col-md-10 col-lg-11',
+                        "disabled"
                       ]);
             ?>
           </div>
