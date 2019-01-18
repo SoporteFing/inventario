@@ -106,19 +106,19 @@ class TransfersController extends AppController
         // reallizo un join  a assets_tranfers para obtener los activos
         //asosiados a un traslado
         $query = $assets_transfers->find()
-                    ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.state'])
+                    ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
                     ->join([
                       'assets'=> [
                         'table'=>'assets',
                         'type'=>'INNER',
-                        'conditions'=> [ 'Assets.plaque= AssetsTransfers.assets_id']
+                        'conditions'=> [ 'assets.plaque= AssetsTransfers.assets_id']
                         ]
                     ])
                     ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['Assets.models_id= models.id']
+                                    'conditions' => ['assets.models_id= models.id']
                                 ]
                                 ])
                     ->join([
@@ -150,7 +150,7 @@ class TransfersController extends AppController
         }
         //$user =$this->Auth->user();
         
-        $Unidad= $this->UnidadAcadémica;
+        $Unidad= $this->UnidadAcademica;
 
         $this->set(compact('transfer','result','Unidad'));
     }
@@ -176,11 +176,14 @@ class TransfersController extends AppController
             //$transfer->transfers_id = $this->request->getData('transfers_id');
             $users = TableRegistry::get('users');
             //se obtiene el nombre del usuario con la posición del dropdown
-            $users_query = $users->find()
-                ->select(['users.nombre','users.apellido1','users.apellido2'])->toList();
+            $functionary = $users->find()
+                ->select(['users.nombre','users.apellido1','users.apellido2'])
+                ->where(['users.id' => $this->request->getData("functionary")])
+                ->first();
+            $transfer->functionary = $functionary['nombre'] .' '.$functionary['apellido1'].' '.$functionary['apellido2'];
+            $transfer->identification = $this->request->getData("functionary");
+ 
 
-            $array_funcionario = $users_query[$transfer->functionary];
-            $transfer->functionary = $array_funcionario->nombre.' '.$array_funcionario->apellido1.' '.$array_funcionario->apellido2;
             //Se verifica que el id no esté duplicado, por alguna razón la base de datos no lo estaba haciendo.
 
             $returnId = $this->Transfers->find('all')
@@ -290,12 +293,12 @@ class TransfersController extends AppController
         //asosiados a un traslado
         $query = $assets_transfers
                     ->find('all')
-                    ->select(['Assets.plaque'])
+                    ->select(['assets.plaque'])
                     ->join([
                       'assets'=> [
                         'table'=>'assets',
                         'type'=>'INNER',
-                        'conditions'=> [ 'Assets.plaque= AssetsTransfers.assets_id']
+                        'conditions'=> [ 'assets.plaque= AssetsTransfers.assets_id']
                         ]
                     ])
 
@@ -307,6 +310,7 @@ class TransfersController extends AppController
         $size = count($query);
         $result=   array_fill(0, $size, NULL);
         
+
         for($i=0;$i<$size;$i++)
         {
             $result[$i] =(object)$query[$i]->assets;
@@ -390,7 +394,7 @@ class TransfersController extends AppController
 
 
         $assetsQuery = TableRegistry::get('Assets');
-        $assetsQuery = $assetsQuery->find()
+        $asset = $assetsQuery->find()
                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.state'])
                         ->join([
                             'models' => [
@@ -415,7 +419,14 @@ class TransfersController extends AppController
                         ])
                         ->where(['Assets.state = "Disponible" or assets_transfers.transfer_id = "'.$id.'"'])
                         ->toList();
+
+        //debug($assetsQuery);
+        //die();
         $size = count($assetsQuery);
+        //debug($assetsQuery);
+        //die();
+
+        /*COMMENT
         $asset=   array_fill(0, $size, NULL);
         
         for($i=0;$i<$size;$i++)
@@ -434,18 +445,26 @@ class TransfersController extends AppController
         /** obtengo una lista de usuarios para cargar un dropdown list en la vista */
         $usersTable= TableRegistry::get('Users');
         $queryUsers = $usersTable->find()
-                        ->select(['users.nombre','users.apellido1','users.apellido2'])
+                        ->select(['Users.nombre','Users.apellido1','Users.apellido2'])
                         ->toList();
 
         $size = count($queryUsers);
-        $users= array_fill(0, $size, NULL);
-        /** se concatena el nombre y se coloca en un mismo array*/
-        for($i=0;$i<$size;$i++)
-        {
-            $users[$i] =$queryUsers[$i]->users['nombre'] ." ".$queryUsers[$i]->users['apellido1']." ".$queryUsers[$i]->users['apellido2'];
-        }
+        /** obtengo una lista de usuarios para cargar un dropdown list en la vista */
+        $this->loadModel('Users');
+        $users = $this->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
 
-        $Unidad= $this->UnidadAcadémica;
+        //debug($asset[0]);
+        //die();
+
+        $Unidad= $this->UnidadAcademica;
         $this->set(compact('transfer', 'asset', 'result','Unidad','users'));
 
     }
@@ -565,7 +584,7 @@ class TransfersController extends AppController
 
         }
         
-        $Unidad= $this->UnidadAcadémica;
+        $Unidad= $this->UnidadAcademica;
 
         $this->set(compact('transfer','result','Unidad'));
     }
@@ -682,7 +701,7 @@ public function download($id = null)
                 <th align="center"><span style="font-weight:bold">RECIBE</span></th>
             </tr>
             <tr>
-                <td height="50"><strong>Unidad: '.$this->UnidadAcadémica.'</td>
+                <td height="50"><strong>Unidad: '.$this->UnidadAcademica.'</td>
                 <td height="50"><strong>Unidad: '.$transfer->Acade_Unit_recib.'</td>
             </tr>
             <tr>
@@ -823,7 +842,7 @@ public function download($id = null)
                 <th align="center"><span style="font-weight:bold">RECIBE</span></th>
             </tr>
             <tr>
-                <td height="50"><strong>Unidad: '.$this->UnidadAcadémica.'</td>
+                <td height="50"><strong>Unidad: '.$this->UnidadAcademica.'</td>
                 <td height="50"><strong>Unidad: '.$transfer->Acade_Unit_recib.'</td>
             </tr>
             <tr>

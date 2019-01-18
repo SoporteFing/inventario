@@ -16,7 +16,7 @@ class AssetsController extends AppController
         $this->Permissions = $this->loadModel('Permissions');
         $this->RolesPermissions = $this->loadModel('RolesPermissions');
 
-        $allowI = false;
+        $allowI = FALSEse;
         $allowM = false;
         $allowE = false;
         $allowC = false;
@@ -69,11 +69,73 @@ class AssetsController extends AppController
      */
     public function index()
     {
+
+
+        $assets = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.year',
+                'Locations.nombre',
+                'Locations.location_id',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+                'Users.nombre',
+                'Users.apellido1',
+                'Users.apellido2',
+
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'users',
+        'alias' => 'Users',
+        'type' => 'INNER',
+        'conditions' => 'Assets.assigned_to = Users.id',
+            ])
+            ->join([
+        'table' => 'locations',
+        'alias' => 'Locations',
+        'type' => 'INNER',
+        'conditions' => 'Assets.location_id = Locations.location_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'INNER',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'INNER',
+        'conditions' => 'Models.id_brand = Brands.id',
+            ])
+            
+            ;
+
+            //debug($assets->toList());
+            //die();
+
+    $this->set('assets', $this->paginate($assets));
+
+
+/*
         $this->paginate = [
             'contain' => ['Users', 'Locations','Models','Types']
         ];
         $assets = $this->paginate($this->Assets);
+   //      debug($assets);
+ //       die();
         $this->set(compact('assets'));
+        */
     }
     /**
      * Método para ver los datos completos de un activo
@@ -84,6 +146,7 @@ class AssetsController extends AppController
         $asset = $this->Assets->get($id, [
             'contain' => ['Users', 'Locations', 'Models', 'Types']
         ]);
+
         $this->set('asset', $asset);
     }
     /**
@@ -221,6 +284,7 @@ class AssetsController extends AppController
         $this->set(compact('asset', 'brands', 'users', 'locations', 'models', 'types'));
 
     }
+
 
     /**
      * Restaura un activo desactivado

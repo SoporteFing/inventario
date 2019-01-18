@@ -6,6 +6,7 @@
 use Cake\Routing\Router;
 ?>
 
+
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
 
 <script src="http://code.jquery.com/ui/1.9.1/jquery-ui.min.js" type="text/javascript"></script>
@@ -121,7 +122,7 @@ use Cake\Routing\Router;
                     <?php 
                     echo $this->Form->select('functionary',
                       $users,
-                      ['empty' => '(Escoja un usuario)','class'=>'form-control', 'style'=>'width:220px;','id'=>'functionary']
+                      ['empty' => '(Escoja un usuario)','class'=>'form-control', 'style'=>'width:220px;','id'=>'functionary', 'value'=>$transfer['identification']]
                     );
                     ?>
                 </div>
@@ -139,7 +140,8 @@ use Cake\Routing\Router;
                                 "required"=>"required",
                             'label'=>['text' => '' ,'style'=>'margin-left:7px;'],
                             'id' =>'identification',
-                            'class'=>'form-control col-sm-6'
+                            'class'=>'form-control col-sm-6',
+                            'Disabled'
                             ]);
                     ?>
                 </div>

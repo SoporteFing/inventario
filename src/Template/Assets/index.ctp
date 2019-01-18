@@ -39,14 +39,14 @@
                             </td>
                             
                             <td><?= h($asset->plaque) ?></td>
-                            <td><?= $asset->has('type') ? h($asset->type->name) : '' ?></td>
-                            <td><?= h($asset->brand) ?></td>
-                            <td><?= $asset->has('model') ? h($asset->model->name) : '' ?></td>
+                            <td><?= $asset->has('Types') ? h($asset->Types['name']) : '' ?></td>
+                            <td><?= $asset->has('Brands') ? h($asset->Brands['name']) : '' ?></td>
+                            <td><?= $asset->has('Models') ? h($asset->Models['name']) : '' ?></td>
                             <td><?= h($asset->series) ?></td>
                             <!--td><?= h($asset->description) ?></td-->
                             <td><?= h($asset->state) ?></td>
-                            <td><?= h($asset->user->nombre . " " . $asset->user->apellido1) ?></td>
-                            <td><?= $asset->has('location') ? $this->Html->link($asset->location->nombre, ['controller' => 'Locations', 'action' => 'view', $asset->location->location_id]) : '' ?></td>
+                            <td><?= h($asset->Users['nombre'] . " " . $asset->Users['apellido1']) ?></td>
+                            <td><?= $asset->has('Locations') ? $this->Html->link($asset->Locations['nombre'], ['controller' => 'Locations', 'action' => 'view', $asset->Locations['location_id']]) : '' ?></td>
                             <td><?= h($asset->year) ?></td>
 
                         </tr>

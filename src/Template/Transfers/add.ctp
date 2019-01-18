@@ -46,6 +46,7 @@
           margin-left: 10px;
         }
 
+
         table {
 
     border-collapse: collapse;
@@ -393,8 +394,8 @@ $(document).ready(function()
                 }
         } );
     $('#assets-transfers-grid input[type="checkbox"]').on('change', function() {
-    // Update data-sort on closest <td>
-    $(this).closest('td').attr('data-order', this.checked ? 1 : 0);
+        // Update data-sort on closest <td>
+        $(this).closest('td').attr('data-order', this.checked ? 1 : 0);
      
         // Store row reference so we can reset its data
         var $tr = $(this).closest('tr');
@@ -437,7 +438,7 @@ $(document).ready(function()
         }
     );
 
-/** función optenida de http://bytutorial.com/blogs/jquery/jquery-get-selected-checkboxes */
+/** función obtenida de http://bytutorial.com/blogs/jquery/jquery-get-selected-checkboxes */
 
     function getValueUsingClass(){
     /* declare an checkbox array */
