@@ -15,6 +15,7 @@
 
 <div class="transfers index large-9 medium-8 columns content">
     <h3><?= __('Traslados') ?></h3>
+
     <table id='transfers-grid' class="table table-striped" cellpadding="0" cellspacing="0">
         <thead>
             <tr>
@@ -22,6 +23,7 @@
                 <th scope="col">Nº traslado</th>
                 <th scope="col">Fecha</th>
                 <th scope="col">Recibe</th>
+                <th scope="col">Placas de Activos</th>
             </tr>
         </thead>
         <tbody>
@@ -42,18 +44,36 @@
                     
                     <?php endif; ?>  
 
+                    <?php if($transfer->file_name == null) : ?> 
+
+                    <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-upload')), ['action' => 'view-download', $transfer->transfers_id], array('escape' => false)) ?>
+
+                    <?php endif; ?>  
+
                 </td>
                 <td><?= h($transfer->transfers_id) ?></td> 
                 <td>
                     <?php 
                     //para darle formato a la fecha
-                    $tmpdate= $transfer->date->format('d-m-Y');
+                    $tmpdate = $transfer->date->format('d-m-Y');
                     ?>
 
                     <?= h($tmpdate) ?>
                     
                 </td> 
-                <td><?= h($transfer->Acade_Unit_recib) ?></td>              
+                <td><?= h($transfer->Acade_Unit_recib) ?></td>
+
+                <?php if(strlen($transfer->asset_list) < 21): ?>
+
+                    <td><?= h($transfer->asset_list) ?></td>
+
+                <?php else: ?>
+
+                    <td><?= h('Lista muy extensa') ?></td>
+
+                <?php endif; ?>
+
+               
             </tr>
             <?php endforeach; ?>
         </tbody>
@@ -63,6 +83,7 @@
                 <th>Nº Traslado</th>
                 <th>Fecha</th>
                 <th>Recibe</th>
+                <th>Placa</th>
             </tr>
         </tfoot>
     </table>
@@ -87,6 +108,14 @@
 
     $(document).ready(function() {
         var table = $('#transfers-grid').DataTable( {
+
+            "columnDefs": [
+                {
+                    "targets": [ 4 ],
+                    "visible": true,
+                    "searchable": true
+                }
+            ],
            dom: 'Bfrtip',
                 buttons: [
                 'copyHtml5',

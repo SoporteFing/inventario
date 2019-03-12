@@ -126,16 +126,6 @@ class AssetsController extends AppController
 
     $this->set('assets', $this->paginate($assets));
 
-
-/*
-        $this->paginate = [
-            'contain' => ['Users', 'Locations','Models','Types']
-        ];
-        $assets = $this->paginate($this->Assets);
-   //      debug($assets);
- //       die();
-        $this->set(compact('assets'));
-        */
     }
     /**
      * MÃ©todo para ver los datos completos de un activo
@@ -560,4 +550,164 @@ class AssetsController extends AppController
         $this->set(compact('asset', 'types', 'brands', 'users', 'locations','models'));
 
     }
+
+
+    public function print($id = null)
+    {
+        $check = array();
+
+        if ($this->request->is('post')) {
+
+            $check = $this->request->getData("checkList");
+            $check = explode(",",$check);
+
+            if($this->request->getData("checkList") == '') {
+                AppController::insertLog($transfer['transfers_id'], TRUE);
+                $this->Flash->error(__('Debe ingresar por lo menos un Activo imprimir la Etiqueta.'));
+
+            }else{
+
+                $resp = '';
+
+                foreach ($check as $plaque) {
+                    //$this->send_to_printer('Placa',$plaque);
+                    $resp = $this->status();
+                    debug($resp);
+                    print_r($resp);
+
+                    //revisar errores
+                    if($resp == false){
+                        $this->Flash->error(__('Ocurrio un error durante la impresion'));
+                        break;
+                    }
+                }
+                
+                if($resp != false){
+
+                    $this->Flash->success(__('Impresion Exitosa'));
+                }
+
+            }
+
+        }
+        
+        $assets = $this->Assets->find()          
+            ->select([       
+                    'Assets.plaque',
+                    'Types.name',
+                    'Models.name',
+                    'Assets.series',
+                    'Assets.state',
+                    'Brands.name',
+                ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'INNER',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'INNER',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'INNER',
+            'conditions' => 'Models.id_brand = Brands.id',
+                ])
+                ;
+
+
+        if(!empty($check)){
+ 
+                       
+            $printing_assets = $this->Assets->find()   
+            ->select([       
+                    'Assets.plaque',
+                    'Types.name',
+                    'Models.name',
+                    'Assets.series',
+                    'Assets.state',
+                    'Brands.name',
+                ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'INNER',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'INNER',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'INNER',
+            'conditions' => 'Models.id_brand = Brands.id',
+                ])
+                ->where(['Assets.plaque IN' => $check]);
+                ;
+            $this->set('printing_assets', $this->paginate($printing_assets));
+
+        }
+
+    
+    $this->set('assets', $this->paginate($assets));
+
+
+    
+    }
+
+
+  
+  private function send_to_printer($label,$code){
+	$fing_label = "GAP 3 mm, 0 mm\n DIRECTION 0,0\n REFERENCE 0,0\n OFFSET 0 mm\n SET PEEL OFF\n SET CUTTER OFF\n SET PARTIAL_CUTTER OFF\n CLS\n BITMAP 186,113,25,64,1,ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ8ã8ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿü     ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿü     ÿÿÿÿÿÿÿÿÿÿÿÿÀ?ÿÿÿÿü     ÿÿÿÿÿÿÿÿÿÿÿÿ€ÿÿÿÿü     ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿşÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿş?ÿÿÿÿÿÿÿÿÿÿÿÿÿÿïüÿÏşûÿ¿óş>ÿïÿóÿÿÿÿÿÿÿÿÀÃøpøğş< ş0ááÿÿÿÿÿÿÿÿàÃøx øğş< > áãÿÿÿÿÿÿÿÿáàÃøÿğxğş?ü<ããÿÿÿÿÿÿÿÿãğãøÿøpøş?ş‡ããÿüÿÿÿàãğÃøüxğş?ÿ?ÇããÿüÿÿÿàãáÃøş8ğş?ÿ?ÃááÿüÿÿÿÀàAÇøp 8ñş< ?ãááÿüÿÿÿÀàÃøp 8ğş8 ?ÃáãÿüÿÿÿààÃøá|xğş8?Çããÿüÿÿÿàãÿãğñüpøü8?‡ããÿüÿÿÿàãÿÃàpøxø|<~‡‡ÃãÿüÿÿÿààóÃ x`øø <8>ÃáÿüÿÿÿÀøÇxøü> ~ ÀáÿüÿÿÿÀüÃ~øÿ?ş0à1ãÿüÿÿÿàÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿãÿüÿÿÿàÿÿóÿÿÿÿÿÿÿÿÿÿÿÿÿãÿüÿÿÿàÿÿÇÿÿÿøÿÿÿÿÿÿÿÿÿãÿüÿÿÿàÿÿ‡ÿÿÿøÿÿÿÿÿÿÿÿáÿüÿÿÿÀÿÿÿÿÿøÿÿÿÿÿÿÿÿÿáÿüÿÿÿÀÿşÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿàÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿàÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿàÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿàÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿÀÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿÀÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüş   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿÀÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿàÀş0üÁùƒÁùóà?8óÿüÿÿÿà€> ?ü ù€ÀùâÀ ?óÿüÿÿÿàÿü8x8øùğaïóÿüÿÿÿàÿø~<xüøññÿ‡ñÿüÿÿÿÀÿÎ?øş<üüøññÿÇñÿüÿÿÿÀÿÎ?øÿ8øüøóùÿÇóÿüÿÿÿàã?Çüÿ8ğøùóùÿÇ?óÿüÿÿÿà ?Çüÿ8øùãøÿÇóÿüÿÿÿà?Ïüÿ8üùóùÿÇÿóÿüÿÿÿà??øş<ÿüøóùÿÇøÿüÿÿÿÀŸøş<ÿüøóùÿÇŸøÿüÿÿÿÀø<|}üøóùÿ¿óÿüÿÿÿàÀ> ?ü ş À9óùÀ€?óÿüÿÿÿààş0ÿüÿÀ9ãøà?àÿóÿüÿÿÿàÿş?ÿüÿÿÿüùÿÿÿÿÿÿóÿüü   ÿş?ÿøÿÿÿüøÿÿÿÿÿÿñÿüü   ÿÿ?ÿøÿÿÿüøÿÿÿÿÿÿñÿüü   ÿş?ÿøÿÿÿıøÿÿÿÿÿğÿüü   ÿş?ÿüÿÿÿÿùÿÿÿÿÿğÿüü   ÿş?ÿüÿÿÿÿùÿÿÿÿÿ÷Ÿÿüü   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ \n CODEPAGE 1252\n TEXT 383,100,\"0\",180,15,15,\"$label\"\n TEXT 383,50,\"0\",180,15,15,\"$code\"\n QRCODE 45,20,H,4,A,0,M2,\"$code\"\n PRINT 1,1\n";//end
+	
+     
+
+    return $this->curl($fing_label);
+  }
+
+private function status(){
+
+
+    $stat = chr(27) + "!?";
+    #  $qrCode = "SIZE 4,2.5\n GAP 0,0\n DIRECTION 1\n CLS\n QRCODE 56,24,H,4,A,0,M2,\"ABCabc123\"\n PRINT 1\n";
+    #  $pTest = "DIRECTION 1\n SIZE 2,1\n GAP 3mm,0mm\n SPEED 4\n DENSITY 12\n CLS\n BAR 8,8,300,100\n PRINT 1\n";
+
+
+    return $this->curl($stat);
+
+}
+  
+
+private function curl($request){
+
+  $curl = curl_init();
+  // Set some options - we are passing in a useragent too here
+  curl_setopt_array($curl, array(
+    CURLOPT_RETURNTRANSFER => 1,
+    CURLOPT_URL => 'http://163.178.109.21/admin/cgi-bin/function.cgi',
+    CURLOPT_USERAGENT => 'Codular Sample cURL Request',
+	CURLOPT_USERNAME => 'rid',
+	CURLOPT_PASSWORD => '3xq23IAedH',
+    CURLOPT_POST => 1,
+    CURLOPT_POSTFIELDS => array(
+      send => $request
+    )
+  ));
+
+  $resp = curl_exec($curl);  // Send the request & save response to $resp
+
+  curl_close($curl);  // Close request to clear up some resources
+
+  return $resp;
+    }
+
 }

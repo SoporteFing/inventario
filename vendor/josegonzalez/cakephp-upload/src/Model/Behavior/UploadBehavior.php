@@ -98,6 +98,8 @@ class UploadBehavior extends Behavior
                 continue;
             }
 
+
+
             $data = $entity->get($field);
             $path = $this->getPathProcessor($entity, $data, $field, $settings);
             $basepath = $path->basepath();

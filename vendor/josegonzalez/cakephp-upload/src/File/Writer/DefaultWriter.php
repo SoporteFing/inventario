@@ -75,6 +75,7 @@ class DefaultWriter implements WriterInterface
      */
     public function write(array $files)
     {
+
         $filesystem = $this->getFilesystem($this->field, $this->settings);
         $results = [];
         foreach ($files as $file => $path) {

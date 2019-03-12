@@ -1,0 +1,94 @@
+2019-02-22 21:38:07 Debug: duration=1 rows=2 SHOW FULL COLUMNS FROM `roles`
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SHOW INDEXES FROM `roles`
+2019-02-22 21:38:07 Debug: duration=1 rows=0 SELECT * FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc
+            ON (
+                kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                AND kcu.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA
+            )
+            WHERE kcu.TABLE_SCHEMA = 'activos' AND kcu.TABLE_NAME = 'roles' AND rc.TABLE_NAME = 'roles'
+2019-02-22 21:38:07 Debug: duration=1 rows=1 SHOW TABLE STATUS WHERE Name = 'roles'
+2019-02-22 21:38:07 Debug: duration=1 rows=2 SHOW FULL COLUMNS FROM `permissions`
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SHOW INDEXES FROM `permissions`
+2019-02-22 21:38:07 Debug: duration=1 rows=0 SELECT * FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc
+            ON (
+                kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                AND kcu.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA
+            )
+            WHERE kcu.TABLE_SCHEMA = 'activos' AND kcu.TABLE_NAME = 'permissions' AND rc.TABLE_NAME = 'permissions'
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SHOW TABLE STATUS WHERE Name = 'permissions'
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SELECT Roles.id AS `Roles__id`, Roles.nombre AS `Roles__nombre` FROM roles Roles WHERE id = 1
+2019-02-22 21:38:07 Debug: duration=1 rows=3 SHOW FULL COLUMNS FROM `roles_permissions`
+2019-02-22 21:38:07 Debug: duration=0 rows=3 SHOW INDEXES FROM `roles_permissions`
+2019-02-22 21:38:07 Debug: duration=1 rows=2 SELECT * FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc
+            ON (
+                kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                AND kcu.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA
+            )
+            WHERE kcu.TABLE_SCHEMA = 'activos' AND kcu.TABLE_NAME = 'roles_permissions' AND rc.TABLE_NAME = 'roles_permissions'
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SHOW TABLE STATUS WHERE Name = 'roles_permissions'
+2019-02-22 21:38:07 Debug: duration=0 rows=28 SELECT RolesPermissions.id AS `Permissions_CJoin__id`, RolesPermissions.id_rol AS `Permissions_CJoin__id_rol`, RolesPermissions.id_permission AS `Permissions_CJoin__id_permission`, Permissions.id AS `Permissions__id`, Permissions.nombre AS `Permissions__nombre` FROM permissions Permissions INNER JOIN roles_permissions RolesPermissions ON Permissions.id = (RolesPermissions.id_permission) WHERE RolesPermissions.id_rol in (1)
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SELECT Roles.id AS `Roles__id`, Roles.nombre AS `Roles__nombre` FROM roles Roles WHERE id = 1
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SELECT Roles.id AS `Roles__id`, Roles.nombre AS `Roles__nombre` FROM roles Roles WHERE id = 1
+2019-02-22 21:38:07 Debug: duration=0 rows=28 SELECT RolesPermissions.id AS `Permissions_CJoin__id`, RolesPermissions.id_rol AS `Permissions_CJoin__id_rol`, RolesPermissions.id_permission AS `Permissions_CJoin__id_permission`, Permissions.id AS `Permissions__id`, Permissions.nombre AS `Permissions__nombre` FROM permissions Permissions INNER JOIN roles_permissions RolesPermissions ON Permissions.id = (RolesPermissions.id_permission) WHERE RolesPermissions.id_rol in (1)
+2019-02-22 21:38:07 Debug: duration=1 rows=10 SHOW FULL COLUMNS FROM `transfers`
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SHOW INDEXES FROM `transfers`
+2019-02-22 21:38:07 Debug: duration=1 rows=0 SELECT * FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc
+            ON (
+                kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                AND kcu.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA
+            )
+            WHERE kcu.TABLE_SCHEMA = 'activos' AND kcu.TABLE_NAME = 'transfers' AND rc.TABLE_NAME = 'transfers'
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SHOW TABLE STATUS WHERE Name = 'transfers'
+2019-02-22 21:38:07 Debug: duration=1 rows=9 SHOW FULL COLUMNS FROM `users`
+2019-02-22 21:38:07 Debug: duration=0 rows=2 SHOW INDEXES FROM `users`
+2019-02-22 21:38:07 Debug: duration=1 rows=1 SELECT * FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc
+            ON (
+                kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                AND kcu.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA
+            )
+            WHERE kcu.TABLE_SCHEMA = 'activos' AND kcu.TABLE_NAME = 'users' AND rc.TABLE_NAME = 'users'
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SHOW TABLE STATUS WHERE Name = 'users'
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SELECT users.nombre AS `users__nombre`, users.apellido1 AS `users__apellido1`, users.apellido2 AS `users__apellido2` FROM users users WHERE users.id = '111111111' LIMIT 1
+2019-02-22 21:38:07 Debug: duration=1 rows=0 SELECT Transfers.transfers_id AS `Transfers__transfers_id`, Transfers.date AS `Transfers__date`, Transfers.functionary AS `Transfers__functionary`, Transfers.identification AS `Transfers__identification`, Transfers.functionary_recib AS `Transfers__functionary_recib`, Transfers.identification_recib AS `Transfers__identification_recib`, Transfers.Acade_Unit_recib AS `Transfers__Acade_Unit_recib`, Transfers.path AS `Transfers__path`, Transfers.file_name AS `Transfers__file_name`, Transfers.descargado AS `Transfers__descargado` FROM transfers Transfers WHERE Transfers.transfers_id = 'asfsdf' LIMIT 1
+2019-02-22 21:38:07 Debug: duration=95 rows=1 INSERT INTO activity_logs (DateAndTime,idUser,currentModule,userAction,message) values('2019-02-22 21:38:07', '1','Transfers', 'Agregar', 'Se agregó : asfsdf');
+2019-02-22 21:38:07 Debug: duration=1 rows=3 SHOW FULL COLUMNS FROM `assets_transfers`
+2019-02-22 21:38:07 Debug: duration=0 rows=3 SHOW INDEXES FROM `assets_transfers`
+2019-02-22 21:38:07 Debug: duration=1 rows=2 SELECT * FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc
+            ON (
+                kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                AND kcu.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA
+            )
+            WHERE kcu.TABLE_SCHEMA = 'activos' AND kcu.TABLE_NAME = 'assets_transfers' AND rc.TABLE_NAME = 'assets_transfers'
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SHOW TABLE STATUS WHERE Name = 'assets_transfers'
+2019-02-22 21:38:07 Debug: duration=0 rows=14 SELECT assets.plaque AS `assets__plaque` FROM assets_transfers AssetsTransfers INNER JOIN assets assets ON assets.plaque= AssetsTransfers.assets_id
+2019-02-22 21:38:07 Debug: duration=1 rows=25 SHOW FULL COLUMNS FROM `assets`
+2019-02-22 21:38:07 Debug: duration=0 rows=9 SHOW INDEXES FROM `assets`
+2019-02-22 21:38:07 Debug: duration=1 rows=5 SELECT * FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc
+            ON (
+                kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                AND kcu.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA
+            )
+            WHERE kcu.TABLE_SCHEMA = 'activos' AND kcu.TABLE_NAME = 'assets' AND rc.TABLE_NAME = 'assets'
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SHOW TABLE STATUS WHERE Name = 'assets'
+2019-02-22 21:38:07 Debug: duration=0 rows=2 SELECT Assets.plaque AS `Assets__plaque`, Types.name AS `Types__name`, Models.name AS `Models__name`, Assets.series AS `Assets__series`, Assets.state AS `Assets__state`, Brands.name AS `Brands__name` FROM assets Assets INNER JOIN types Types ON Assets.type_id = Types.type_id INNER JOIN models Models ON Assets.models_id = Models.id INNER JOIN brands Brands ON Models.id_brand = Brands.id WHERE Assets.plaque in ('263686','263687') LIMIT 9223372036854775807 OFFSET 0
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SELECT (COUNT(*)) AS `count` FROM assets Assets INNER JOIN types Types ON Assets.type_id = Types.type_id INNER JOIN models Models ON Assets.models_id = Models.id INNER JOIN brands Brands ON Models.id_brand = Brands.id WHERE Assets.plaque in ('263686','263687')
+2019-02-22 21:38:07 Debug: duration=1 rows=9 SHOW FULL COLUMNS FROM `users`
+2019-02-22 21:38:07 Debug: duration=0 rows=2 SHOW INDEXES FROM `users`
+2019-02-22 21:38:07 Debug: duration=1 rows=1 SELECT * FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc
+            ON (
+                kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                AND kcu.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA
+            )
+            WHERE kcu.TABLE_SCHEMA = 'activos' AND kcu.TABLE_NAME = 'users' AND rc.TABLE_NAME = 'users'
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SHOW TABLE STATUS WHERE Name = 'users'
+2019-02-22 21:38:07 Debug: duration=1 rows=391 SELECT Assets.plaque AS `Assets__plaque`, Types.name AS `Types__name`, Models.name AS `Models__name`, Assets.series AS `Assets__series`, Assets.state AS `Assets__state`, Brands.name AS `Brands__name` FROM assets Assets INNER JOIN types Types ON Assets.type_id = Types.type_id INNER JOIN models Models ON Assets.models_id = Models.id INNER JOIN brands Brands ON Models.id_brand = Brands.id WHERE Assets.state = 'Disponible' LIMIT 9223372036854775807 OFFSET 0
+2019-02-22 21:38:07 Debug: duration=0 rows=1 SELECT (COUNT(*)) AS `count` FROM assets Assets INNER JOIN types Types ON Assets.type_id = Types.type_id INNER JOIN models Models ON Assets.models_id = Models.id INNER JOIN brands Brands ON Models.id_brand = Brands.id WHERE Assets.state = 'Disponible'
+2019-02-22 21:38:07 Debug: duration=0 rows=5 SELECT Users.id AS `Users__id`, Users.nombre AS `Users__nombre`, Users.apellido1 AS `Users__apellido1`, Users.apellido2 AS `Users__apellido2`, Users.correo AS `Users__correo`, Users.username AS `Users__username`, Users.password AS `Users__password`, Users.id_rol AS `Users__id_rol`, Users.account_status AS `Users__account_status` FROM users Users WHERE Users.username not in ('root')

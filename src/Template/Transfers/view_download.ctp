@@ -141,10 +141,11 @@
                     //$a= (object)$asset->assets;
                 ?>
                 <td><?= h($asset->plaque) ?></td>
-                <td><?= h($asset->brand) ?></td>
-                <td><?= h($asset->model) ?></td>
+                <td><?= $asset->has('Types') ? h($asset->Types['name']) : '' ?></td>
+                <td><?= $asset->has('Brands') ? h($asset->Brands['name']) : '' ?></td>
+                <td><?= $asset->has('Models') ? h($asset->Models['name']) : '' ?></td>
                 <td><?= h($asset->series) ?></td>
-                <td><?= h($asset->state) ?></td>
+                <td><?= h($asset->Assets_Transfers['transfer_state']) ?></td>
 
             </tr>
             <?php endforeach; ?>
@@ -152,10 +153,10 @@
 
     </div>
   </fieldset>
-    <b>1- <?= $this->Html->link(__('Generar'), ['controller'=> 'Transfers', 'action' => 'generate',$transfer->transfers_id], [ 'confirm' => __('¿Seguro que desea descargar el archivo?')]) ?> el formulario para llenar y luego subirlo al sistema.</b>
+    <b>1- <?= $this->Html->link(__('Descargar'), ['controller'=> 'Transfers', 'action' => 'generate',$transfer->transfers_id], [ 'confirm' => __('¿Seguro que desea descargar el archivo?')]) ?> el formulario para llenar y luego subirlo al sistema.</b>
     <br><br>
     <div >
-    <b><?php echo $this->Form->input('file_name',['type' => 'file','label' => '2- Subir Formulario de Préstamo una vez lleno para Finalizar', 'class' => 'form-control-file']); ?></b>
+    <b><?php echo $this->Form->input('file_name',['type' => 'file','label' => '2- Subir Formulario de Préstamo una vez FIRMADO y hacer clic en Aceptar.', 'class' => 'form-control-file']); ?></b>
      </div>
      <div class=\"col-12 text-right\">
 

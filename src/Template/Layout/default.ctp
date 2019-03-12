@@ -77,7 +77,7 @@ $cakeDescription = 'Control de Activos';
             <?php if ($allowR) : ?>
                 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Roles">
                     <?= $this->Html->link(
-                        $this->Html->tag('i', '', array('class' => 'fa fa-cog')) . $this->Html->tag('span', ' Roles', array('class' => 'nav-link-text')),
+                        $this->Html->tag('i', '', array('class' => 'fa fa-address-book')) . $this->Html->tag('span', ' Roles', array('class' => 'nav-link-text')),
                         array('controller' => 'Roles', 'action' => 'index'),
                         array('class' => 'nav-link',
                             'escape' => false)
@@ -90,14 +90,14 @@ $cakeDescription = 'Control de Activos';
 
                 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Menú de Activos">
                     <a href="#activosSubmenu" data-toggle="collapse" aria-expanded="false" class="nav-link">
-                        <i class="fa fa-wrench"></i><span class="nav-link-text"> Menú de activos</span>
+                        <i class="fa fa-cubes"></i><span class="nav-link-text"> Menú de activos</span>
                     </a>
                 </li>
 
                 <ul class="collapse" id="activosSubmenu">
                     <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Activos">
                         <?= $this->Html->link(
-                            $this->Html->tag('i', '', array('class' => 'fa fa-users')) . $this->Html->tag('span', ' Activos', array('class' => 'nav-link-text')),
+                            $this->Html->tag('i', '', array('class' => 'fa fa-laptop')) . $this->Html->tag('span', ' Activos', array('class' => 'nav-link-text')),
                             array('controller' => 'Assets', 'action' => 'index'),
                             array('class' => 'nav-link',
                                 'escape' => false)
@@ -107,7 +107,7 @@ $cakeDescription = 'Control de Activos';
 
                     <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Marcas de activo">
                         <?= $this->Html->link(
-                            $this->Html->tag('i', '', array('class' => 'fa fa-users')) . $this->Html->tag('span', ' Marcas de activo', array('class' => 'nav-link-text')), array('controller' => 'Brands', 'action' => 'index'),
+                            $this->Html->tag('i', '', array('class' => 'fa fa-font-awesome')) . $this->Html->tag('span', ' Marcas de activo', array('class' => 'nav-link-text')), array('controller' => 'Brands', 'action' => 'index'),
                             array('class' => 'nav-link',
                                 'escape' => false)
                         );
@@ -116,7 +116,7 @@ $cakeDescription = 'Control de Activos';
 
                     <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Modelos de activo">
                         <?= $this->Html->link(
-                            $this->Html->tag('i', '', array('class' => 'fa fa-users')) . $this->Html->tag('span', ' Modelos de activo', array('class' => 'nav-link-text')), array('controller' => 'Models', 'action' => 'index'),
+                            $this->Html->tag('i', '', array('class' => 'fa fa-list')) . $this->Html->tag('span', ' Modelos de activo', array('class' => 'nav-link-text')), array('controller' => 'Models', 'action' => 'index'),
                             array('class' => 'nav-link',
                                 'escape' => false)
                         );
@@ -125,8 +125,19 @@ $cakeDescription = 'Control de Activos';
 
                     <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tipos de activos">
                         <?= $this->Html->link(
-                            $this->Html->tag('i', '', array('class' => 'fa fa-users')) . $this->Html->tag('span', ' Tipos de activos', array('class' => 'nav-link-text')),
+                            $this->Html->tag('i', '', array('class' => 'fa fa-sitemap')) . $this->Html->tag('span', ' Tipos de activos', array('class' => 'nav-link-text')),
                             array('controller' => 'Types', 'action' => 'index'),
+                            array('class' => 'nav-link',
+                                'escape' => false)
+                        );
+                        ?>
+
+                    </li>
+
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Imprimir Etiquetas">
+                        <?= $this->Html->link(
+                            $this->Html->tag('i', '', array('class' => 'fa fa-print')) . $this->Html->tag('span', ' Imprimir Etiquetas', array('class' => 'nav-link-text')),
+                            array('controller' => 'Assets', 'action' => 'print'),
                             array('class' => 'nav-link',
                                 'escape' => false)
                         );
@@ -223,8 +234,15 @@ $cakeDescription = 'Control de Activos';
         </ul>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="navbar-brand" style="color:white">
-                    <i class="fa fa-user"></i> <?= $this->Html->link(__($nombre . " " . $apellido), ['controller' => 'Users',$uid, 'action' => 'profile']) ?>
+                
+
+                    <?= $this->Html->link(
+                    $this->Html->tag('i', '', array('class' => 'fa fa-user-circle')) . $this->Html->tag('span', " " . $nombre . " " . $apellido, array('class' => 'nav-link-text')), array('controller' => 'Users', $uid, 'action' => 'profile'),
+                    array('class' => 'nav-link',
+                        'escape' => false)
+                    );
+                    ?>
+                    
 
             </li>
 

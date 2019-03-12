@@ -127,11 +127,11 @@
         <table cellpadding="0" cellspacing="0">
             <tr>
                 <th class="transfer-h" scope="col"><?= __('Placa') ?></th>
-
+                <th class="transfer-h" scope="col"><?= __('Tipo') ?></th>
                 <th class="transfer-h" scope="col"><?= __('Marca') ?></th>
                 <th class="transfer-h" scope="col"><?= __('Modelo') ?></th>
                 <th class="transfer-h" scope="col"><?= __('Serie') ?></th>
-                <th class="transfer-h" scope="col"><?= __('Estado') ?></th>
+                <th class="transfer-h" scope="col"><?= __('Condición') ?></th>
                 
             </tr>
             <?php foreach ($result as $asset): ?>
@@ -140,10 +140,11 @@
                     //$a= (object)$asset->assets;
                 ?>
                 <td><?= h($asset->plaque) ?></td>
-                <td><?= h($asset->brand) ?></td>
-                <td><?= h($asset->model) ?></td>
+                <td><?= $asset->has('Types') ? h($asset->Types['name']) : '' ?></td>
+                <td><?= $asset->has('Brands') ? h($asset->Brands['name']) : '' ?></td>
+                <td><?= $asset->has('Models') ? h($asset->Models['name']) : '' ?></td>
                 <td><?= h($asset->series) ?></td>
-                <td><?= h($asset->state) ?></td>
+                <td><?= h($asset->Assets_Transfers['transfer_state']) ?></td>
 
             </tr>
             <?php endforeach; ?>

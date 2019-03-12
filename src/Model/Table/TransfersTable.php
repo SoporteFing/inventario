@@ -42,7 +42,7 @@ class TransfersTable extends Table
                     'size' => 'file_size',
                     'type' => 'file_type',
                 ],
-                'path' => 'webroot{DS}files{DS}{model}{DS}{field}{DS}}{primaryKey}{DS}',
+                'path' => 'webroot{DS}files{DS}{model}{DS}{field}{DS}{primaryKey}{DS}',
                 'nameCallback' => function ($table, $entity, $data, $field, $settings) {
                     return strtolower($data['name']);
                 },
@@ -70,7 +70,7 @@ class TransfersTable extends Table
         $validator
             ->scalar('transfers_id')
             ->maxLength('transfers_id', 100)
-            ->alphaNumeric('transfers_id', 'El número de autorización debe contener solo caracteres alfanuméricos.')
+            ->requirePresence('transfers_id', 'create')
             ->notEmpty('transfers_id', 'El número de autorización es requerido.');
 
 
@@ -96,12 +96,12 @@ class TransfersTable extends Table
             ->scalar('functionary_recib')
             ->maxLength('functionary_recib', 100)
             ->requirePresence('functionary_recib', 'create')
-            ->add('functionary_recib',[ 
+            /*->add('functionary_recib',[ 
                 [
                 'rule'=>['custom', ' /^[a-zA-ZÀ-ÖØ-öø-ÿ ]+$/ '],
                 'message'=>'Debe contener sólo caracteres del alfabeto.'
                 ]
-            ])
+            ])*/
             ->notEmpty('functionary_recib','Este campo es requerido');
 
             $validator
@@ -109,12 +109,14 @@ class TransfersTable extends Table
             ->maxLength('identification_recib', 9,'La cédula debe contener 9 dígitos' )
             ->minLength('identification_recib', 9,'La cédula debe contener 9 dígitos' )
             ->numeric('identification_recib','La cédula debe contener sólo digitos')
+            ->requirePresence('identification_recib', 'create')
             ->notEmpty('identification_recib','Este campo es requerido');
             
 
         $validator
             ->scalar('Acade_Unit_recib')
             ->maxLength('Acade_Unit_recib', 30)
+            ->requirePresence('Acade_Unit_recib', 'create')
             ->notEmpty('Acade_Unit_recib','Este campo es requerido');
 
         $validator
