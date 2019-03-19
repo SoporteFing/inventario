@@ -15,27 +15,27 @@
                 
                 <thead>
                     <tr>
-                        <th scope="col" class="actions">Acciones</th>  
                         <th scope="col">Nombre</th>
+                        <th scope="col" class="actions">Acciones</th>  
                     </tr>
                 </thead>
 
                 <tbody>
                     <?php foreach ($brands as $brand): ?>
                         <tr>
+                            <td><?= h($brand->name) ?></td>
                             <td class="actions">
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $brand->id],  array('escape'=> false)) ?>
                                 <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $brand->id],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar esta marca? # {0}?', $brand->id)]) ?>
                             </td>
-                            <td><?= h($brand->name) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
 
                 <tfoot>
                     <tr>
-                        <td></td>
                         <th>Nombre</th>
+                        <td></td>
                     </tr>
                 </tfoot>
 

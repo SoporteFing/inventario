@@ -19,38 +19,17 @@
     <table id='transfers-grid' class="table table-striped" cellpadding="0" cellspacing="0">
         <thead>
             <tr>
-                <th scope="col" class="actions">Acciones</th>
                 <th scope="col">Nº traslado</th>
                 <th scope="col">Fecha</th>
                 <th scope="col">Recibe</th>
                 <th scope="col">Placas de Activos</th>
+                <th scope="col" class="actions">Acciones</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($transfers as $transfer): ?>
             <tr>
-                <td class="actions">
-
-                    <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $transfer->transfers_id], array('escape' => false)) ?>
-                    
-                    <?php if($transfer->file_name == null) : ?> 
-
-                        <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $transfer->transfers_id], array('escape' => false)) ?>
-                    <?php endif; ?>  
-
-                    <?php if(($transfer->descargado == null) && ($transfer->file_name == null )) : ?> 
-
-                    <?= $this->Form->postlink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $transfer->transfers_id], ['escape' => false, 'confirm' => __('¿Está seguro que quiere borrar el traslado # '.$transfer->transfers_id.' ?', $transfer->transfers_id)]) ?>
-                    
-                    <?php endif; ?>  
-
-                    <?php if($transfer->file_name == null) : ?> 
-
-                    <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-upload')), ['action' => 'view-download', $transfer->transfers_id], array('escape' => false)) ?>
-
-                    <?php endif; ?>  
-
-                </td>
+                
                 <td><?= h($transfer->transfers_id) ?></td> 
                 <td>
                     <?php 
@@ -73,17 +52,40 @@
 
                 <?php endif; ?>
 
-               
+               <td class="actions">
+
+                    <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $transfer->transfers_id], array('escape' => false)) ?>
+                    
+                    <?php if($transfer->file_name == null) : ?> 
+
+                        <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $transfer->transfers_id], array('escape' => false)) ?>
+                    <?php endif; ?>  
+
+                    <?php if(($transfer->descargado == null) && ($transfer->file_name == null )) : ?> 
+
+                    <?= $this->Form->postlink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $transfer->transfers_id], ['escape' => false, 'confirm' => __('¿Está seguro que quiere borrar el traslado # '.$transfer->transfers_id.' ?', $transfer->transfers_id)]) ?>
+                    
+                    <?php endif; ?>  
+
+                    <?php if($transfer->file_name == null) : ?> 
+
+                    <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-upload')), ['action' => 'view-download', $transfer->transfers_id], array('escape' => false)) ?>
+
+                    <?php endif; ?>  
+
+                </td>
+
             </tr>
             <?php endforeach; ?>
         </tbody>
         <tfoot>
             <tr>
-                <td></td>
+                
                 <th>Nº Traslado</th>
                 <th>Fecha</th>
                 <th>Recibe</th>
                 <th>Placa</th>
+                <td></td>
             </tr>
         </tfoot>
     </table>

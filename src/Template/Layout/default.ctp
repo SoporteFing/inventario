@@ -105,6 +105,15 @@ $cakeDescription = 'Control de Activos';
                         ?>
                     </li>
 
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Ubicaciones">
+                        <?= $this->Html->link(
+                            $this->Html->tag('i', '', array('class' => 'fa fa-globe')) . $this->Html->tag('span', ' Ubicaciones', array('class' => 'nav-link-text')), array('controller' => 'Locations', 'action' => 'index'),
+                            array('class' => 'nav-link',
+                                'escape' => false)
+                        );
+                        ?>
+                    </li>
+
                     <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Marcas de activo">
                         <?= $this->Html->link(
                             $this->Html->tag('i', '', array('class' => 'fa fa-font-awesome')) . $this->Html->tag('span', ' Marcas de activo', array('class' => 'nav-link-text')), array('controller' => 'Brands', 'action' => 'index'),
@@ -166,16 +175,6 @@ $cakeDescription = 'Control de Activos';
             <?php endif; ?>
 
 
-            <?php if ($allowUb) : ?>
-                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Ubicaciones">
-                    <?= $this->Html->link(
-                        $this->Html->tag('i', '', array('class' => 'fa fa-globe')) . $this->Html->tag('span', ' Ubicaciones', array('class' => 'nav-link-text')), array('controller' => 'Locations', 'action' => 'index'),
-                        array('class' => 'nav-link',
-                            'escape' => false)
-                    );
-                    ?>
-                </li>
-            <?php endif; ?>
 
             <?php if ($allowP) : ?>
                 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Prestamos">
@@ -234,7 +233,6 @@ $cakeDescription = 'Control de Activos';
         </ul>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                
 
                     <?= $this->Html->link(
                     $this->Html->tag('i', '', array('class' => 'fa fa-user-circle')) . $this->Html->tag('span', " " . $nombre . " " . $apellido, array('class' => 'nav-link-text')), array('controller' => 'Users', $uid, 'action' => 'profile'),

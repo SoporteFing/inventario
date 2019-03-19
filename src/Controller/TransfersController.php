@@ -278,8 +278,11 @@ class TransfersController extends AppController
                 'Transfers.transfers_id' => $transfer->transfers_id
                 ])
                 ->first();
-                if($returnId){
+                
+                if($returnId ){
                     $transfer->setError('transfers_id', ['El número de traslado ya existe.']);
+                }else if($transfer->transfers_id == ''){
+                    $transfer->setError('transfers_id', ['Debe tener un número de traslado.']);
                 }else{
 
 

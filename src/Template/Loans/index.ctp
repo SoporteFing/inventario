@@ -24,19 +24,17 @@
             <table id="loans-grid"  class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col" class="actions"><?= __('') ?></th>             
                         <th scope="col">Responsable</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Fecha de inicio</th>
                         <th scope="col">Fecha de devolución</th>
+                        <th scope="col" class="actions"><?= __('') ?></th>             
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($loans as $loan): ?>
                         <tr>
-                            <td class="actions">
-                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $loan->id], array('escape'=> false)) ?>
-                            </td>                            
+                                                       
                             <td><?= h($loan->user->nombre . " " . $loan->user->apellido1) ?></td>   
                             
                             <?php
@@ -56,16 +54,20 @@
                             
                             <td><?= h(date("d-m-Y", strtotime($loan->fecha_inicio))) ?></td>
                             <td><?= $loan->has('fecha_devolucion') ? h(date("d-m-Y", strtotime($loan->fecha_devolucion))) : '' ?></td>
+                            <td class="actions">
+                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $loan->id], array('escape'=> false)) ?>
+                            </td> 
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td></td>
+                        
                         <th>Responsable</th>
                         <th>Estado</th>
                         <th>Fecha de inicio</th>
                         <th>Fecha de devolución</th>
+                        <td></td>
                     </tr>
                 </tfoot>
             </table>

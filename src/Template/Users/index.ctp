@@ -16,7 +16,7 @@
                 <thead>
                     <tr>
                         <!--<th scope="col"><?= $this->Paginator->sort('id') ?></th>-->
-                        <th scope="col" class="actions">Acciones</th>
+                        
                         <th scope="col">Cédula</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Apellido 1</th>
@@ -26,17 +26,14 @@
                         <!--<th scope="col"><?= $this->Paginator->sort('password') ?></th>-->
                         <!--<th scope="col"><?= $this->Paginator->sort('id_rol') ?></th>-->
                         <th scope="col">Estado</th>
+                        <th scope="col" class="actions">Acciones</th>
                         <!--<th scope="col">Rol</th>-->
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($users as $user): ?>
                         <tr>
-                            <td class="actions">
-                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $user->id], array('escape'=> false)) ?>
-                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $user->id],  array('escape'=> false)) ?>
-                                <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $user->id],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar este usuario? # {0}?', $user->id)]) ?>
-                            </td>
+                            
                             <!--<td><?= $this->Number->format($user->id) ?></td>-->
                             <td><?= h($user->id) ?></td>
                             <td><?= h($user->nombre) ?></td>
@@ -48,19 +45,24 @@
                             <!--<td><?= $this->Number->format($user->id_rol) ?></td>-->
                             <td><?= h($user->account_status == 1 ? 'Activo' : 'Inoperante') ?></td>
                             <!--<td><?= $user->has('roles') ? h($user->roles->nombre) : '' ?></td>-->
+                            <td class="actions">
+                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $user->id], array('escape'=> false)) ?>
+                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $user->id],  array('escape'=> false)) ?>
+                                <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $user->id],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar este usuario? # {0}?', $user->id)]) ?>
+                            </td>
 
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td></td>
                         <th>Cédula</th>
                         <th>Nombre</th>
                         <th>Apellido1</th>
                         <th>Apellido2</th>
                         <th>Usuario</th>
                         <th>Estado</th>
+                        <td></td>
                         <!--<th>Rol</th>-->
                     </tr>
                 </tfoot>

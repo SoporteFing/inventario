@@ -16,31 +16,34 @@
                 
                 <thead>
                     <tr>
-                        <th scope="col" class="actions"><?= __('') ?></th>  
+                        
                         <th scope="col"><?= $this->Paginator->sort('Nombre') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Descripción') ?></th>
+                        <th scope="col" class="actions"><?= __('') ?></th>  
                     </tr>
                 </thead>
 
                 <tbody>
                     <?php foreach ($types as $type): ?>
                         <tr>
+                            
+                            <td><?= h($type->name) ?></td>
+                            <td><?= h($type->description) ?></td>
                             <td class="actions">
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $type->type_id],  array('escape'=> false)) ?>                                
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $type->type_id],  array('escape'=> false)) ?>
                                 <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $type->type_id],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar este tipo de activo? # {0}?', $type->type_id)]) ?>
                             </td>
-                            <td><?= h($type->name) ?></td>
-                            <td><?= h($type->description) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
 
                 <tfoot>
                     <tr>
-                        <td></td>
+                        
                         <th>Nombre</th>
                         <th>Descripción</th>
+                        <td></td>
                     </tr>
                 </tfoot>
 

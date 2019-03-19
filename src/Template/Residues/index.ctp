@@ -15,33 +15,19 @@ $mysqli = new mysqli('decanatura.mysql.database.azure.com','ecci@decanatura','Ga
             <table id="residues-grid"  class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col" class="actions">Acciones</th>
+                        
                         <th scope="col">Unidad Custodio</th>
                         <th scope="col">Fecha</th>
                         <th scope="col">Recomendación</th>
                         <th scope="col">N° Autorización</th>
+                        <th scope="col" class="actions">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
 
                     <?php foreach ($residues as $residuess): ?>
                         <tr>
-                            <td class="actions">
-
-                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $residuess->residues_id], array('escape' => false)) ?>
-
-                                <?php if($residuess->file == null) : ?> 
-
-                                    <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $residuess->residues_id], array('escape' => false)) ?>
-
-                                <?php endif; ?>
-
-                                 <?php if(($residuess->descargado == null) && ($residuess->file == null )) : ?>
-
-                                    <?= $this->Form->postlink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $residuess->residues_id], ['escape' => false, 'confirm' => __('¿Seguro quiere borrar el reporte # '.$residuess->residues_id.' ?', $residuess->residues_id)]) ?>
-                                <?php endif; ?>
-                                
-                            </td>
+                            
                             <td><?= h($Unidad) ?></td>  
                             <td><?= h($residuess->date ) ?></td>
 
@@ -71,17 +57,38 @@ $mysqli = new mysqli('decanatura.mysql.database.azure.com','ecci@decanatura','Ga
                               endif;
                           }
                           ?></td>
-                          <td><?= h('VRA-'.$residuess->residues_id ) ?></td>    
+                          <td><?= h('VRA-'.$residuess->residues_id ) ?></td>  
+
+                          <td class="actions">
+
+                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $residuess->residues_id], array('escape' => false)) ?>
+
+                                <?php if($residuess->file == null) : ?> 
+
+                                    <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $residuess->residues_id], array('escape' => false)) ?>
+
+                                <?php endif; ?>
+
+                                 <?php if(($residuess->descargado == null) && ($residuess->file == null )) : ?>
+
+                                    <?= $this->Form->postlink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $residuess->residues_id], ['escape' => false, 'confirm' => __('¿Seguro quiere borrar el reporte # '.$residuess->residues_id.' ?', $residuess->residues_id)]) ?>
+                                <?php endif; ?>
+                                
+                            </td>
+
+
+
                       </tr>
                   <?php endforeach; ?>
               </tbody>
               <tfoot>
                     <tr>
-                        <td></td>
+                        
                         <th>Unidad</th>
                         <th>Fecha</th>
                         <th>Recomendación</th>
                         <th>Autorización</th>
+                        <td></td>
                     </tr>
 
                 </tfoot>

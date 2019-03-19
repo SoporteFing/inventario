@@ -15,7 +15,6 @@
             <table id="assets-grid"  class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col" class="actions"><?= __('') ?></th>        
                         <th scope="col">Placa</th>
                         <th scope="col">Tipo</th>        
                         <th scope="col">Marca</th>
@@ -26,18 +25,13 @@
                         <th scope="col">Asignado</th>
                         <th scope="col">Ubicación</th>                
                         <th scope="col">Año</th>
-                        
+                        <th scope="col" class="actions">Acciones<?= __('') ?></th> 
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($assets as $asset): ?>
                         <tr>
-                            <td class="actions">
-                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $asset->plaque], array('escape'=> false, 'target' => '_blank')) ?>
-                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $asset->plaque],  array('escape'=> false, 'target' => '_blank')) ?>
-                                <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'softDelete', $asset->plaque],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar este activo? # {0}?', $asset->id)]) ?>
-                            </td>
-                            
+                                                        
                             <td><?= h($asset->plaque) ?></td>
                             <td><?= $asset->has('Types') ? h($asset->Types['name']) : '' ?></td>
                             <td><?= $asset->has('Brands') ? h($asset->Brands['name']) : '' ?></td>
@@ -48,13 +42,17 @@
                             <td><?= h($asset->Users['nombre'] . " " . $asset->Users['apellido1']) ?></td>
                             <td><?= $asset->has('Locations') ? $this->Html->link($asset->Locations['nombre'], ['controller' => 'Locations', 'action' => 'view', $asset->Locations['location_id']]) : '' ?></td>
                             <td><?= h($asset->year) ?></td>
-
+                            <td class="actions">
+                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $asset->plaque], array('escape'=> false, 'target' => '_blank')) ?>
+                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $asset->plaque],  array('escape'=> false, 'target' => '_blank')) ?>
+                                <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'softDelete', $asset->plaque],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar este activo? # {0}?', $asset->id)]) ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td></td>
+                        
                         <th>Placa</th>
                         <th>Tipo</th>
                         <th>Marca</th>
@@ -65,6 +63,7 @@
                         <th>Asignado a</th>
                         <th>Ubicación</th>
                         <th>Año</th>
+                        <td></td>
                     </tr>
 
                 </tfoot>
