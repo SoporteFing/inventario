@@ -51,7 +51,13 @@
 	
     <div class="col-md-4">
         <label> <b>Placa:</b><b style="color:red;">*</b> </label>
-    <?php echo $this->Form->imput('plaque', ['class'=>'form-control col-md-9']); ?> 
+    <?php echo $this->Form->input('plaque', ['templates' => [
+                    'inputContainer' => '<div class="row col-md-12">{{content}}</div>',
+                    'inputContainerError' => '<div class="row {{type}} error col-md-12"> {{content}} {{error}}</div>'
+                    ],
+                    'type' => 'text',
+                    'label' => false,
+                    'class'=>'form-control col-md-9']); ?> 
     </div>
 	  	  
 	  <div class="col-md-4 ">
@@ -77,7 +83,14 @@
 	  
 	  <div class="col-md-4">
         <label>Serie:</label>
-        <?php echo $this->Form->imput('series', ['label' => 'Serie:', 'class'=>'form-control col-md-9']); ?>        
+        <?php echo $this->Form->input('series', [
+                        'templates' => [
+                          'inputContainer' => '<div class="row col-md-12">{{content}}</div>',
+                        'inputContainerError' => '<div class="row {{type}} error col-md-12"> {{content}} {{error}}</div>'
+                        ],
+                        'label' => false,
+                        'class'=>'form-control col-md-9'
+                      ]); ?>        
     </div>
 
   </div> 
@@ -119,7 +132,15 @@
       
       <div class="col-md-8">
         <label class="col-lg-3"> <b>Año de Ingreso:</b><b style="color:red;">*</b> </label>
-        <?php echo $this->Form->imput('year',['class'=>'form-control col-md-4']); ?>        
+        <?php echo $this->Form->input('year',[
+                        'templates' => [
+                        'inputContainer' => '{{content}}',
+                        'inputContainerError' => '{{content}} {{error}}'
+                      ], 
+                      'label'=>false,
+                      "required"=>"required",
+                      'class'=>'form-control col-sm-6 col-md-4',
+                    ]); ?>        
       </div>
 	  
 	  <div class="row col-lg-1">
@@ -144,13 +165,13 @@
 	<div class = "row">
     <div class = "col-md-4">
       <label> Imagen: </label>
-      <?php echo $this->Form->imput('image',['type' => 'file', 'class' => 'form-control-file']); ?>
+      <?php echo $this->Form->input('image',['type' => 'file', 'class' => 'form-control-file']); ?>
     </div>
 
-    <div class = "offset-md-1 col-md-4">
+    <!--div class = "offset-md-1 col-md-4">
       <label> Archivo adjunto: </label>
-      <?php echo $this->Form->imput('file',['type' => 'file', 'class' => 'form-control-file']); ?>
-    </div>
+      <?php echo $this->Form->input('file',['type' => 'file', 'class' => 'form-control-file']); ?>
+    </div-->
   </div>
 
   </fieldset>
@@ -166,8 +187,21 @@
 </body>
 
 <script>
+
+  $(document).ready(function(){
+    if($("#type-list").val() != ''){
+      getBrands($("#type-list").val());  
+    }
+
+    if($("#brand-list").val() != ''){
+      getModels($("#brand-list").val());  
+    }
+    
+    
+
+  });
+
     function getBrands(val) {
-        console.log(val);
         $.ajax({
             type: "GET",
             url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'brandsList' ]); ?>',
@@ -193,7 +227,8 @@
         $.ajax({
             type: "GET",
             url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'modelsList' ]); ?>',
-            data:{brand_id:val},
+            data:{brand_id:val,
+                  type_id:$("#type-list").val()},
             
             success: function(data){
                 $("#model-list").html(data);

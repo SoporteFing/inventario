@@ -232,7 +232,7 @@ return [
 
             'username' => 'geovani',
             'password' => 'g3ov4n1',
-            'database' => 'activos',
+            'database' => 'activos_final',
             'encoding' => 'utf8',
             'timezone' => 'UTC',
             'flags' => [],

@@ -127,13 +127,15 @@ class UsersTable extends Table
             ->maxLength('password', 60)
             ->minLength('password', 8, 'La constraseña debe tener mínimo 8 caracteres')
             ->requirePresence('password', 'create')
-            ->notEmpty('residues_id', 'La constraseña es requerida.');
+            ->notEmpty('password', 'La constraseña es requerida.')
+            ->allowEmpty('password','update') ;
 
         $validator
             ->scalar('password2')
             ->maxLength('password2', 60)
             ->requirePresence('password2', 'create')
-            ->notEmpty('residues_id', 'La confirmación de constraseña es requerida.');
+            ->notEmpty('password', 'La confirmación de constraseña es requerida.')
+            ->allowEmpty('password','update') ;
 
         $validator
             ->integer('id_rol')

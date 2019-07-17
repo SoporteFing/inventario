@@ -76,9 +76,15 @@ class ModelsController extends AppController
     public function index()
     {
 		$this->paginate = [
-            'contain' => ['Brands', 'Types']
+            'contain' => ['Brands', 'Types']/*,
+            'conditions' => [
+                'Models.name' 
+            ]
+            */
         ];
+
         $models = $this->paginate($this->Models);
+
         $this->set(compact('models'));
     }
     /**

@@ -6,6 +6,7 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 use Imagine;
+use Cake\ORM\Rule\IsUnique;
 
 /**
  * Assets Model
@@ -252,6 +253,9 @@ class AssetsTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
+
+        $rules->add($rules->isUnique(['series'], 'Serie ya existe en otro activo')/*,['errorField' => 'series', 'message', 'Serie ya existe en otro activo']*/);
+
         $rules->add($rules->existsIn(['responsable_id'], 'Users'));
         $rules->add($rules->existsIn(['assigned_to'], 'Users'));
         $rules->add($rules->existsIn(['location_id'], 'Locations'));

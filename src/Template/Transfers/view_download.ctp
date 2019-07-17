@@ -145,7 +145,7 @@
                 <td><?= $asset->has('Brands') ? h($asset->Brands['name']) : '' ?></td>
                 <td><?= $asset->has('Models') ? h($asset->Models['name']) : '' ?></td>
                 <td><?= h($asset->series) ?></td>
-                <td><?= h($asset->Assets_Transfers['transfer_state']) ?></td>
+                <td><?= h($asset->Assets_Transfers['transfers_state']) ?></td>
 
             </tr>
             <?php endforeach; ?>

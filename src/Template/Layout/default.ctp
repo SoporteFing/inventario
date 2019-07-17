@@ -26,6 +26,7 @@ $cakeDescription = 'Control de Activos';
         'custom.css',
         'sb-admin.css']) ?>
 
+
     <?=
     $this->Html->script(['plugins/jquery/jquery.min.js']);
     ?>

@@ -1,7 +1,8 @@
 <?php
 /**
  * @var \App\View\AppView $this
- * @var \App\Model\Entity\Rol $rol
+ * 
+ *@var \App\Model\Entity\Role $role
  */
 ?>
 
@@ -11,54 +12,188 @@
         $dis = "Disabled";
     }
 ?>
-<head>
-  <style>
-        .btn-primary {
-          color: #fff;
-          background-color: #0099FF;
-          border-color: #0099FF;
-          float: right;
-          margin-left: 10px;
-        }
 
-        .btn-default {
-          color: #000;
-          background-color: #7DC7EF;
-          border-top-right-radius: 5px;
-          border-bottom-right-radius: 5px;
-        }
+<div class="roles x large-9 medium-8 columns content">
+    <h4>Editar Rol <?php echo $rol->nombre ;?></h4>
 
-        label {
-          text-align:left;
-          margin-right: 10px;
+    <?php echo $this->Form->create(false, array(
+    'url' => array($rol['id'])
+    ));
+    ?>
 
-        }
-
-        .sameLine{
-          display: flex;
-          justify-content: space-between;
-          border-color: transparent;
-        }
-
-  </style>
-</head>
-
-<body>
-<div class="users form large-9 medium-8 columns content">
-  <?= $this->Form->create($rol) ?>
-  <fieldset>
-    <legend><?= __('Editar Rol') ?></legend>
-    <br>
-    <div class="row">
-      <label> <b>Nombre:</b><b style="color:red;">*</b> </label>
-      <?php echo $this->Form->imput('nombre', ['class'=>'form-control col-md-6', $dis]); ?>
+    <div class="col-md-4">
+        <label> <h5><b>Nombre</b></h5></label>
+        <div class="row col-md-12">
+          <input type="text" name="nombre" class="form-control col-md-9" id="nombre" value="<?php echo $rol->nombre ;?>" Disabled="<?php echo $dis ;?>">
+        </div> 
     </div>
-  <br>
-</fieldset>
+
+      
+
+    <br>
+    
+    <div class="col-md-12">
+      <h5><b>Permisos</b></h5>
+
+      <br>
+
+      <table class="table">
+          <tr>
+              <th><h5><?= __('Modulo') ?></h5></th>
+              <td><h5><?= __('Insertar') ?></h5></td>
+              <td><h5><?= __('Modificar') ?></h5></td>
+              <td><h5><?= __('Eliminar') ?></h5></td>
+              <td><h5><?= __('Consultar') ?></h5></td>
+          </tr>
+          
+        <tr>
+              <th><h5><?= __('Usuarios') ?></h5></th>
+
+          <?php 
+            for ($x = 1; $x < 5; $x++) {
+              if ($permisos[$x] == 1) {
+                echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              } else {
+               echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              }
+            } 
+          ?>
+
+        </tr>
+          
+        <tr>
+              <th><h5><?= __('Activos') ?></h5></th>
+              
+
+          <?php 
+            for ($x = 5; $x < 9; $x++) {
+              if ($permisos[$x] == 1) {
+                echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              } else {
+               echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              }
+            } 
+          ?>
+
+
+        </tr>
+
+        <tr>
+              <th><h5><?= __('Reporte Tecnico') ?></h5></th>
+              
+          <?php 
+            for ($x = 9; $x < 13; $x++) {
+              if ($permisos[$x] == 1) {
+                echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              } else {
+               echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              }
+            } 
+          ?>
+
+
+
+          </tr>
+          
+          <tr>
+              <th><h5><?= __('Ubicaciones') ?></h5></th>
+              
+          <?php 
+            for ($x = 13; $x < 17; $x++) {
+              if ($permisos[$x] == 1) {
+                echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              } else {
+               echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              }
+            } 
+          ?>
+
+          </tr>
+          
+          <tr>
+              <th><h5><?= __('Prestamos') ?></h5></th>
+              
+          <?php 
+            for ($x = 17; $x < 21; $x++) {
+              if ($permisos[$x] == 1) {
+                echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              } else {
+               echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              }
+            } 
+          ?>
+
+
+          </tr>
+          
+          <tr>
+              <th><h5><?= __('Traslados') ?></h5></th>
+              
+          <?php 
+            for ($x = 21; $x < 25; $x++) {
+              if ($permisos[$x] == 1) {
+                echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              } else {
+               echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              }
+            } 
+          ?>
+
+
+          <tr>
+              <th><h5><?= __('Desechos') ?></h5></th>
+              
+          <?php 
+            for ($x = 25; $x < 29; $x++) {
+              if ($permisos[$x] == 1) {
+                echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              } else {
+               echo "<td>";
+                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo "</td>";
+              }
+            } 
+          ?>
+
+
+          </tr>
+
+          </tr>
+
+
+
+      </table>
+
+    </div>
+    <?= $this->Form->button(__('Guardar'), ['class' => 'btn btn-primary']) ?>
+    <?= $this->Html->link(__('Cancelar'), ['controller' => 'Roles', 'action' => 'index'], ['class' => 'btn btn-primary']) ?>
+
+    <?= $this->Form->end() ?>
+
 </div>
-<br>
-
-<?= $this->Html->link(__('Cancelar'), ['action' => 'index'], ['class' => 'btn btn-primary']) ?>
-<?= $this->Form->button(__('Aceptar'), ['class' => 'btn btn-primary']) ?>
-
-<?= $this->Form->end(); ?>

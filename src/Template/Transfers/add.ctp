@@ -172,9 +172,8 @@
                 <div class="row">
                     <label class = "funcionario" ><b>Funcionario:</b><font color="red"> * </font></label>
                     <?php 
-                    echo $this->Form->select('functionary',
-                      $users,
-                      ['id' => 'functionary', 'empty' => '(Escoja un usuario)','class'=>'form-control','onChange' => 'fillID(this.value);', 'style'=>'width:220px;']
+                    echo $this->Form->control('functionary',
+                      ['id' => 'functionary', 'empty' => '(Escoja un usuario)','class'=>'form-control','onChange' => 'fillID(this.value);', 'style'=>'width:220px;', 'options' => $users, 'type' => 'select', 'label' => false]
                     );
                     ?>
                 </div>
@@ -193,7 +192,7 @@
                             'label'=>['text' => '' ,'style'=>'margin-left:7px;'],
                             'id' =>'identification',
                             'class'=>'form-control col-sm-8',
-                            'Disabled'
+                            'disabled'
                             ]);
                     ?>
 
@@ -225,7 +224,16 @@
                 <div class="row">
                     <label style="width: 160px;margin-left: 20px;" ><b>Funcionario:</b><font color="red"> * </font></label>
                     <?php 
-                      echo $this->Form->imput('functionary_recib', ['label' => 'functionary:', 'class'=>'form-control col-sm-4 col-xs-4']);
+                      echo $this->Form->control('functionary_recib', [
+                                'label' => ['text' => '' ,'style'=>'margin-left:7px;'], 
+                                'class'=>'form-control col-sm-6 col-md-10 col-lg-10', 'templates' => [
+                                'inputContainer' => '<div class="row">{{content}}</div>',
+                                'inputContainerError' => '<div {{type}} error"> {{content}} {{error}}</div>'
+                                ],
+                                "required"=>"required",
+                                'id' =>'functionary_recib'
+
+                            ]);
                      ?>
                 </div>
 
@@ -366,7 +374,7 @@
 
       $('#assetButton').click( function()
       {
-        var plaque = $('#assetImput').val();
+        var plaque = $('#assetinput').val();
         if(''!=plaque)
         {
          $.ajax({

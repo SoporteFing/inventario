@@ -25,7 +25,7 @@
                        
                         <td><?= h($rol->nombre) ?></td>
                          <td class="actions">
-                            <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $rol->id], array('escape'=> false));?>
+                            <!--//?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $rol->id], array('escape'=> false));?//-->
                             <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $rol->id],  array('escape'=> false));?>
                             <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $rol->id],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar el rol: {0}?', $rol->nombre)]);?>
                         </td>

@@ -223,7 +223,7 @@ use Cake\Routing\Router;
                     <td><?= h($a->series) ?></td> 
                     <td>
                         <?php if(empty($states)) : ?> 
-                            <?= $this->Form->select('state', array('Bueno' => 'Bueno', 'Malo' => 'Malo'), array('default' => $a->Assets_Transfers['transfer_state'], 'class' => 'form-control col-md-11')); ?></td>
+                            <?= $this->Form->select('state', array('Bueno' => 'Bueno', 'Malo' => 'Malo'), array('default' => $a->Assets_Transfers['transfers_state'], 'class' => 'form-control col-md-11')); ?></td>
                         <?php else : ?>  
                                 <?= $this->Form->input('state', array('type' => 'select', 'label' => false,'options' => array('Bueno' => 'Bueno', 'Malo' => 'Malo'), 'value' => $states[$i] , 'class' => 'form-control col-md-11')); ?>
                             

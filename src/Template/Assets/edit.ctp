@@ -79,7 +79,12 @@
 	  
 	  <div class="col-md-4">
         <label>Serie:</label>
-        <?php echo $this->Form->imput('series', ['label' => 'Serie:', 'class'=>'form-control col-md-9']); ?>        
+        <?php echo $this->Form->input('series', ['templates' => [
+                          'inputContainer' => '<div class="row col-md-12">{{content}}</div>',
+                        'inputContainerError' => '<div class="row {{type}} error col-md-12"> {{content}} {{error}}</div>'
+                        ],
+                        'label' => false, 
+                        'class'=>'form-control col-md-9']); ?>        
       </div>
 
     </div> <br>
@@ -159,19 +164,28 @@
 
 
 </body>
-
 <script>
 
+  $(document).ready(function(){
+    if($("#type-list").val() != ''){
+      getBrands($("#type-list").val());  
+    }
+
+    if($("#brand-list").val() != ''){
+      getModels($("#brand-list").val());  
+    }
+    
+    
+
+  });
 
     function getBrands(val) {
-        console.log(val);
         $.ajax({
             type: "GET",
             url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'brandsList' ]); ?>',
             data:{type_id:val},
             
             success: function(data){
-               console.log(data);
                 $("#brand-list").html(data);
                 $("#model-list").empty();
                 $("#model-list").append('<option selected="selected" value>-- Seleccione Modelo --</option>');
@@ -191,10 +205,10 @@
         $.ajax({
             type: "GET",
             url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'modelsList' ]); ?>',
-            data:{brand_id:val},
+            data:{brand_id:val,
+                  type_id:$("#type-list").val()},
             
             success: function(data){
-                console.log(data);
                 $("#model-list").html(data);
             },
             error: function(e) {

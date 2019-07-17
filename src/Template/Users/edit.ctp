@@ -189,6 +189,7 @@
                         'label'=>['text'=>''],
                         'type'=>'password',
                         'value'=>'',
+                        'required' => '',
                         'class'=>'form-control col-md-11',
                       ]);
             ?>

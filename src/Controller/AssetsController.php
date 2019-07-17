@@ -10,13 +10,11 @@ class AssetsController extends AppController
 {
     public function isAuthorized($user)
     {
-
-
         $this->Roles = $this->loadModel('Roles');
         $this->Permissions = $this->loadModel('Permissions');
         $this->RolesPermissions = $this->loadModel('RolesPermissions');
 
-        $allowI = FALSEse;
+        $allowI = false;
         $allowM = false;
         $allowE = false;
         $allowC = false;
@@ -70,10 +68,11 @@ class AssetsController extends AppController
     public function index()
     {
 
-
+        $as = $this->Assets->find();
         $assets = $this->Assets->find()          
             ->select([
                 'Assets.plaque',
+                'Assets.deleted',
                 'Types.name',
                 'Models.name',
                 'Assets.year',
@@ -108,21 +107,19 @@ class AssetsController extends AppController
             ->join([
         'table' => 'models',
         'alias' => 'Models',
-        'type' => 'INNER',
+        'type' => 'LEFT',
         'conditions' => 'Assets.models_id = Models.id',
             ])
-            
             ->join([
         'table' => 'brands',
         'alias' => 'Brands',
-        'type' => 'INNER',
-        'conditions' => 'Models.id_brand = Brands.id',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.brand = Brands.id',
             ])
             
+            ->where(['Assets.deleted' => '0'])
             ;
 
-            //debug($assets->toList());
-            //die();
 
     $this->set('assets', $this->paginate($assets));
 
@@ -149,7 +146,7 @@ class AssetsController extends AppController
         $asset = $this->Assets->newEntity();
         if ($this->request->is('post')) {
             
-
+ 
 
             $random = uniqid();
             $fecha = date('Y-m-d H:i:s');
@@ -186,6 +183,19 @@ class AssetsController extends AppController
                 AppController::insertLog($asset['plaque'], TRUE);
                 $this->Flash->success(__('El activo fue guardado exitosamente.'));
                 return $this->redirect(['action' => 'index']);
+            }else{
+
+                foreach ($asset->getErrors() as $field => $error) {
+                    if($field == 'series'){
+                        foreach ($error as $id => $message) {
+                            if($id == '_isUnique'){
+                                //debug($message);
+                                $asset->setError('series', [$message]);
+                            }
+                        }
+                    }
+                } 
+
             }
             AppController::insertLog($asset['plaque'], FALSE);
             $this->Flash->error(__('El activo no se pudo guardar, por favor intente nuevamente.'));
@@ -232,7 +242,7 @@ class AssetsController extends AppController
                 $this->Flash->success(__('El activo fue guardado exitosamente.'));
                 return $this->redirect(['action' => 'index']);
             }
-            debug($asset);
+            
             AppController::insertLog($asset['plaque'], FALSE);
             $this->Flash->error(__('El activo no se pudo guardar, por favor intente nuevamente.'));
         }
@@ -395,6 +405,7 @@ class AssetsController extends AppController
         $this->loadModel('Brands');
         
         $brand_id = $_GET['brand_id'];
+        $type_id = $_GET['type_id'];
         
         $brand = $this->Brands->get($brand_id);
         if($brand == NULL)
@@ -403,7 +414,7 @@ class AssetsController extends AppController
         }
         
         $models = $this->Models->find('list')
-            ->where(['Models.id_brand' => $brand->id]);
+            ->where(['Models.id_brand' => $brand_id, 'Models.id_type' => $type_id]);
         
         if(empty($models))
         {
