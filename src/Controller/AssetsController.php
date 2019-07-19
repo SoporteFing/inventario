@@ -228,6 +228,15 @@ class AssetsController extends AppController
             'contain' => []
         ]);
 
+        $this->loadModel('Models');
+        $model = $this->Models->get($asset->models_id, [
+            'contain' => []
+        ]);
+
+        $this->loadModel('Brands');
+        $brand = $this->Brands->get($asset->brand, [
+            'contain' => []
+        ]);
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $fecha = date('Y-m-d H:i:s');
@@ -247,8 +256,7 @@ class AssetsController extends AppController
             $this->Flash->error(__('El activo no se pudo guardar, por favor intente nuevamente.'));
         }
 
-        $this->loadModel('Brands');
-
+        
         $brands = $this->Brands->find('list')          
             ->select([
                 'Brands.id',
@@ -281,7 +289,7 @@ class AssetsController extends AppController
         $locations = $this->Assets->Locations->find('list', ['limit' => 200]);
 		$types = $this->Assets->Types->find('list', ['limit' => 200]);
 		
-        $this->set(compact('asset', 'brands', 'users', 'locations', 'models', 'types'));
+        $this->set(compact('asset', 'brands', 'users', 'locations', 'models', 'types', 'model','brand'));
 
     }
 

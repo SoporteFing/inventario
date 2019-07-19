@@ -67,14 +67,15 @@
 	
 	<div class="row" >
 
+
   <div class="col-md-4">
         <label>Marca:</label>
-        <?php echo $this->Form->select('brand', $brands, ['id' => 'brand-list', 'onChange' => 'getModels(this.value);', 'empty' => '-- Seleccione Marca --',  'class'=>'form-control col-md-9']); ?>        
+        <?php echo $this->Form->select('brand', $brands, ['id' => 'brand-list', 'onChange' => 'getModels(this.value);', 'empty' => '-- Seleccione Marca --',  'class'=>'form-control col-md-9', 'selected' => $brand->name ]); ?>        
       </div>
       
       <div class="col-md-4">
         <label>Modelo:</label>
-        <?php echo $this->Form->select('models_id', $models, ['id' => 'model-list', 'empty' => '-- Seleccione Modelo --', 'class'=>'form-control col-md-9']); ?>        
+        <?php echo $this->Form->select('models_id', $models, ['id' => 'model-list', 'empty' => '-- Seleccione Modelo --', 'class'=>'form-control col-md-9', 'selected' => $model->name]); ?>        
       </div>
 	  
 	  <div class="col-md-4">
@@ -167,6 +168,7 @@
 <script>
 
   $(document).ready(function(){
+    /*
     if($("#type-list").val() != ''){
       getBrands($("#type-list").val());  
     }
@@ -174,7 +176,7 @@
     if($("#brand-list").val() != ''){
       getModels($("#brand-list").val());  
     }
-    
+    */
     
 
   });
