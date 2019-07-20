@@ -53,11 +53,11 @@
             for ($x = 1; $x < 5; $x++) {
               if ($permisos[$x] == 1) {
                 echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               } else {
                echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               }
             } 
@@ -73,11 +73,11 @@
             for ($x = 5; $x < 9; $x++) {
               if ($permisos[$x] == 1) {
                 echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               } else {
                echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               }
             } 
@@ -93,11 +93,11 @@
             for ($x = 9; $x < 13; $x++) {
               if ($permisos[$x] == 1) {
                 echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               } else {
                echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               }
             } 
@@ -114,11 +114,11 @@
             for ($x = 13; $x < 17; $x++) {
               if ($permisos[$x] == 1) {
                 echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               } else {
                echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               }
             } 
@@ -133,11 +133,11 @@
             for ($x = 17; $x < 21; $x++) {
               if ($permisos[$x] == 1) {
                 echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               } else {
                echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               }
             } 
@@ -153,11 +153,11 @@
             for ($x = 21; $x < 25; $x++) {
               if ($permisos[$x] == 1) {
                 echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               } else {
                echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               }
             } 
@@ -171,11 +171,11 @@
             for ($x = 25; $x < 29; $x++) {
               if ($permisos[$x] == 1) {
                 echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               } else {
                echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox', 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
+                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
                 echo "</td>";
               }
             } 
@@ -197,3 +197,23 @@
     <?= $this->Form->end() ?>
 
 </div>
+
+<script type="text/javascript">
+
+    $("input[type=checkbox]").change(function() {
+        if(this.checked && !(this.id % 4 == 0)) {
+          var consultar = (parseInt(this.id / 4) + 1) * 4;
+          $("#" + consultar).prop("checked", true );
+        }
+        if(!this.checked && this.id % 4 == 0) {
+          console.log(this.id);
+          $("#" + (this.id - 1)).prop("checked", false );
+          $("#" + (this.id - 2)).prop("checked", false );
+          $("#" + (this.id - 3)).prop("checked", false );
+        }
+    });
+    
+
+
+
+</script>>
