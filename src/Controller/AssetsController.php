@@ -3,6 +3,7 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\Event\Event;
 use Imagine;
+
 /**
 * Controlador para los activos de la aplicación
 */
@@ -29,13 +30,13 @@ class AssetsController extends AppController
             $rls = $roles['permissions'];
             foreach ($rls as $item){
                 //$permisos[(int)$item['id']] = 1;
-                if($item['nombre'] == 'Insertar Usuarios'){
+                if($item['nombre'] == 'Insertar Activos'){
                     $allowI = true;
-                }else if($item['nombre'] == 'Modificar Usuarios'){
+                }else if($item['nombre'] == 'Modificar Activos'){
                     $allowM = true;
-                }else if($item['nombre'] == 'Eliminar Usuarios'){
+                }else if($item['nombre'] == 'Eliminar Activos'){
                     $allowE = true;
-                }else if($item['nombre'] == 'Consultar Usuarios'){
+                }else if($item['nombre'] == 'Consultar Activos'){
                     $allowC = true;
                 }
             }
@@ -228,15 +229,25 @@ class AssetsController extends AppController
             'contain' => []
         ]);
 
+        //debug($asset);
+        //die();
+
         $this->loadModel('Models');
-        $model = $this->Models->get($asset->models_id, [
-            'contain' => []
-        ]);
+
+        if($asset->models_id != null){    
+            $model = $this->Models->get($asset->models_id, [
+                'contain' => []
+            ]);
+        }
+
 
         $this->loadModel('Brands');
-        $brand = $this->Brands->get($asset->brand, [
-            'contain' => []
-        ]);
+        if($asset->brand != null){
+            
+            $brand = $this->Brands->get($asset->brand, [
+                'contain' => []
+            ]);
+        }
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $fecha = date('Y-m-d H:i:s');
@@ -397,6 +408,9 @@ class AssetsController extends AppController
         {
             throw new NotFoundException(__('Marcas no encontradas') );      
         }
+
+        //debug($brands->toList());
+        //die();
 
         $this->set('brands', $brands);
 

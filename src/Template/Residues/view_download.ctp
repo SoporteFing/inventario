@@ -1,4 +1,4 @@
-<?php
+    <?php
 /**
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\TechnicalReport $technicalReport
@@ -99,7 +99,7 @@
         <div class='row'>
             <label class='align'>Unidad Custodio:</label>
             <?php 
-                echo $this->Form->imput('Unidad', ['class'=>'form-control col-sm-4', 'value'=>$Unidad, 'disabled']);
+                echo $this->Form->imput('Unidad', ['class'=>'form-control col-sm-4', 'value'=>$unidadAcademica, 'disabled']);
             ?>
         </div><br>
 
@@ -154,41 +154,26 @@
 
         <table cellpadding="0" cellspacing="0">
             <tr>
-                <th class="transfer-h" scope="col"><?= __('Placa') ?></th>
-                <th class="transfer-h" scope="col"><?= __('Recomendacion') ?></th>
-                <th class="transfer-h" scope="col"><?= __('Informe Técnico') ?></th>
+                        <th class="transfer-h"><?= __('Placa') ?></th>
+                        <th class="transfer-h"><?= __('Tipo') ?></th>
+                        <th class="transfer-h"><?= __('Marca') ?></th>
+                        <th class="transfer-h"><?= __('Modelo') ?></th>
+                        <th class="transfer-h"><?= __('Serie') ?></th>
                 
             </tr>
     
-            <?php
+            <?php foreach ($asset as $a): ?>
 
-            $size = count($resultRec);
-            for ($i=0; $i< $size;$i++){
-                echo '<tr>';
-                    echo '<td>' .h($result[$i]->plaque). '</td>';
+                      <tr>
+                        <td><?= h($a->plaque) ?></td>
+                        <td><?= $a->has('Types') ? h($a->Types['name']) : '' ?></td>
+                        <td><?= $a->has('Brands') ? h($a->Brands['name']) : '' ?></td>
+                        <td><?= $a->has('Models') ? h($a->Models['name']) : '' ?></td>
+                        <td><?= h($a->series) ?></td> 
+                        
+                      </tr>
+            <?php endforeach; ?>
 
-                    switch ($resultRec[$i]->recommendation) {
-                        case 'C':
-                            echo '<td>' .'Reubicar'. '</td>';
-                        break;
-                        case 'R':
-                            echo '<td>' .'Reparar'. '</td>'; 
-                         break;
-                        case 'D':
-                            echo '<td>' .'Desechar'. '</td>'; 
-                        break;
-                        case 'U':   
-                            echo '<td>' .'Usar Piezas'. '</td>'; 
-                        break;
-                        case 'O':
-                            echo '<td>' .'Otros'. '</td>'; 
-                        break;
-                    } 
-                    echo '<td>' .h($resultRec[$i]->technical_report_id). '</td>';      
-                echo '</tr>';
-            }
-            
-            ?>
         </table>
     </div><br>
 

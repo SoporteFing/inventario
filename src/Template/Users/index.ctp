@@ -46,9 +46,17 @@
                             <td><?= h($user->account_status == 1 ? 'Activo' : 'Inoperante') ?></td>
                             <!--<td><?= $user->has('roles') ? h($user->roles->nombre) : '' ?></td>-->
                             <td class="actions">
+                                <?php if($allowC) : ?>
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $user->id], array('escape'=> false)) ?>
+                                <?php endif; ?>
+                                <?php if($allowM) : ?>
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $user->id],  array('escape'=> false)) ?>
+                                <?php endif; ?>
+
+                                <?php if($allowE) : ?>
                                 <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $user->id],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar este usuario? # {0}?', $user->id)]) ?>
+                                <?php endif; ?>
+
                             </td>
 
                         </tr>

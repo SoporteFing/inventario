@@ -7,15 +7,7 @@
 ?>
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <?php echo $this->Html->css('//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css');?>
-  <link rel="stylesheet" href="/resources/demos/style.css">
 
-  <script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
- 
   <style>
         .btn-primary {
           color: #fff;
@@ -24,6 +16,8 @@
           float: right;
           margin-left: 10px;
         }
+
+
         
         .btn-default {
           color: #000;
@@ -166,7 +160,7 @@
                 <div class="row" >
                     <label class="label-t" ><b>Unidad académica:</b><font color="red"> * </font></label>
                    
-                    <label><?php echo h($paramUnidad); ?></label>
+                    <label><?php echo h($unidadAcademica); ?></label>
                 </div>
                 <br>
                 <div class="row">

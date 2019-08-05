@@ -114,8 +114,9 @@
 }
 </style>
 
-
+<?php if($allowI) : ?>
 <?= $this->Html->link(__('Insertar informe técnico'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
+<?php endif; ?>
 
 <script type="text/javascript">
 

@@ -28,7 +28,7 @@ $mysqli = new mysqli('decanatura.mysql.database.azure.com','ecci@decanatura','Ga
                     <?php foreach ($residues as $residuess): ?>
                         <tr>
                             
-                            <td><?= h($Unidad) ?></td>  
+                            <td><?= h($unidadAcademica) ?></td>  
                             <td><?= h($residuess->date ) ?></td>
 
                             <td><?php
@@ -60,16 +60,17 @@ $mysqli = new mysqli('decanatura.mysql.database.azure.com','ecci@decanatura','Ga
                           <td><?= h('VRA-'.$residuess->residues_id ) ?></td>  
 
                           <td class="actions">
-
+                                <?php if($allowC) : ?>
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $residuess->residues_id], array('escape' => false)) ?>
 
-                                <?php if($residuess->file == null) : ?> 
+                                <?php endif; ?>
+                                <?php if($residuess->file == null && $allowM) : ?> 
 
                                     <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $residuess->residues_id], array('escape' => false)) ?>
 
                                 <?php endif; ?>
 
-                                 <?php if(($residuess->descargado == null) && ($residuess->file == null )) : ?>
+                                 <?php if(($residuess->descargado == null) && ($residuess->file == null ) && $allowE) : ?>
 
                                     <?= $this->Form->postlink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $residuess->residues_id], ['escape' => false, 'confirm' => __('¿Seguro quiere borrar el reporte # '.$residuess->residues_id.' ?', $residuess->residues_id)]) ?>
                                 <?php endif; ?>
@@ -109,7 +110,9 @@ $mysqli = new mysqli('decanatura.mysql.database.azure.com','ecci@decanatura','Ga
 }
 </style>
 
+<?php if($allowI) : ?>
 <?= $this->Html->link(__('Insertar Acta'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
+<?php endif; ?>
 
 <script type="text/javascript">
 

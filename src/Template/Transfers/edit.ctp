@@ -114,7 +114,7 @@ use Cake\Routing\Router;
                 <div class="row" >
                     <label class="label-t" ><b>Unidad académica:</b><font color="red"> * </font></label>
                    
-                    <label><?php echo h($Unidad); ?></label>
+                    <label><?php echo h($unidadAcademica); ?></label>
                 </div>
                 <br>
                 <div class="row">

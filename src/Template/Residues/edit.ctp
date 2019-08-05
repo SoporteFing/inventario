@@ -122,7 +122,7 @@
         <div class='row'>
             <label class='align'>Unidad Custodio:</label>
             <?php 
-                echo $this->Form->imput('Unidad', ['class'=>'form-control col-sm-3', 'value'=>$Unidad, 'disabled','id'=>'unit']);
+                echo $this->Form->imput('Unidad', ['class'=>'form-control col-sm-3', 'value'=>$unidadAcademica, 'disabled','id'=>'unit']);
             ?>
         </div><br>
 

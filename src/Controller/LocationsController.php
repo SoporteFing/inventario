@@ -30,20 +30,20 @@ class LocationsController extends AppController
         $query = $this->Roles->find('all', array(
                     'conditions' => array(
                         'id' => $user['id_rol']
-                    )
+                    )   
                 ))->contain(['Permissions']);
 
         foreach ($query as $roles) {
             $rls = $roles['permissions'];
             foreach ($rls as $item){
                 //$permisos[(int)$item['id']] = 1;
-                if($item['nombre'] == 'Insertar Ubicaciones'){
+                if($item['nombre'] == 'Insertar Activos'){
                     $allowI = true;
-                }else if($item['nombre'] == 'Modificar Ubicaciones'){
+                }else if($item['nombre'] == 'Modificar Activos'){
                     $allowM = true;
-                }else if($item['nombre'] == 'Eliminar Ubicaciones'){
+                }else if($item['nombre'] == 'Eliminar Activos'){
                     $allowE = true;
-                }else if($item['nombre'] == 'Consultar Ubicaciones'){
+                }else if($item['nombre'] == 'Consultar Activos'){
                     $allowC = true;
                 }
             }

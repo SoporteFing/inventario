@@ -55,7 +55,14 @@
                             <td><?= h(date("d-m-Y", strtotime($loan->fecha_inicio))) ?></td>
                             <td><?= $loan->has('fecha_devolucion') ? h(date("d-m-Y", strtotime($loan->fecha_devolucion))) : '' ?></td>
                             <td class="actions">
+                                <?php if($allowC) : ?>
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $loan->id], array('escape'=> false)) ?>
+                                <?php endif; ?>
+                                <?php if($loan->estado == 'En proceso' ) : ?> 
+
+                                    <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-upload')), ['action' => 'finalizar', $loan->id], array('escape' => false)) ?>
+
+                                <?php endif; ?> 
                             </td> 
                         </tr>
                     <?php endforeach; ?>
@@ -87,7 +94,9 @@
 }
 </style>
 
+<?php if($allowI) : ?>
 <?= $this->Html->link(__('Insertar Préstamo'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
+<?php endif; ?>
 
 <script type="text/javascript">
 

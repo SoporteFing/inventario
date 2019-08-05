@@ -43,9 +43,17 @@
                             <td><?= $asset->has('Locations') ? $this->Html->link($asset->Locations['nombre'], ['controller' => 'Locations', 'action' => 'view', $asset->Locations['location_id']]) : '' ?></td>
                             <td><?= h($asset->year) ?></td>
                             <td class="actions">
+                                <?php if($allowC) : ?>
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $asset->plaque], array('escape'=> false, 'target' => '_blank')) ?>
+                                <?php endif; ?>
+
+                                <?php if($allowM) : ?>
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $asset->plaque],  array('escape'=> false, 'target' => '_blank')) ?>
+                                <?php endif; ?>
+
+                                <?php if($allowE) : ?>
                                 <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'softDelete', $asset->plaque],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar este activo? # {0}?', $asset->id)]) ?>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -85,9 +93,13 @@
 }
 </style>
 
+<?php if($allowI) : ?>
+
 <?= $this->Html->link(__('Insertar Activo'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
 
 <?= $this->Html->link(__('Insertar Activos por Lote'), ['action' => 'batch'] ,['class' => 'btn btn-primary']) ?>
+
+<?php endif; ?>
 
 <script type="text/javascript">
 

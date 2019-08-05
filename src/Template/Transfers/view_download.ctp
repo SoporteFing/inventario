@@ -82,7 +82,7 @@
                 <div class="row" >
                     <label class="label-t">Unidad académica: </label>
                    
-                    <?php echo '<input type="text" class="form-control col-sm-6" readonly="readonly" value="' . htmlspecialchars($Unidad) . '">'; ?>
+                    <?php echo '<input type="text" class="form-control col-sm-6" readonly="readonly" value="' . htmlspecialchars($unidadAcademica) . '">'; ?>
                 </div>
                 <br>
                 <div class="row">

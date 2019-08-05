@@ -67,7 +67,6 @@
 	
 	<div class="row" >
 
-
   <div class="col-md-4">
         <label>Marca:</label>
         <?php echo $this->Form->select('brand', $brands, ['id' => 'brand-list', 'onChange' => 'getModels(this.value);', 'empty' => '-- Seleccione Marca --',  'class'=>'form-control col-md-9', 'selected' => $brand->name ]); ?>        
@@ -168,16 +167,32 @@
 <script>
 
   $(document).ready(function(){
-    /*
+    
     if($("#type-list").val() != ''){
       getBrands($("#type-list").val());  
     }
 
+/*    
+    if("<?php echo $brand->id ?>" != ""){
+      console.log('"<?php echo $brand->id ?>"');
+      $("#brand-list").val('"<?php echo $brand->id ?>"');
+    }else{
+      console.log('test');
+      //$("#brand-list").append("<option disabled selected value> -- Seleccione una Marca -- </option>");
+    }
+
+
     if($("#brand-list").val() != ''){
       getModels($("#brand-list").val());  
     }
-    */
     
+    if("<?php echo $model->id ?>" != ""){
+      $("#model-list").val("<?php echo $model->id ?>");
+    }else{
+      $("#model-list").val("<option disabled selected value> -- Seleccione un Modelo -- </option>");
+    }
+
+    */
 
   });
 
@@ -191,6 +206,14 @@
                 $("#brand-list").html(data);
                 $("#model-list").empty();
                 $("#model-list").append('<option selected="selected" value>-- Seleccione Modelo --</option>');
+                if("<?php echo $brand->id ?>" != ""){
+                  //si tiene marca
+                  //selecciona la marca del activo
+                  $("#brand-list").val('<?php echo $brand->id ?>');
+                  //carga los modelos
+                  getModels($("#brand-list").val());
+
+                }
             },
 
             error: function(e) {
@@ -203,7 +226,7 @@
     }
 
     function getModels(val) {
-        console.log(val);
+        
         $.ajax({
             type: "GET",
             url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'modelsList' ]); ?>',
@@ -212,6 +235,11 @@
             
             success: function(data){
                 $("#model-list").html(data);
+                if("<?php echo $model->id ?>" != ""){
+                  //si tiene modelo lo selecciona
+                  $("#model-list").val("<?php echo $model->id ?>");
+                }
+
             },
             error: function(e) {
                     alert("Ocurrió un error: artículo no encontrado.");

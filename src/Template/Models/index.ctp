@@ -29,9 +29,17 @@
                             <td><?= h($model->brand->name) ?></td>
                             <td><?= h($model->type->name) ?></td>
                             <td class="actions">
+                                <?php if($allowC) : ?>
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $model->id], array('escape'=> false)) ?>
+                                <?php endif; ?>
+
+                                <?php if($allowM) : ?>
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $model->id],  array('escape'=> false)) ?>
+                                <?php endif; ?>
+
+                                <?php if($allowE) : ?>
                                 <?= $this->Form->postLink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $model->id],  ['escape'=> false,'confirm' => __('¿Está seguro que desea eliminar este modelo? {0}?', $model->name)]) ?>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -61,7 +69,9 @@
 }
 </style>
 
+<?php if($allowI) : ?>
 <?= $this->Html->link(__('Insertar Modelo'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
+<?php endif; ?>
 
 <script type="text/javascript">
 

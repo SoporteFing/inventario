@@ -68,7 +68,9 @@
 }
 </style>
 </div>
+<?php if($allowI) : ?>
 <?= $this->Html->link(__('Insertar Ubicación'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
+<?php endif; ?>
 
 <script type="text/javascript">
 

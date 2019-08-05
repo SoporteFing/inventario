@@ -3,19 +3,11 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Residue $residue
  */
-    use Cake\Routing\Router;
+use Cake\Routing\Router;
 ?>
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <?php echo $this->Html->css('//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css');?>
-  <link rel="stylesheet" href="/resources/demos/style.css">
 
-  <script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 
     <style>
     .btn-primary {
@@ -101,7 +93,7 @@
 
 <div class="residues form large-9 medium-8 columns content">
     <!-- El segundo parametro es para utilizar los validadores de cakephp-->
-    <?= $this->Form->create($residue,['novalidate','onsubmit'=>'return validateCheck()']) ?>
+    <?= $this->Form->create($residue) ?>
     <fieldset>
         <legend><?= __('Insertar acta de desecho') ?></legend>
            
@@ -247,39 +239,39 @@
 <br>
         <!-- AQUI ESTA LO IMPORTANTE. RECUERDEN COPIAR LOS SCRIPTS -->
         <div class="related">
-            <legend><?= __('Activos a desechar') ?></legend>
+            <legend><?= __('Activos a Desechar') ?></legend>
 
             <!--  Sirve para mostrar el mensaje que se debe seleccionar un activo -->
             <p id="errorMsg" style="color: red;"></p>
 
             <!-- tabla que contiene  datos básicos de activos-->
-            <table id='assets-residues-grid' cellpadding="0" cellspacing="0">
+            <table id='assets-transfers-grid2' cellpadding="0" cellspacing="0">
                 <thead>
                     <tr>
                         <th class="transfer-h"><?= __('Placa') ?></th>
+                        <th class="transfer-h"><?= __('Tipo') ?></th>
                         <th class="transfer-h"><?= __('Marca') ?></th>
                         <th class="transfer-h"><?= __('Modelo') ?></th>
                         <th class="transfer-h"><?= __('Serie') ?></th>
-                        <th class="transfer-h"><?= __('Estado') ?></th>
                         <th class="transfer-h"><?= __('Seleccionados') ?></th>
                     </tr>
                 <thead>
                 <tbody>
                     <?php 
-                      foreach ($result as $a): ?>
+                      foreach ($asset_old as $a): ?>
 
                       <tr>
-                          <td><?= h($a->plaque) ?></td>
-                          <td><?= h($a->brand) ?></td>
-                          <td><?= h($a->model) ?></td>
-                          <td><?= h($a->series) ?></td>
-                          <td><?= h($a->state) ?></td>
-                          <td data-order="0"><?php
-                                echo $this->Form->checkbox('assets_id',
-                                        ['value'=>htmlspecialchars($a->plaque),"class"=>"chk"]
-                                );
-                              ?>
-                          </td>
+                        <td><?= h($a->plaque) ?></td>
+                        <td><?= $a->has('Types') ? h($a->Types['name']) : '' ?></td>
+                        <td><?= $a->has('Brands') ? h($a->Brands['name']) : '' ?></td>
+                        <td><?= $a->has('Models') ? h($a->Models['name']) : '' ?></td>
+                        <td><?= h($a->series) ?></td> 
+                        <td><?php
+                                    echo $this->Form->checkbox('assets_id',
+                                    ['value'=>htmlspecialchars($a->plaque),'id'=>htmlspecialchars($a->plaque),"class"=>"chk"]
+                                    );
+                             ?>
+                        </td>
                       </tr>
                     <?php endforeach; ?>
                     
@@ -288,6 +280,54 @@
 
 
         </div>
+
+
+        <!--Development starts-->
+
+            <div class="related">
+            <legend><?= __('Activos Disponibles') ?></legend>
+
+            <!--  Sirve para mostrar el mensaje que se debe seleccionar un activo -->
+            <p id="errorMsg" style="color: red;"></p>
+
+            <!-- tabla que contiene  datos básicos de activos-->
+            <table id='assets-transfers-grid' cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="transfer-h"><?= __('Placa') ?></th>
+                        <th class="transfer-h"><?= __('Tipo') ?></th>
+                        <th class="transfer-h"><?= __('Marca') ?></th>
+                        <th class="transfer-h"><?= __('Modelo') ?></th>
+                        <th class="transfer-h"><?= __('Serie') ?></th>
+                        <th class="transfer-h"><?= __('Seleccionados') ?></th>
+                    </tr>
+                <thead>
+                <tbody>
+                    <?php 
+                      foreach ($asset as $a): ?>
+
+                      <tr>
+                        <td><?= h($a->plaque) ?></td>
+                        <td><?= $a->has('Types') ? h($a->Types['name']) : '' ?></td>
+                        <td><?= $a->has('Brands') ? h($a->Brands['name']) : '' ?></td>
+                        <td><?= $a->has('Models') ? h($a->Models['name']) : '' ?></td>
+                        <td><?= h($a->series) ?></td> 
+                        <td><?php
+                                    echo $this->Form->checkbox('assets_id',
+                                    ['value'=>htmlspecialchars($a->plaque),'id'=>htmlspecialchars($a->plaque),"class"=>"chk"]
+                                    );
+                             ?>
+                        </td>
+                      </tr>
+                    <?php endforeach; ?>
+                    
+                </tbody>
+            </table>
+
+
+        </div>
+
+
 
     <!-- input donde coloco la lista de placas checkeadas -->
     <input type="hidden" name="checkList" id="checkList">
@@ -301,9 +341,9 @@
 <br>
 <br>
 <div>
-
-        <?= $this->Html->link(__('Cancelar'), ['action' => 'index'], ['class' => 'btn btn-primary']) ?>
         <?= $this->Form->button(__('Siguiente'), ['class' => 'btn btn-primary', 'id'=>'acept']) ?>
+        <?= $this->Html->link(__('Cancelar'), ['action' => 'index'], ['class' => 'btn btn-primary']) ?>
+        
         </form>
 </div>
 <script type="text/javascript">
@@ -321,8 +361,10 @@
 **/
 $(document).ready(function() 
 {
-    var equipmentTable = $('#assets-residues-grid').DataTable( {
-          dom: 'Bfrtip',
+
+    var equipmentTable = $('#assets-transfers-grid').DataTable( {
+                responsive: true,
+                dom: 'Bfrtip',
                 buttons: [
                 ],
                 "iDisplayLength": 10,
@@ -364,21 +406,155 @@ $(document).ready(function()
                 }
         } );
 
-    // Listen to change event from checkbox to trigger re-sorting
-    $('#assets-residues-grid input[type="checkbox"]').on('change', function() {
-    // Update data-sort on closest <td>
-    $(this).closest('td').attr('data-order', this.checked ? 1 : 0);
-    
-    // Store row reference so we can reset its data
-    var $tr = $(this).closest('tr');
-    
-    // Force resorting
-    equipmentTable
-    .row($tr)
-    .invalidate()
-    .order([ 5, 'desc' ])
-    .draw();
+    var selectionTable = $('#assets-transfers-grid2').DataTable( {
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: [
+                ],
+                "iDisplayLength": 10,
+                "paging": true,
+                "pageLength": 10,
+                "language": {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "decimal": ",",
+                    "thousands": ".",
+                    "sSelect": "1 fila seleccionada",
+                    "select": {
+                        rows: {
+                            _: "Ha seleccionado %d filas",
+                            0: "Dele click a una fila para seleccionarla",
+                            1: "1 fila seleccionada"
+                        }
+                    },
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+        } );
+
+
+    $('#assets-transfers-grid2').on('click', 'input[type="checkbox"]', function () {
+
+      if(this.checked == 0){
+         
+        //var $row = $(this).closest('tr');
+
+        var addRow = $('#assets-transfers-grid2').dataTable().fnGetData($row);
+        //addRow[5] = addRow[6];
+        //addRow.pop();
+
+        var plaque = addRow[0];
+        $('#assets-transfers-grid').DataTable().row.add(addRow).draw();
+        $('#assets-transfers-grid2').dataTable().fnDeleteRow($row);
+
+
+        
+        document.getElementById(plaque).checked = false;
+        
+        
+        $('#' + plaque).on('click', function() {
+
+          if(this.checked == 1){
+            var $row = $(this).closest('tr');
+
+            //console.log($(this).closest('td').prev('td').find("select").val());
+
+            var addRow = $('#assets-transfers-grid').dataTable().fnGetData($row);
+
+            //var chk = addRow[5]['display'];
+            //addRow.push(addRow[5]);
+            //addRow[5] = '<select name="state" class="form-control" style="width:113px;" required="required"><option value="Bueno">Bueno</option><option value="Malo">Malo</option></select>';
+
+            var plaque = addRow[0];
+
+            $('#assets-transfers-grid2').DataTable().row.add(addRow).draw();
+
+            $('#assets-transfers-grid').dataTable().fnDeleteRow($row);
+
+          }
+
+        });
+
+
+
+
+       }
+    });
+
+
+    $('#assets-transfers-grid').on('click', 'input[type="checkbox"]', function () {
+
+      if(this.checked == 1){
+         
+        var $row = $(this).closest('tr');
+
+        var addRow = $('#assets-transfers-grid').dataTable().fnGetData($row);
+          
+        var plaque = addRow[0];
+        
+        //var chk = addRow[5]['display'];
+
+        //addRow.push(addRow[5]);
+        //addRow[5] = '<select name="state" class="form-control" style="width:113px;" required="required"><option value="Bueno">Bueno</option><option value="Malo">Malo</option></select>';
+
+
+        $('#assets-transfers-grid2').DataTable().row.add(addRow).draw();
+        $('#assets-transfers-grid').dataTable().fnDeleteRow($row);
+
+
+        document.getElementById(plaque).checked = true;
+
+        $('#' + plaque).on('click', function() {
+
+          if(this.checked == 0){
+            var $row = $(this).closest('tr');
+
+            //console.log($(this).closest('td').prev('td').find("select").val());
+
+            var addRow = $('#assets-transfers-grid2').dataTable().fnGetData($row);
+
+            //addRow[5] = addRow[6];
+            //addRow.pop();
+
+            var plaque = addRow[0];
+
+            $('#assets-transfers-grid').DataTable().row.add(addRow).draw();
+
+            $('#assets-transfers-grid2').dataTable().fnDeleteRow($row);
+
+          }
+
+        } );
+
+          
+
+        }
+
+
+
+
     } );
+
+
+
 } );
 
 // función para validar que algún checkbox ha sido marcado
@@ -398,17 +574,21 @@ $(document).ready(function()
         return true;
     }
     
-}
+    }
 $("document").ready(
     function() {
+
       $('#acept').click( function()
       {
-        var check = getValueUsingClass();
+        
+        var check = getSelectedList();
+        
         $('#checkList').val(check);
+        
+      });
 
-        });
-        }
-    );
+
+    });
 /** función optenida de http://bytutorial.com/blogs/jquery/jquery-get-selected-checkboxes */
 
     function getValueUsingClass(){
@@ -424,5 +604,24 @@ $("document").ready(
     var selected;
     selected = chkArray.join(',') ;
     return selected;
-}
+    }
+
+
+
+    function getSelectedList(){
+        /* declare an checkbox array */
+        var chkArray = [];
+        
+        /* look for all checkboxes that have a class 'chk' attached to it and check if it was checked */
+        $(".chk:checked").each(function() {
+            chkArray.push($(this).val());
+        });
+        
+        /* we join the array separated by the comma */
+        var selected;
+        selected = chkArray.join(',') ;
+        return selected;
+    };
+
+
 </script>

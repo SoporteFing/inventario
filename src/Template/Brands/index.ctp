@@ -54,7 +54,11 @@
 }
 </style>
 
+<?php if($allowI) : ?>
+
 <?= $this->Html->link(__('Insertar Marca'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
+
+<?php endif; ?>
 
 <script type="text/javascript">
 

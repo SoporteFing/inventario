@@ -53,15 +53,16 @@
                 <?php endif; ?>
 
                <td class="actions">
-
+                    <?php if($allowC) : ?>
                     <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $transfer->transfers_id], array('escape' => false)) ?>
+                    <?php endif; ?>
                     
-                    <?php if($transfer->file_name == null) : ?> 
+                    <?php if($transfer->file_name == null && $allowM) : ?> 
 
                         <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $transfer->transfers_id], array('escape' => false)) ?>
                     <?php endif; ?>  
 
-                    <?php if(($transfer->descargado == null) && ($transfer->file_name == null )) : ?> 
+                    <?php if(($transfer->descargado == null) && ($transfer->file_name == null ) && $allowE) : ?> 
 
                     <?= $this->Form->postlink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $transfer->transfers_id], ['escape' => false, 'confirm' => __('¿Está seguro que quiere borrar el traslado # '.$transfer->transfers_id.' ?', $transfer->transfers_id)]) ?>
                     
@@ -103,8 +104,9 @@
 }
 </style>
 
-
+<?php if($allowI) : ?>
 <?= $this->Html->link(__('Insertar traslado'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
+<?php endif; ?>
 
 <script type="text/javascript">
 

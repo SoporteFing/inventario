@@ -132,11 +132,11 @@ class TechnicalReportsController extends AppController
 
         $assets;               
         //* se acomodan los valores dentro 
-        $assets[0]['plaque']= $assetsQuery[0]->assets['plaque'];
+        $assets[0]['plaque']= $assetsQuery[0]['plaque'];
         $assets[0]['brand']= $assetsQuery[0]->brands['name'];
         $assets[0]['model']= $assetsQuery[0]->models['name'];
-        $assets[0]['series']= $assetsQuery[0]->assets['series'];
-        $assets[0]['description']= $assetsQuery[$i]->assets['description'];
+        $assets[0]['series']= $assetsQuery[0]['series'];
+        $assets[0]['description']= $assetsQuery[0]['description'];
 
         // se realiza una conversion a objeto para que la vista lo use sin problemas
         $assets=(object)$assets[0];
@@ -206,6 +206,7 @@ class TechnicalReportsController extends AppController
         }// if post
         
         // En caso de que la acción sea simplemente cargar la vista
+        $this->Assets = $this->loadModel('Assets');
         $assets = $this->Assets->find('all');
         
         // Le paso a la vista los valores de assets y el ID que se va a desplegar.
@@ -266,11 +267,12 @@ class TechnicalReportsController extends AppController
 
         $assets;               
         //* se acomodan los valores dentro 
-        $assets[0]['plaque']= $assetsQuery[0]->assets['plaque'];
+
+        $assets[0]['plaque']= $assetsQuery[0]['plaque'];
         $assets[0]['brand']= $assetsQuery[0]->brands['name'];
         $assets[0]['model']= $assetsQuery[0]->models['name'];
-        $assets[0]['series']= $assetsQuery[0]->assets['series'];
-        $assets[0]['description']= $assetsQuery[$i]->assets['description'];
+        $assets[0]['series']= $assetsQuery[0]['series'];
+        $assets[0]['description']= $assetsQuery[0]['description'];
 
         // se realiza una conversion a objeto para que la vista lo use sin problemas
         $assets=(object)$assets[0];
@@ -336,11 +338,11 @@ class TechnicalReportsController extends AppController
         for($i=0;$i<$size;$i++)
         {
             //* se acomodan los valores dentro de un mismo [$i]
-            $searchedAsset[$i]['plaque']= $assetsQuery[$i]->assets['plaque'];
+            $searchedAsset[$i]['plaque']= $assetsQuery[$i]['plaque'];
             $searchedAsset[$i]['brand']= $assetsQuery[$i]->brands['name'];
             $searchedAsset[$i]['model']= $assetsQuery[$i]->models['name'];
-            $searchedAsset[$i]['series']= $assetsQuery[$i]->assets['series'];
-            $searchedAsset[$i]['description']= $assetsQuery[$i]->assets['description'];
+            $searchedAsset[$i]['series']= $assetsQuery[$i]['series'];
+            $searchedAsset[$i]['description']= $assetsQuery[$i]['description'];
 
             // se realiza una conversion a objeto para que la vista lo use sin problemas
             $searchedAsset[$i]= (object)$searchedAsset[$i];
@@ -402,11 +404,11 @@ class TechnicalReportsController extends AppController
 
         $assets;               
         //* se acomodan los valores dentro 
-        $assets[0]['plaque']= $assetsQuery[0]->assets['plaque'];
+        $assets[0]['plaque']= $assetsQuery[0]['plaque'];
         $assets[0]['brand']= $assetsQuery[0]->brands['name'];
         $assets[0]['model']= $assetsQuery[0]->models['name'];
-        $assets[0]['series']= $assetsQuery[0]->assets['series'];
-        $assets[0]['description']= $assetsQuery[$i]->assets['description'];
+        $assets[0]['series']= $assetsQuery[0]['series'];
+        $assets[0]['description']= $assetsQuery[$i]['description'];
 
         // se realiza una conversion a objeto para que la vista lo use sin problemas
         $assets=(object)$assets[0];
@@ -467,7 +469,7 @@ class TechnicalReportsController extends AppController
 
             debug($results);
             debug($technicalReport);
-            die();
+            //die();
 
             require_once 'dompdf/autoload.inc.php';
             //initialize dompdf class
@@ -549,8 +551,7 @@ class TechnicalReportsController extends AppController
      public function generate($id = null)
     {
 
-                    debug($this->request->getData());
-            die();
+
 
         // se crea una entidad para luego poder hacer los validadores
         $technicalReport= $this->TechnicalReports->get($id);

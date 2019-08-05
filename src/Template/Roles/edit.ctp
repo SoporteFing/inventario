@@ -107,30 +107,13 @@
 
           </tr>
           
-          <tr>
-              <th><h5><?= __('Ubicaciones') ?></h5></th>
-              
-          <?php 
-            for ($x = 13; $x < 17; $x++) {
-              if ($permisos[$x] == 1) {
-                echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
-                echo "</td>";
-              } else {
-               echo "<td>";
-                echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
-                echo "</td>";
-              }
-            } 
-          ?>
 
-          </tr>
           
           <tr>
               <th><h5><?= __('Prestamos') ?></h5></th>
               
           <?php 
-            for ($x = 17; $x < 21; $x++) {
+            for ($x = 13; $x < 17; $x++) {
               if ($permisos[$x] == 1) {
                 echo "<td>";
                 echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
@@ -150,7 +133,7 @@
               <th><h5><?= __('Traslados') ?></h5></th>
               
           <?php 
-            for ($x = 21; $x < 25; $x++) {
+            for ($x = 17; $x < 21; $x++) {
               if ($permisos[$x] == 1) {
                 echo "<td>";
                 echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
@@ -168,7 +151,7 @@
               <th><h5><?= __('Desechos') ?></h5></th>
               
           <?php 
-            for ($x = 25; $x < 29; $x++) {
+            for ($x = 21; $x < 25; $x++) {
               if ($permisos[$x] == 1) {
                 echo "<td>";
                 echo $this->Form->input('', array( 'type'=>'checkbox','id' => $x, 'name' => $x, 'checked'=> true, 'format' => array('before', 'input', 'between', 'label', 'after', 'error' ), $dis));
@@ -216,4 +199,4 @@
 
 
 
-</script>>
+</script>

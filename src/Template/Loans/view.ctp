@@ -76,18 +76,22 @@
     <table id='assets-borrowed-grid' cellpadding="0" cellspacing="0">
         <thead>
             <tr>
-                <th class="transfer-h"><?= __('Placa') ?></th>
-                <th class="transfer-h"><?= __('Modelo') ?></th>
-                <th class="transfer-h"><?= __('Serie') ?></th>
+              <th class="transfer-h"><?= __('Placa') ?></th>
+              <th class="transfer-h"><?= __('Tipo') ?></th>
+              <th class="transfer-h"><?= __('Marca') ?></th>
+              <th class="transfer-h"><?= __('Modelo') ?></th>
+              <th class="transfer-h"><?= __('Serie') ?></th>
             </tr>
         <thead>
         <tbody>
             <?php 
                 foreach ($result as $a): ?>
                 <tr>
-                    <td><?= h($a->plaque) ?></td>
-                    <td><?= h($a->models_id) ?></td>  
-                    <td><?= h($a->series) ?></td>
+                  <td><?= h($a->plaque) ?></td>
+                  <td><?= $a->has('Types') ? h($a->Types['name']) : '' ?></td>
+                  <td><?= $a->has('Brands') ? h($a->Brands['name']) : '' ?></td>
+                  <td><?= $a->has('Models') ? h($a->Models['name']) : '' ?></td>
+                  <td><?= h($a->series) ?></td> 
                 </tr>
             <?php endforeach; ?>
             
