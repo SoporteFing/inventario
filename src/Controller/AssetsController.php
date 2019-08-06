@@ -257,6 +257,10 @@ class AssetsController extends AppController
 			if ($_POST['models_id'] == '') {
 				$asset->models_id = null;
 			}
+            if ($_POST['series'] == '') {
+                $asset->series = null;
+            }
+
             if ($this->Assets->save($asset)) {
                 AppController::insertLog($asset['plaque'], TRUE);
                 $this->Flash->success(__('El activo fue guardado exitosamente.'));
