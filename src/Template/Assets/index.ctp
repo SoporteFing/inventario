@@ -40,7 +40,7 @@
                             <!--td><?= h($asset->description) ?></td-->
                             <td><?= h($asset->state) ?></td>
                             <td><?= h($asset->Users['nombre'] . " " . $asset->Users['apellido1']) ?></td>
-                            <td><?= $asset->has('Locations') ? $this->Html->link($asset->Locations['nombre'], ['controller' => 'Locations', 'action' => 'view', $asset->Locations['location_id']]) : '' ?></td>
+                            <td><?= h($asset->Locations['nombre']) ?></td>
                             <td><?= h($asset->year) ?></td>
                             <td class="actions">
                                 <?php if($allowC) : ?>
