@@ -102,8 +102,11 @@
 
 
 <body>
+
+<?php if($result == null) : ?>
+
 <div class="locations form large-9 medium-8 columns content">
-  <?= $this->Form->create($transfer,['novalidate','onsubmit'=>'return validateCheck()'])?>
+  <?= $this->Form->create()?>
   <fieldset>
 
     <legend><?= __('Imprimir Etiquetas:') ?></legend>
@@ -195,10 +198,63 @@
 <br>
     </fieldset>
     </div>
-</body>
 
   <?= $this->Html->link(__('Cancelar'), ['action' => 'index'], ['class' => 'btn btn-primary']) ?>
   <?= $this->Form->button(__('Imprimir Selección'), ['class' => 'btn btn-primary','id'=>'acept']) ?>
+
+  <?= $this->Form->end()?>
+
+<?php else : ?>
+
+
+    <!-- RENDER FOR RESULT -->
+    <div class="locations form large-9 medium-8 columns content">
+
+        <legend><?= __('Imprimir Etiquetas:') ?></legend>
+        <br>
+
+
+        <div class="related">
+            <legend><?= __('Activos que se imprimieron:') ?></legend>
+            <!-- tabla que contiene  datos básicos de activos-->
+            <table id='assets-transfers-grid' cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="transfer-h"><?= __('Placa') ?></th>
+                        <th class="transfer-h"><?= __('Tipo') ?></th>
+                        <th class="transfer-h"><?= __('Marca') ?></th>
+                        <th class="transfer-h"><?= __('Modelo') ?></th>
+                        <th class="transfer-h"><?= __('Serie') ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    foreach ($printing_assets as $a): ?>
+                    <?php //debug($a)?>
+                    <tr>
+                        <td><?= h($a->plaque) ?></td>
+                        <td><?= $a->has('Types') ? h($a->Types['name']) : '' ?></td>
+                        <td><?= $a->has('Brands') ? h($a->Brands['name']) : '' ?></td>
+                        <td><?= $a->has('Models') ? h($a->Models['name']) : '' ?></td>
+                        <td><?= h($a->series) ?></td> 
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+
+        <?= $this->Html->link(__('Regresar'), ['action' => 'print'], ['class' => 'btn btn-primary']) ?>
+      
+    </div>
+
+
+<?php endif; ?>
+
+
+</body>
+
+
 
 <br><br><br>
 

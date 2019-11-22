@@ -373,7 +373,7 @@ class LoansController extends AppController
 
     }
 
-    /*Segundo paso para ingresar prestamo*/
+    /*Segundo paso para ingresar prestamo
     public function finalizar($id)
     {
         $loan = $this->Loans->get($id, [
@@ -430,49 +430,87 @@ class LoansController extends AppController
         $this->set(compact('loan', 'result'));
     }
 
+    */
+
     /*Terminar para varios activos*/
-    public function terminar($id)
+    public function finalizar($id)
     {
         $this->loadModel('Assets');
         
         $loan = $this->Loans->get($id, [
             'contain' => []
         ]);
+
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
         
-        
-        $loan->estado = 'Terminado';
-        $loan->fecha_devolucion = date('y-m-d', time());
+            
+            $loan->estado = 'Terminado';
+            $loan->fecha_devolucion = date('y-m-d', time());
 
- 
-        if ($this->Loans->save($loan)){
+     
+            if ($this->Loans->save($loan)){
 
-          
-            $assets = $this->Assets->find()
-            ->where(['Assets.loan_id' => $id])
-            ->toList();
-                
-            foreach($assets as $asset){
-                $asset->state = 'Disponible';
-                $asset->loan_id = NULL;
+              
+                $assets = $this->Assets->find()
+                ->where(['Assets.loan_id' => $id])
+                ->toList();
+                    
+                foreach($assets as $asset){
+                    $asset->state = 'Disponible';
+                    $asset->loan_id = NULL;
 
-                if(!($this->Assets->save($asset))){
-                    $this->Flash->error(__('Error al terminar el préstamo'));
-                    $this->Loans->delete($loan);
-                    return $this->redirect(['action' => 'index']);
+                    if(!($this->Assets->save($asset))){
+                        $this->Flash->error(__('Error al terminar el préstamo'));
+                        $this->Loans->delete($loan);
+                        return $this->redirect(['action' => 'index']);
+                    }
                 }
+
+                $this->Flash->success(__('El préstamo ha sido finalizado.'));
+                return $this->redirect(['action' => 'index']);
+
+            }
+            else{
+                $this->Flash->error(__('Error al finalizar el préstamo'));
+                return $this->redirect(['action' => 'index']);
             }
 
-            $this->Flash->success(__('El préstamo ha sido finalizado.'));
-            return $this->redirect(['action' => 'index']);
+        }
 
-        }
-        else{
-            $this->Flash->error(__('Error al finalizar el préstamo'));
-            return $this->redirect(['action' => 'index']);
-        }
-        $assets = $this->Loans->Assets->find('list', ['limit' => PHP_INT_MAX]);
-        $users = $this->Loans->Users->find('list', ['limit' => PHP_INT_MAX ]);
-        $this->set(compact('assets', 'loan', 'users'));
+
+        $this->loadModel('Assets');
+        $result = $this->Assets->find()          
+        ->select([
+            'Assets.plaque',
+            'Types.name',
+            'Models.name',
+            'Assets.series',
+            'Assets.state',
+            'Brands.name',
+        ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->where(['Assets.loan_id' => $id])
+            ;
+        $this->set(compact('loan', 'result'));
+
     }
 
     /**

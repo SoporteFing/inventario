@@ -11,14 +11,17 @@ use Cake\ORM\Entity;
  * @property string $evaluation
  * @property string $recommendation
  * @property \Cake\I18n\FrozenDate $date
- * @property string $file_name
+ * @property $file_name
  * @property string $path
  * @property string $residues_id
  * @property string $evaluator_name
  * @property string $year
  * @property string $facultyInitials
  * @property int $internal_id
- * @property bool $descargado
+ * @property int $descargado
+ * @property int $canceled
+ * @property int $year_autonum
+ * @property string $initial
  *
  * @property \App\Model\Entity\Asset $asset
  * @property \App\Model\Entity\Residue $residue
@@ -37,7 +40,6 @@ class TechnicalReport extends Entity
      * @var array
      */
     protected $_accessible = [
-        'technical_report_id'=>true,
         'assets_id' => true,
         'evaluation' => true,
         'recommendation' => true,
@@ -50,6 +52,9 @@ class TechnicalReport extends Entity
         'facultyInitials' => true,
         'internal_id' => true,
         'descargado' => true,
+        'canceled' => true,
+        'year_autonum' => true,
+        'initial' => true,
         'asset' => true,
         'residue' => true,
         'internal' => true

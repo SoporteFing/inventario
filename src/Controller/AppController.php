@@ -213,7 +213,9 @@ class AppController extends Controller
         $this->set('allowL', $allowL);
 
         $unidadAcademica = 'Facultad de Ingeniería';
+        $sigla = 'I';
         
+        $this->set('sigla', $sigla);
         $this->set('unidadAcademica', $unidadAcademica);
         $this->set('uid', $this->Auth->user('id'));
         $this->set('nombre', $this->Auth->user('nombre'));

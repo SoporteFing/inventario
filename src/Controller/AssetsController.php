@@ -143,7 +143,6 @@ class AssetsController extends AppController
     public function add()
     {
 
-
         $asset = $this->Assets->newEntity();
         if ($this->request->is('post')) {
             
@@ -218,8 +217,12 @@ class AssetsController extends AppController
         $locations = $this->Assets->Locations->find('list', ['limit' => 200]);
 		$types = $this->Assets->Types->find('list', ['limit' => 200]);
         
+        $this->viewBuilder()->setLayout('');
+
         $this->set(compact('asset', 'brands', 'users', 'locations', 'models', 'types'));
     }
+
+
     /**
      * Método para editar un activo en el sistema
      */
@@ -588,9 +591,9 @@ class AssetsController extends AppController
 
     }
 
-
-    public function print($id = null)
+    public function print()
     {
+
         $check = array();
 
         if ($this->request->is('post')) {
@@ -607,10 +610,10 @@ class AssetsController extends AppController
                 $resp = '';
 
                 foreach ($check as $plaque) {
-                    //$this->send_to_printer('Placa',$plaque);
+                    $this->send_to_printer('Placa',$plaque);
                     $resp = $this->status();
-                    debug($resp);
-                    print_r($resp);
+                    //debug($resp);
+                    //print_r($resp);
 
                     //revisar errores
                     if($resp == false){
@@ -620,43 +623,95 @@ class AssetsController extends AppController
                 }
                 
                 if($resp != false){
+                    
+                    $printing_assets = $this->Assets->find()   
+                    ->select([       
+                            'Assets.plaque',
+                            'Types.name',
+                            'Models.name',
+                            'Assets.series',
+                            'Assets.state',
+                            'Brands.name',
+                        ])
+                        ->join([
+                    'table' => 'types',
+                    'alias' => 'Types',
+                    'type' => 'INNER',
+                    'conditions' => 'Assets.type_id = Types.type_id',
+                        ])
+                        ->join([
+                    'table' => 'models',
+                    'alias' => 'Models',
+                    'type' => 'INNER',
+                    'conditions' => 'Assets.models_id = Models.id',
+                        ])
+                        ->join([
+                    'table' => 'brands',
+                    'alias' => 'Brands',
+                    'type' => 'INNER',
+                    'conditions' => 'Models.id_brand = Brands.id',
+                        ])
+                        ->where(['Assets.plaque IN' => $check]);
+                        ;
+                    $this->set('printing_assets', $this->paginate($printing_assets));
+
+                    $result = 1;
+
+                    $this->set('result', $result);
 
                     $this->Flash->success(__('Impresion Exitosa'));
+                    // return $this->redirect(['action' => 'print' , 1]);
+                    return;
                 }
 
             }
 
         }
         
-        $assets = $this->Assets->find()          
-            ->select([       
-                    'Assets.plaque',
-                    'Types.name',
-                    'Models.name',
-                    'Assets.series',
-                    'Assets.state',
-                    'Brands.name',
-                ])
-                ->join([
-            'table' => 'types',
-            'alias' => 'Types',
-            'type' => 'INNER',
-            'conditions' => 'Assets.type_id = Types.type_id',
-                ])
-                ->join([
-            'table' => 'models',
-            'alias' => 'Models',
-            'type' => 'INNER',
-            'conditions' => 'Assets.models_id = Models.id',
-                ])
-                ->join([
-            'table' => 'brands',
-            'alias' => 'Brands',
-            'type' => 'INNER',
-            'conditions' => 'Models.id_brand = Brands.id',
-                ])
-                ;
+            $assets = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Assets.deleted',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
 
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'users',
+        'alias' => 'Users',
+        'type' => 'INNER',
+        'conditions' => 'Assets.assigned_to = Users.id',
+            ])
+            ->join([
+        'table' => 'locations',
+        'alias' => 'Locations',
+        'type' => 'INNER',
+        'conditions' => 'Assets.location_id = Locations.location_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            
+            ->where(['Assets.deleted' => '0'])
+            ;
 
         if(!empty($check)){
  
@@ -691,7 +746,7 @@ class AssetsController extends AppController
                 ->where(['Assets.plaque IN' => $check]);
                 ;
             $this->set('printing_assets', $this->paginate($printing_assets));
-
+            $this->set('result', $this->paginate($result));
         }
 
     

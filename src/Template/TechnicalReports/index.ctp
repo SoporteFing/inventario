@@ -77,10 +77,18 @@
                                 <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $technicalReport->technical_report_id], array('escape' => false)) ?>
                             <?php endif; ?>         
                         <?php endif; ?> 
+                        <?php if($allowM) : ?> 
+                            <?php if(($technicalReport->descargado == null) && ($technicalReport->file_name == null )) : ?> 
+
+                             <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-upload')), ['action' => 'finalizar', $technicalReport->technical_report_id], array('escape' => false)) ?>
+
+                            <?php endif; ?> 
+                        <?php endif; ?> 
+
                         <?php if($allowE) : ?> 
                             <?php if(($technicalReport->descargado == null) && ($technicalReport->file_name == null )) : ?> 
 
-                            <?= $this->Form->postlink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $technicalReport->technical_report_id], ['escape' => false, 'confirm' => __('¿Seguro quiere borrar el reporte # '.$technicalReport->technical_report_id.' ?', $technicalReport->technical_report_id)]) ?>
+                            <?= $this->Form->postlink($this->Html->tag('i', '', array('class' => 'fa fa-times')), ['action' => 'cancel', $technicalReport->technical_report_id], ['escape' => false, 'confirm' => __('¿Seguro quiere cancelar el reporte # '.$technicalReport->technical_report_id.' ?', $technicalReport->technical_report_id)]) ?>
                             <?php endif; ?> 
                         <?php endif; ?> 
                     </td>

@@ -7,6 +7,7 @@ use Dompdf\Dompdf;
 use Cake\I18n\Date;
 use Cake\Datasource\ConnectionManager;
 
+
 /**
  * TechnicalReports Controller
  *
@@ -17,7 +18,7 @@ use Cake\Datasource\ConnectionManager;
 class TechnicalReportsController extends AppController
 {
     /** variable para asignar las iniciales que correspondan a la facultad/escuela*/
-    public $escuela = 'INGELEC';
+    public $escuela = 'I';
 
 
      public function isAuthorized($user)
@@ -279,6 +280,69 @@ class TechnicalReportsController extends AppController
         $this->set(compact('technicalReport', 'assets','internalID'));
     }
 
+
+    public function finalizar($id = null)
+    {
+        $technicalReport = $this->TechnicalReports->get($id, [
+            'contain' => []
+        ]);
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $technicalReport = $this->TechnicalReports->patchEntity($technicalReport, $this->request->getData());
+            if ($this->TechnicalReports->save($technicalReport)) {
+                AppController::insertLog($technicalReport['technical_report_id'], TRUE);
+                $this->Flash->success(__('Los cambios han sido guardados.'));
+
+                return $this->redirect(['action' => 'index']);
+            }
+            //debug($technicalReport);
+            AppController::insertLog($technicalReport['technical_report_id'], FALSE);
+            $this->Flash->error(__('El reporte técnico no se pudo guardar.'));
+
+        }
+
+        $internalID= $this->escuela."-".$technicalReport->internal_id."-".$technicalReport->year;
+
+        //variable para cargar los datos del activo ya asignado
+        $Assets = TableRegistry::get('Assets');
+        $assetsQuery = $Assets->find()
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.description'])
+                         ->join([
+                            'models' => [
+                                    'table' => 'models',
+                                    'type'  => 'LEFT',
+                                    'conditions' => ['Assets.models_id= models.id']
+                                ]
+                                ])
+                         ->join([
+                            'brands' => [
+                                    'table' => 'brands',
+                                    'type'  => 'LEFT',
+                                    'conditions' => ['models.id_brand = brands.id']
+                                ]
+                                ])
+                         ->where(['Assets.plaque' => $technicalReport->assets_id ])
+                        ->toList();
+
+
+        $assets;               
+        //* se acomodan los valores dentro 
+
+        $assets[0]['plaque']= $assetsQuery[0]['plaque'];
+        $assets[0]['brand']= $assetsQuery[0]->brands['name'];
+        $assets[0]['model']= $assetsQuery[0]->models['name'];
+        $assets[0]['series']= $assetsQuery[0]['series'];
+        $assets[0]['description']= $assetsQuery[0]['description'];
+
+        // se realiza una conversion a objeto para que la vista lo use sin problemas
+        $assets=(object)$assets[0];
+        $this->set(compact('technicalReport', 'assets','internalID'));
+    }
+
+
+
+
+
     /**
      * Delete method
      *
@@ -290,6 +354,25 @@ class TechnicalReportsController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $technicalReport = $this->TechnicalReports->get($id);
+        if ($this->TechnicalReports->delete($technicalReport)) {
+            AppController::insertLog($technicalReport['technical_report_id'], TRUE);
+            $this->Flash->success(__('El informe técnico se ha eliminado.'));
+        } else {
+            AppController::insertLog($technicalReport['technical_report_id'], FALSE);
+            $this->Flash->error(__('El informe técnico no se pudo eliminar, por favor intente de nuevo'));
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
+
+
+    public function cancel($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $technicalReport = $this->TechnicalReports->get($id);
+        debug($technicalReport);
+        die();
+        //$technicalReport->state
         if ($this->TechnicalReports->delete($technicalReport)) {
             AppController::insertLog($technicalReport['technical_report_id'], TRUE);
             $this->Flash->success(__('El informe técnico se ha eliminado.'));
