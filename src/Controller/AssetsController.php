@@ -135,7 +135,26 @@ class AssetsController extends AppController
             'contain' => ['Users', 'Locations', 'Models', 'Types']
         ]);
 
+        $this->Models = $this->loadmodel('Models');
+
+        if($asset->models_id != null){    
+            $model = $this->Models->get($asset->models_id, [
+                'contain' => []
+            ]);
+        }
+
+        $this->loadModel('Brands');
+        if($asset->brand != null){
+            
+            $brand = $this->Brands->get($asset->brand, [
+                'contain' => []
+            ]);
+        }
+
         $this->set('asset', $asset);
+        $this->set('model', $model);
+        $this->set('brand', $brand);
+
     }
     /**
      * Método para agregar nuevos activos al sistema
