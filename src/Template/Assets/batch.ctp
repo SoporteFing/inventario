@@ -157,7 +157,7 @@
 
 <script>
     function getBrands(val) {
-        console.log(val);
+        
         $.ajax({
             type: "GET",
             url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'brandsList' ]); ?>',
@@ -179,15 +179,15 @@
         });
     }
 
-    function getModels(val) {
+function getModels(val) {
         console.log(val);
         $.ajax({
             type: "GET",
             url: '<?php echo Router::url(['controller' => 'Assets', 'action' => 'modelsList' ]); ?>',
-            data:{brand_id:val},
+            data:{brand_id:val,
+                  type_id:$("#type-list").val()},
             
             success: function(data){
-                console.log(data);
                 $("#model-list").html(data);
             },
             error: function(e) {
