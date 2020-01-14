@@ -167,6 +167,9 @@ class AssetsController extends AppController
                 $asset->brand = $_POST['brands_id'];
             }
 
+            if ($_POST['series'] != '') {
+                $asset->series = null;
+            }
 
             /** verifica que el id no sea repetido y se setea el error manualmente */
             $returnId = $this->Assets->find('all')
@@ -184,7 +187,6 @@ class AssetsController extends AppController
                 $this->Flash->success(__('El activo fue guardado exitosamente.'));
                 return $this->redirect(['action' => 'index']);
             }else{
-
                 foreach ($asset->getErrors() as $field => $error) {
                     if($field == 'series'){
                         foreach ($error as $id => $message) {
