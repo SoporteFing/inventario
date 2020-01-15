@@ -630,8 +630,8 @@ class AssetsController extends AppController
                 $resp = '';
 
                 foreach ($check as $plaque) {
-                    // $this->send_to_printer('Placa',$plaque);
-                    // $resp = $this->status();
+                    $this->send_to_printer('Placa',$plaque);
+                    $resp = $this->status();
                     $resp = true;
                     //debug($resp);
                     //print_r($resp);
@@ -789,9 +789,13 @@ class AssetsController extends AppController
         $this->Flash->success(__('Impresion Exitosa'));
         
 
+    }else{
+
+        $this->set('printing_assets', null);
+            
     }
 
-    $this->set('printing_assets', null);
+    
   }
   
   private function send_to_printer($label,$code){
