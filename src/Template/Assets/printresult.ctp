@@ -102,57 +102,63 @@
 
 
 <body>
-<div class="locations form large-9 medium-8 columns content">
+
+
+
+    <!-- RENDER FOR RESULT -->
+    <div class="locations form large-9 medium-8 columns content">
+
   
-  <fieldset>
-
-    <legend><?= __('Imprimir Etiquetas:') ?></legend>
-    <br>
-
-    
-<!-- DEVELOPING END-->
+        <br>
 
 
-    <div class="related">
-        <legend><?= __('Activos que se imprimieron:') ?></legend>
-        <!-- tabla que contiene  datos básicos de activos-->
-        <table id='assets-transfers-grid' cellpadding="0" cellspacing="0">
-            <thead>
-                <tr>
-                    <th class="transfer-h"><?= __('Placa') ?></th>
-                    <th class="transfer-h"><?= __('Tipo') ?></th>
-                    <th class="transfer-h"><?= __('Marca') ?></th>
-                    <th class="transfer-h"><?= __('Modelo') ?></th>
-                    <th class="transfer-h"><?= __('Serie') ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php 
-                foreach ($assets as $a): ?>
-                <?php //debug($a)?>
-                <tr>
-                    <td><?= h($a->plaque) ?></td>
-                    <td><?= $a->has('Types') ? h($a->Types['name']) : '' ?></td>
-                    <td><?= $a->has('Brands') ? h($a->Brands['name']) : '' ?></td>
-                    <td><?= $a->has('Models') ? h($a->Models['name']) : '' ?></td>
-                    <td><?= h($a->series) ?></td> 
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+        <div class="related">
+
+            <?php if($printing_assets == null): ?>
+
+                <legend><?= __('No hay activos impresos') ?></legend>    
+
+            <?php else:?>
+
+              <legend><?= __('Activos Impresos:') ?></legend>
+              <!-- tabla que contiene  datos básicos de activos-->
+              <table id='assets-transfers-grid' cellpadding="0" cellspacing="0">
+                  <thead>
+                      <tr>
+                          <th class="transfer-h"><?= __('Placa') ?></th>
+                          <th class="transfer-h"><?= __('Tipo') ?></th>
+                          <th class="transfer-h"><?= __('Marca') ?></th>
+                          <th class="transfer-h"><?= __('Modelo') ?></th>
+                          <th class="transfer-h"><?= __('Serie') ?></th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <?php 
+                      foreach ($printing_assets as $a): ?>
+                      <?php //debug($a)?>
+                      <tr>
+                          <td><?= h($a->plaque) ?></td>
+                          <td><?= $a->has('Types') ? h($a->Types['name']) : '' ?></td>
+                          <td><?= $a->has('Brands') ? h($a->Brands['name']) : '' ?></td>
+                          <td><?= $a->has('Models') ? h($a->Models['name']) : '' ?></td>
+                          <td><?= h($a->series) ?></td> 
+                      </tr>
+                      <?php endforeach; ?>
+                  </tbody>
+              </table>
+            <?php endif; ?>
+            
+        </div>
+
+
+        <?= $this->Html->link(__('Regresar'), ['action' => 'print'], ['class' => 'btn btn-primary']) ?>
+      
     </div>
 
-     </div>
-        <!--input type="hidden" name="checkList" id="checkList"-->
-    </div>
 
-<br>
-    </fieldset>
-    </div>
+
+
 </body>
-
-  <?= $this->Html->link(__('Regresar'), ['action' => 'print'], ['class' => 'btn btn-primary']) ?>
-  
 
 <br><br><br>
 

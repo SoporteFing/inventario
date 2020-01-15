@@ -630,8 +630,9 @@ class AssetsController extends AppController
                 $resp = '';
 
                 foreach ($check as $plaque) {
-                    $this->send_to_printer('Placa',$plaque);
-                    $resp = $this->status();
+                    // $this->send_to_printer('Placa',$plaque);
+                    // $resp = $this->status();
+                    $resp = true;
                     //debug($resp);
                     //print_r($resp);
 
@@ -643,45 +644,14 @@ class AssetsController extends AppController
                 }
                 
                 if($resp != false){
+
+                    $this->request->session()->write(
+                        'printed', 
+                        $check
+                    );
+
+                    return $this->redirect(['action' => 'printresult']);
                     
-                    $printing_assets = $this->Assets->find()   
-                    ->select([       
-                            'Assets.plaque',
-                            'Types.name',
-                            'Models.name',
-                            'Assets.series',
-                            'Assets.state',
-                            'Brands.name',
-                        ])
-                        ->join([
-                    'table' => 'types',
-                    'alias' => 'Types',
-                    'type' => 'INNER',
-                    'conditions' => 'Assets.type_id = Types.type_id',
-                        ])
-                        ->join([
-                    'table' => 'models',
-                    'alias' => 'Models',
-                    'type' => 'INNER',
-                    'conditions' => 'Assets.models_id = Models.id',
-                        ])
-                        ->join([
-                    'table' => 'brands',
-                    'alias' => 'Brands',
-                    'type' => 'INNER',
-                    'conditions' => 'Models.id_brand = Brands.id',
-                        ])
-                        ->where(['Assets.plaque IN' => $check]);
-                        ;
-                    $this->set('printing_assets', $this->paginate($printing_assets));
-
-                    $result = 1;
-
-                    $this->set('result', $result);
-
-                    $this->Flash->success(__('Impresion Exitosa'));
-                    // return $this->redirect(['action' => 'print' , 1]);
-                    return;
                 }
 
             }
@@ -779,8 +749,49 @@ class AssetsController extends AppController
 
   public function printresult(){
 
-    
-    
+    $printed = $this->request->session()->read('printed');  
+
+    if($printed != null){
+
+
+        $printing_assets = $this->Assets->find()   
+        ->select([       
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'INNER',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'INNER',
+        'conditions' => 'Models.id_brand = Brands.id',
+            ])
+            ->where(['Assets.plaque IN' => $printed]);
+            ;
+
+        $this->set('printing_assets', $this->paginate($printing_assets));
+
+        $this->Flash->success(__('Impresion Exitosa'));
+        
+
+    }
+
+    $this->set('printing_assets', null);
   }
   
   private function send_to_printer($label,$code){
