@@ -20,7 +20,7 @@ use Cake\I18n\Date;
  */
 class ResiduesController extends AppController
 {
-    private $UnidadAcadémica = 'Ingeniería';
+    
 
     public function isAuthorized($user)
     {
@@ -44,13 +44,13 @@ class ResiduesController extends AppController
             $rls = $roles['permissions'];
             foreach ($rls as $item){
                 //$permisos[(int)$item['id']] = 1;
-                if($item['nombre'] == 'Insertar Usuarios'){
+                if($item['nombre'] == 'Insertar Desechos'){
                     $allowI = true;
-                }else if($item['nombre'] == 'Modificar Usuarios'){
+                }else if($item['nombre'] == 'Modificar Desechos'){
                     $allowM = true;
-                }else if($item['nombre'] == 'Eliminar Usuarios'){
+                }else if($item['nombre'] == 'Eliminar Desechos'){
                     $allowE = true;
-                }else if($item['nombre'] == 'Consultar Usuarios'){
+                }else if($item['nombre'] == 'Consultar Desechos'){
                     $allowC = true;
                 }
             }
@@ -86,8 +86,8 @@ class ResiduesController extends AppController
     {
 
         $residues = $this->paginate($this->Residues);   
-        $Unidad = $this->UnidadAcadémica;
-        $this->set(compact('residues','Unidad'));
+        
+        $this->set(compact('residues'));
     }
 
     /**
@@ -137,9 +137,9 @@ class ResiduesController extends AppController
             $resultRec[$i]= (object)$queryRec[$i];
         }
 
-        $Unidad = $this->UnidadAcadémica;
+        
 
-        $this->set(compact('residue', 'result', 'resultRec', 'Unidad'));
+        $this->set(compact('residue', 'result', 'resultRec'));
 
     }
 
@@ -153,6 +153,10 @@ class ResiduesController extends AppController
         
         $residue = $this->Residues->newEntity();
         if ($this->request->is('post')) {
+
+            $listaPlaques = $this->request->getData('checkList');
+            
+            $listaPlaques = array_filter( explode(",", $listaPlaques ));
 
             $residue = $this->Residues->patchEntity($residue, $this->request->getData());
 
@@ -176,84 +180,192 @@ class ResiduesController extends AppController
 
 
             $residue['new']=true;
-            if ($this->Residues->save($residue) ) {
 
-                
 
-                //Se obtienen los seleccionados y se convierte a string separado en , 
-                $condicion = explode(',', $this->request->getData('checkList'));
-                
-                //Actualiza  los Activos seleccionados
-                $assets = TableRegistry::get('Assets')->find('all');
-                $assets->update()
-                    ->set(['residues_id' => $residue->residues_id, 'state' => "Desechado"])
-                    ->where(['plaque IN' => $condicion])
-                    ->execute();
+            if(!empty($listaPlaques)){
 
-                //Actualiza los reportes technicos donde tengan los Activos seleccionados
-                $technical_reports = TableRegistry::get('TechnicalReports')->find('all');
-                $technical_reports->update()
-                    ->set(['residues_id' => $residue->residues_id])
-                    ->where(['assets_id IN' => $condicion])
-                    ->execute();
-                    AppController::insertLog($residue['residues_id'], TRUE);
-                $this->Flash->success(__('El acta de desecho fue guardada.'));
-                return $this->redirect(['action' => 'viewDownload', $residue->residues_id ] );
+                if ($this->Residues->save($residue) ) {
+
+                    
+
+                    //Se obtienen los seleccionados y se convierte a string separado en , 
+                    $condicion = explode(',', $this->request->getData('checkList'));
+                    
+                    //Actualiza  los Activos seleccionados
+                    $assets = TableRegistry::get('Assets')->find('all');
+                    $assets->update()
+                        ->set(['residues_id' => $residue->residues_id, 'state' => "Desechado"])
+                        ->where(['plaque IN' => $condicion])
+                        ->execute();
+
+                    //Actualiza los reportes technicos donde tengan los Activos seleccionados
+                    $technical_reports = TableRegistry::get('TechnicalReports')->find('all');
+                    $technical_reports->update()
+                        ->set(['residues_id' => $residue->residues_id])
+                        ->where(['assets_id IN' => $condicion])
+                        ->execute();
+                        AppController::insertLog($residue['residues_id'], TRUE);
+                    $this->Flash->success(__('El acta de desecho fue guardada.'));
+                    return $this->redirect(['action' => 'viewDownload', $residue->residues_id ] );
+                }
+
+                AppController::insertLog($model['residues_id'], FALSE);
+                $this->Flash->error(__('El Acta de Desecho no se pudo guardar. Inténtelo de nuevo.'));
+            }else{
+
+                $this->Flash->error(__('El Acta de Desecho no se pudo guardar. Debe seleccionar al menos un activo.'));
             }
-            AppController::insertLog($model['residues_id'], FALSE);
-            $this->Flash->error(__('El Acta de Desecho no se pudo guardar. Inténtelo de nuevo.'));
         }
-
 
         //Hace la seleccion de los Activos usando Join para unir los datos
         $technical_reports = TableRegistry::get('TechnicalReports');
         $assetsQuery = $technical_reports->find()
-                         ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
+                         ->select(['Assets.plaque','Brands.name','Models.name','Assets.series','Assets.state'])
                          ->join([
                             'assets' => [
                                     'table' => 'assets',
+                                    'alias' => 'Assets',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.plaque= TechnicalReports.assets_id']
+                                    'conditions' => ['Assets.plaque= TechnicalReports.assets_id']
                                 ]
                                 ])
                          ->join([
                             'models' => [
                                     'table' => 'models',
+                                    'alias' => 'Models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= Models.id']
                                 ]
                                 ])
                          ->join([
                             'brands' => [
                                     'table' => 'brands',
+                                    'alias' => 'Brands',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['models.id_brand = brands.id']
+                                    'conditions' => ['Models.id_brand = Brands.id']
                                 ]
                                 ])
-                         ->where(['TechnicalReports.recommendation' => "D", 'assets.state' => "Disponible"])
-                         ->group (['assets.plaque'])
+                         ->where(['TechnicalReports.recommendation' => "D", 'Assets.state' => "Disponible"])
+                         ->group (['Assets.plaque'])
                          ->toList();
 
         $size = count($assetsQuery);
-        $result=   array_fill(0, $size, NULL);
-        
-        for($i=0;$i<$size;$i++)
-        {
-            //* se acomodan los valores dentro de un mismo [$i]
-            $result[$i]['plaque']= $assetsQuery[$i]->assets['plaque'];
-            $result[$i]['brand']= $assetsQuery[$i]->brands['name'];
-            $result[$i]['model']= $assetsQuery[$i]->models['name'];
-            $result[$i]['series']= $assetsQuery[$i]->assets['series'];
-            $result[$i]['state']= $assetsQuery[$i]->assets['state'];
 
-            // se realiza una conversion a objeto para que la vista lo use sin problemas
-            $result[$i]= (object)$result[$i];
+
+        $this->loadModel('Assets');
+
+
+        if(!empty($check)){
+
+            $asset_old = $this->Assets->find()          
+                ->select([
+                    'Assets.plaque',
+                    'Types.name',
+                    'Models.name',
+                    'Assets.series',
+                    'Assets.state',
+                    'Brands.name',
+                ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->where(['Assets.plaque IN' => $check]);
+                ;
+
+            $this->set('asset_old', $this->paginate($asset_old));
+
+            $asset = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->where(['Assets.state' => 'Disponible'])
+                ->where(['Assets.plaque NOT IN' => $check])
+                ;
+
+
+
+        }else{
+
+            $asset = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->join([
+            'table' => 'technical_reports',
+            'alias' => 'TechnicalReports',
+            'type' => 'LEFT',
+            'conditions' => 'TechnicalReports.assets_id = Assets.plaque',
+                ])
+                ->where(['TechnicalReports.recommendation' => 'D'])
+                ;
+
+
+
         }
 
-        debug($result);
-        die();
 
-        $this->set(compact('residue', 'result'));
+        $this->set(compact('residue', 'asset'));
     }
     /**
      * Edit method
@@ -270,8 +382,8 @@ class ResiduesController extends AppController
 
         //Obtengo los activos que estan en el acta de residuos
         $query2 = $assets->find()
-                        ->select(['assets.plaque'])
-                        ->where(['assets.residues_id' => $id])
+                        ->select(['Assets.plaque'])
+                        ->where(['Assets.residues_id' => $id])
                         ->toList();
 
         //lo paso a objeto para manejarlo en vista
@@ -369,19 +481,19 @@ class ResiduesController extends AppController
         /** se obtienen los datos de los activos que se quieren desechar*/
         $technical_reports = TableRegistry::get('TechnicalReports');
         $query = $technical_reports->find()
-                        ->select(['assets.plaque', 'brands.name', 'models.name', 'assets.series', 'assets.state'])
+                        ->select(['Assets.plaque', 'brands.name', 'models.name', 'Assets.series', 'Assets.state'])
                         ->join ([
                             'assets'=> [
                                 'table'=>'assets',
                                 'type'=>'INNER',
-                                'conditions'=> ['assets.plaque= TechnicalReports.assets_id']
+                                'conditions'=> ['Assets.plaque= TechnicalReports.assets_id']
                             ]
                         ])
                         ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -394,16 +506,16 @@ class ResiduesController extends AppController
                         ->where(['OR'=>[
                                         ['AND'=>[
                                                  ['TechnicalReports.recommendation' => "D"],
-                                                 ['assets.state' => 'Disponible']
+                                                 ['Assets.state' => 'Disponible']
                                                 ]
                                         ],
-                                        ['assets.plaque in'=>array_column($result2, 'plaque')]
+                                        ['Assets.plaque in'=>array_column($result2, 'plaque')]
                                        ]
                                 ])
-                        //->where(['assets.state not like' => 'Des%'])
+                        //->where(['Assets.state not like' => 'Des%'])
                         //->where(['TechnicalReports.recommendation' => "D"])
-                        //->where(['or assets.plaque in'=>$result2 ])
-                        ->group(['assets.plaque'])
+                        //->where(['or Assets.plaque in'=>$result2 ])
+                        ->group(['Assets.plaque'])
                         ->toList();
         //debug($query);
         $size = count($query);
@@ -423,9 +535,9 @@ class ResiduesController extends AppController
 
         
 
-        $Unidad = $this->UnidadAcadémica;
+        
         //debug($residue);
-        $this->set(compact('residue', 'result', 'result2', 'Unidad'));
+        $this->set(compact('residue', 'result', 'result2'));
     }
 
     /**
@@ -469,6 +581,8 @@ class ResiduesController extends AppController
     /** método para la ventana intermedia para insertar un acta de desechos */
     public function viewDownload($id = null)
     {
+
+
         $residue = $this->Residues->get($id);
 
         if ($this->request->is(['patch', 'post', 'put'])) { 
@@ -491,21 +605,45 @@ class ResiduesController extends AppController
 
         }
         //obtengo la tabla assets
-        $assets = TableRegistry::get('Assets');
-        //busco los datos que necesito
-        $assetsquery = $assets->find()
-                        ->select(['assets.plaque'])
-                        ->where(['residues_id'=>$id])
-                        ->toList();
 
-        //lo paso a objeto para manejarlo en vista
-        $size = count($assetsquery);
-        $result = array_fill(0, $size, NULL);
-        
-        for($i = 0; $i < $size; $i++)
-        {
-            $result[$i] =(object)$assetsquery[$i]->assets;
-        }
+        $this->Assets = $this->loadModel('Assets');
+
+            $asset = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->join([
+            'table' => 'residues',
+            'alias' => 'Residues',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.residues_id = Residues.residues_id' 
+                ])
+                ->where(['Assets.residues_id' => $id])
+                ;
+
 
         //obtengo la tabla technical_reports
         $technical_reports = TableRegistry::get('TechnicalReports');
@@ -526,8 +664,8 @@ class ResiduesController extends AppController
             $resultRec[$i]= (object)$queryRec[$i];
         }
 
-        $Unidad = $this->UnidadAcadémica;
-        $this->set(compact('residue', 'result', 'resultRec', 'Unidad'));
+        
+        $this->set(compact('residue', 'asset', 'resultRec'));
     }
 
 
@@ -536,7 +674,7 @@ class ResiduesController extends AppController
     {
         /*$conn = ConnectionManager::get('default');
         $stmt = $conn->execute('SELECT * FROM assets
-            inner join residues on assets.residues_id = residues.residues_id
+            inner join residues on Assets.residues_id = residues.residues_id
             where residues.residues_id =\'' . $id . '\';');
         $results = $stmt ->fetchAll('assoc');
          require_once 'dompdf/autoload.inc.php';
@@ -578,7 +716,7 @@ class ResiduesController extends AppController
             $plaques= explode(',',$this->request->data('plaques') );
 
             //  las placas se pasan a un formato de string de manera que seaan válidas en
-            //el where assets.plaque in
+            //el where Assets.plaque in
             $plaqueList;
             $plaqueList.="'".$plaques[0]."'";
             $size=count($plaques);
@@ -589,7 +727,7 @@ class ResiduesController extends AppController
             
             $conn = ConnectionManager::get('default');
             $stmt = $conn->execute("SELECT description, plaque FROM assets
-            where assets.plaque in (". $plaqueList .");");
+            where Assets.plaque in (". $plaqueList .");");
             $results = $stmt ->fetchAll('assoc');
 
             require_once 'dompdf/autoload.inc.php';
@@ -627,7 +765,7 @@ class ResiduesController extends AppController
             <p>&nbsp;</p>
             <div id="element2" align="left"><strong>Autorización N.º VRA-'.$residue->residues_id.'</strong></div>
             <p>&nbsp;</p>
-            <div id="element1" align="left"><strong>Unidad de Custodio:'.$this->UnidadAcadémica.'</strong></div>
+            <div id="element1" align="left"><strong>Unidad de Custodio:'.$this->unidadAcademica.'</strong></div>
             <p>&nbsp;</p>
             <p align="left">El dia <strong>'.$residue->date.'</strong> en presencia de los señores:</p>
             <p>&nbsp;</p>
@@ -704,11 +842,45 @@ class ResiduesController extends AppController
              //y de paso se validan los campos para mayor seguridad del PDF
             $this->Residues->save($residue);
 
-            $conn = ConnectionManager::get('default');
-            $stmt = $conn->execute("SELECT description, plaque FROM assets
-            where assets.residues_id = '". $id ."';");
-            $results = $stmt ->fetchAll('assoc');
-            $size = count($results);
+
+        $this->Assets = $this->loadModel('Assets');
+
+            $asset = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->join([
+            'table' => 'residues',
+            'alias' => 'Residues',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.residues_id = Residues.residues_id' 
+                ])
+                ->where(['Assets.residues_id' => $id])
+                ;
+
             require_once 'dompdf/autoload.inc.php';
 
             $document = new Dompdf();
@@ -759,15 +931,21 @@ class ResiduesController extends AppController
             <table width="0" border="1">
             <tbody>
             <tr>
-            <th align="center"><strong>DESCRIPCIÓN DEL BIEN</strong></th>
-            <th align="center"><strong>N.º PLACA</strong></th>
+            <th align="center">Placa</th>
+            <th align="center">Tipo</th>
+            <th align="center">Marca</th>
+            <th align="center">Modelo</th>
+            <th align="center">Serie</th>
             </tr>';
-            for($a=0;$a < $size; $a++) {
+            foreach ($asset as $item) {
             $html .= 
             '<tr>
-                <td align="center">' . $results[$a]['description']. '</td>
-                <td align="center">' . $results[$a]['plaque'] . '</td>
-             </tr>';
+                <td align="center">' . $item->plaque . '</td>
+                 <td align="center">' . $item->Types['name'] . '</td>
+                 <td align="center">' . $item->Brands['name'] . '</td>
+                 <td align="center">' . $item->Models['name'] . '</td>
+                 <td align="center">' . $item->series . '</td>
+                 </tr>';
 
             }
             $html .=

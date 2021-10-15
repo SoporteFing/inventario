@@ -6,6 +6,7 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 use Imagine;
+use Cake\ORM\Rule\IsUnique;
 
 /**
  * Assets Model
@@ -158,10 +159,12 @@ class AssetsTable extends Table
 
         $validator
             ->scalar('year')
-            ->add('year', 'validFormat',[
-                'rule' => array('custom', '/^[0-9]{4}$/'),
-                'message' => 'El año debe de tener el formato yyyy'
-                ])
+            ->add('year',[ 
+                [
+                'rule'=>['custom', ' /^[0-9]{4}$/ '],
+                'message'=>'El año debe de tener el formato yyyy. Ejemplo: 2010'
+                ]
+            ])
             ->notEmpty('year','Debe ingresar un año');
 
         $validator
@@ -222,8 +225,10 @@ class AssetsTable extends Table
 		$validator
             ->scalar('type_id')
 			->maxLength('type_id', 255)
-            ->allowEmpty('type_id');
-            
+            ->requirePresence('type_id', 'create')
+            ->requirePresence('type_id', 'update')
+            ->notEmpty('type_id');
+
         return $validator;
     }
 
@@ -248,6 +253,9 @@ class AssetsTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
+
+        $rules->add($rules->isUnique(['series'], 'Serie ya existe en otro activo')/*,['errorField' => 'series', 'message', 'Serie ya existe en otro activo']*/);
+
         $rules->add($rules->existsIn(['responsable_id'], 'Users'));
         $rules->add($rules->existsIn(['assigned_to'], 'Users'));
         $rules->add($rules->existsIn(['location_id'], 'Locations'));

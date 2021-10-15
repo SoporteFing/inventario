@@ -69,12 +69,12 @@
 
         <div class="row">
           <label> <b>Rol:</b><b style="color:red;"></b> </label>
-          <?php echo '<input type="text" class="form-control col-sm-7" readonly="readonly" value="' . htmlspecialchars($user->id_rol) . '">'; ?>
+          <?php echo '<input type="text" class="form-control col-sm-7" readonly="readonly" value="' . htmlspecialchars($rol) . '">'; ?>
         </div>
 
         <div class="row">
           <label> <b>Estado:</b><b style="color:red;"></b> </label>
-          <?php echo '<input type="text" class="form-control col-sm-7" readonly="readonly" value="' . htmlspecialchars($user->account_status) . '">'; ?>
+          <?php echo '<input type="text" class="form-control col-sm-7" readonly="readonly" value="' . htmlspecialchars($estado) . '">'; ?>
         </div>
 
       </div>

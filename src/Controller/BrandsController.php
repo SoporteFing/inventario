@@ -4,7 +4,7 @@ namespace App\Controller;
 use App\Controller\AppController;
 
 /**
- * Brands Controller
+ * Brands ControllerSSS
  *
  * @property \App\Model\Table\BrandsTable $Brands
  *
@@ -35,13 +35,13 @@ class BrandsController extends AppController
             $rls = $roles['permissions'];
             foreach ($rls as $item){
                 //$permisos[(int)$item['id']] = 1;
-                if($item['nombre'] == 'Insertar Usuarios'){
+                if($item['nombre'] == 'Insertar Activos'){
                     $allowI = true;
-                }else if($item['nombre'] == 'Modificar Usuarios'){
+                }else if($item['nombre'] == 'Modificar Activos'){
                     $allowM = true;
-                }else if($item['nombre'] == 'Eliminar Usuarios'){
+                }else if($item['nombre'] == 'Eliminar Activos'){
                     $allowE = true;
-                }else if($item['nombre'] == 'Consultar Usuarios'){
+                }else if($item['nombre'] == 'Consultar Activos'){
                     $allowC = true;
                 }
             }

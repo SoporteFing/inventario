@@ -26,8 +26,11 @@ class TechnicalReportsTableTest extends TestCase
     public $fixtures = [
         'app.technical_reports',
         'app.assets',
+        'app.models',
+        'app.brands',
         'app.types',
         'app.users',
+        'app.activity_logs',
         'app.locations',
         'app.loans',
         'app.residues',

@@ -39,94 +39,41 @@
         }
 </style> 
   
-<div class="residues form large-9 medium-8 columns content">
-  <?= $this->Form->create($loan, ['type' => 'file']) ?>
+
+
+<div>
 
   <fieldset>
         <legend><?= __('Consultar préstamo') ?></legend>
     
     <br>
 
-    <div class="form-control sameLine">
-      <div class="row col-lg-5">
-        <label> <b>Responsable:</b><b style="color:red;">*</b> </label>
-        <?php echo '<input type="text" id="id_responsables" class="form-control col-sm-4 col-md-4 col-lg-4" readonly="readonly" value="' . htmlspecialchars($loan->user->nombre). '">'; ?>
-      </div>
-
-      <div class="row">
-        <label> <b>Fecha inicio:</b><b style="color:red;">*</b> </label>
-        <?php echo $this->Form->imput('fecha_inicio', ['class'=>'form-control date', 'value' => date("y-m-d"), 'id'=>'datepicker', 'disabled']); ?>
-      </div>
-      
-      <div class="row">
-        <label> Fecha de devolución: </label>
-                <?php echo $this->Form->imput('fecha_devolucion', ['class'=>'form-control date', 'id'=>'datepicker2', 'disabled']); ?>
-      </div>
-      
-    </div>
-  
   </fieldset>
-    <br> <br>
-</div>
+    <br>
+    
+<?php 
+      $nombre_archivo_cambiado = str_replace(' ', '%20', $loan->file_devolucion);
+      echo "<iframe src=./../../webroot/files/Uploads/Loans/$nombre_archivo_cambiado width=1000px height=1250px ></iframe>";
+?>
 
-<div class="related">
-    <legend><?= __('Activos prestados') ?></legend>
-
-    <!-- tabla que contiene  datos básicos de activos-->
-    <table id='assets-borrowed-grid' cellpadding="0" cellspacing="0">
-        <thead>
-            <tr>
-                <th class="transfer-h"><?= __('Placa') ?></th>
-                <th class="transfer-h"><?= __('Modelo') ?></th>
-                <th class="transfer-h"><?= __('Serie') ?></th>
-            </tr>
-        <thead>
-        <tbody>
-            <?php 
-                foreach ($result as $a): ?>
-                <tr>
-                    <td><?= h($a->plaque) ?></td>
-                    <td><?= h($a->models_id) ?></td>  
-                    <td><?= h($a->series) ?></td>
-                </tr>
-            <?php endforeach; ?>
-            
-        </tbody>
-    </table>
-
-</div>
-
-<div>
       <label> Observaciones: </label>
       <?php echo '<input type="text" id="observaciones" class="form-control col-sm-4 col-md-4 col-lg-4" readonly="readonly" value="' . htmlspecialchars($loan->observaciones). '">'; ?>
     </div> <br>
 
 <?php
-  if($loan->file_solicitud == ''){
-      echo "<b>1- "; 
-      echo $this->Html->link(__('Descargar'), ['controller'=> 'Loans', 'action' => 'download',$loan->id], [ 'confirm' => __('Seguro que desea descargar el archivo?')]);
-      echo " el formulario para llenar y luego subirlo al sitema.</b>";
-      echo "<br><br><br>";
-      echo "<div >";
-      echo "<b>";
-      echo $this->Form->input('file_solicitud',['type' => 'file','label' => '2- Subir Formulario de Préstamo una vez lleno para Finalizar', 'class' => 'form-control-file']);
-      echo "</b>";
-      echo "</div>";
-      echo "<div class=\"col-12 text-right\">";
+  if($loan->file_devolucion == ''){
+      echo "<b>Error 404, archivo no encontrado.</b>";
 
   }else{
 
-      echo $this->Html->link(__('Ver Formulario'),'/' . $loan->file_solicitud_dir . '/' . $loan->file_solicitud);
+      echo $this->Html->link(__('Descargar formulario.'),'/' . $loan->file_devolucion_dir . $loan->file_devolucion);
       echo "<div class=\"col-12 text-right\">";
-
   }
  
 ?>
-    
 
 
-
- <?= $this->Html->link(__('Cancelar'), ['controller' => 'Loans', 'action' => 'index'], ['class' => 'btn btn-primary']) ?>
+ <?= $this->Html->link(__('Terminar'), ['controller' => 'Loans', 'action' => 'index'], ['class' => 'btn btn-primary']) ?>
 <?php
    if($loan->file_solicitud == ''){
     $this->Form->button(__('Subir'), ['class' => 'btn btn-primary']);
@@ -137,6 +84,8 @@
     }
    }
 ?>
+
+
 
 
 </div>

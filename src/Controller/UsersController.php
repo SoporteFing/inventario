@@ -117,7 +117,6 @@ class UsersController extends AppController
     {
         $this->viewBuilder()->setLayout('default');
 
-
         $user = $this->Users->get($id, [
             'contain' => []
         ]);
@@ -134,8 +133,15 @@ class UsersController extends AppController
             $rol = $items['nombre'];
         }
 
-        $this->set('rol', $rol);
 
+        $estado = 'Activo';
+
+        if(!$user['account_status']){
+            $estado = 'Inoperante';
+        }
+
+        $this->set('rol', $rol);
+        $this->set('estado', $estado);
         $this->set('user', $user);
     }
 
@@ -179,13 +185,10 @@ class UsersController extends AppController
                 $user->setError('username', ['El usuario ya existe.']);
             }
 
-            if($user->password != $user->password2){
+            if(strcmp($this->request->getData()['password'], $this->request->getData()['password']) != 0){
                 $user->setError('password', ['Las contraseñas no coinciden.']);
                 $user->setError('password2', ['Las contraseñas no coinciden.']);
             }
-
-            debug($user);
-            die();
 
             $user = $this->Users->patchEntity($user, $this->request->getData());
             
@@ -236,6 +239,9 @@ class UsersController extends AppController
 
 
         if ($this->request->is(['patch', 'post', 'put'])) {
+
+            //debug($this->request->getData());
+            //die();
             if($this->request->getData()['password'] == $this->request->getData()['password2']){
                     
                 $user = $this->Users->patchEntity($user, $this->request->getData());
@@ -352,6 +358,7 @@ class UsersController extends AppController
     }
 
     public function logout(){
+        $this->Session->destroy();
 
         return $this->redirect($this->Auth->logout());
     }

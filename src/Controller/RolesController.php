@@ -24,6 +24,12 @@ class RolesController extends AppController
         $this->Roles = $this->loadModel('Roles');
         $this->Permissions = $this->loadModel('Permissions');
         $this->RolesPermissions = $this->loadModel('RolesPermissions');
+
+
+        if($this->request->getParam('action') == 'delete' && $this->request->getParam('pass')[0] == 1){
+            $this->Flash->error(__('Este Rol no se puede eliminar'));
+            return false;
+        }
         
         $query = $this->Roles->find('all', array(
                     'conditions' => array(
@@ -37,6 +43,7 @@ class RolesController extends AppController
                 return false;
             }
         } 
+
         $this->set('allowI',$allowI);
         $this->set('allowM',$allowM);
         $this->set('allowE',$allowE);
@@ -80,7 +87,7 @@ class RolesController extends AppController
             'conditions' => array(
                 'id' => $id
             )
-        ))->contain(['Permissions']);;
+        ))->contain(['Permissions']);
         foreach ($query as $roles) {
             $rls = $roles['permissions'];
             foreach ($rls as $item){
@@ -166,20 +173,98 @@ class RolesController extends AppController
      */
     public function edit($id = null)
     {
-        $rol = $this->Roles->get($id, [
-            'contain' => []
-        ]);
+        $this->viewBuilder()->setLayout('default'); 
+        $rol = $this->Roles->get($id);
+        $this->set('rol', $rol);
+        $this->Permissions = $this->loadModel('Permissions');
+        $this->RolesPermissions = $this->loadModel('RolesPermissions');
+        $permisos = array();
+        for ($i = 1; $i < 29; ++$i) {
+            $permisos[$i] = 0;
+        }
+        $id = $rol->id;
+        $rol_activo = $rol->id;
+        $query = $this->Roles->find('all', array(
+            'conditions' => array(
+                'id' => $id
+            )
+        ))->contain(['Permissions']);
+        foreach ($query as $roles) {
+            $rls = $roles['permissions'];
+            foreach ($rls as $item){
+                $permisos[(int)$item['id']] = 1;
+                //echo $item['id'];
+                //echo "<br>";
+            }
+        } 
         if ($this->request->is(['patch', 'post', 'put'])) {
+
+            //edit name
             $rol = $this->Roles->patchEntity($rol, $this->request->getData());
+
             if ($this->Roles->save($rol)) {
                 AppController::insertLog($rol['id'], TRUE);
+
+                //edit permissions
+
+
+                $checks = $this->request->data;
+
+                $cant = 1;
+                $cant_final = 29;
+                $this->RolesPermissions->deleteAll(
+                    array(
+                        "RolesPermissions.id_rol" => $rol_activo
+                    )
+                );
+                
+                for($i=1;$i<$cant_final;$i++){
+                    if($checks[$i] == 1){
+                        //INSERTA
+                        $permiso = $this->RolesPermissions->newEntity();
+                        
+                        $permiso->id_rol = $rol_activo;
+                        $permiso->id_permission = $i; 
+                        if ($this->RolesPermissions->save($permiso)) {
+                            $cant += 1;
+                        }else{
+                            //$this->Flash->error(__('The roles permission could not be saved. Please, try again.'));
+                        }
+                    } else {
+                        $cant += 1;
+                    }
+                }
+                if ($cant == $cant_final){
+                    $this->Flash->success(__('Permisos guardados correctamente'));
+                } else {
+                    $this->Flash->error(__('Ha habido un error al guardar los permisos. Por favor intente de nuevo'));
+                }
+                $query = $this->Roles->find('all', array(
+                    'conditions' => array(
+                        'id' => $rol_activo
+                    )
+                ))->contain(['Permissions']);;
+                foreach ($query as $roles) {
+                    $rls = $roles['permissions'];
+                    foreach ($rls as $item){
+                        $permisos[(int)$item['id']] = 1;
+                        //echo $item['id'];
+                        //echo "<br>";
+                    }
+                }
+
                 $this->Flash->success(__('El rol ha sido guardado.'));
                 return $this->redirect(['action' => 'index']);
+
+            }else{
+                AppController::insertLog($rol['id'], FALSE);
+                $this->Flash->error(__('El rol no ha podido ser guardado. Porfavor, intente de nuevo.'));
             }
-            AppController::insertLog($rol['id'], FALSE);
-            $this->Flash->error(__('El rol no ha podido ser guardado. Porfavor, intente de nuevo.'));
+
+            
         }
-        $this->set(compact('rol'));
+        $this->set(compact('rol','permisos','rol_activo'));
+
     }
     /**
      * Delete method

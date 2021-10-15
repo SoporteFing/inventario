@@ -7,6 +7,7 @@ use Dompdf\Dompdf;
 use Cake\I18n\Date;
 use Cake\Datasource\ConnectionManager;
 
+
 /**
  * TechnicalReports Controller
  *
@@ -17,7 +18,7 @@ use Cake\Datasource\ConnectionManager;
 class TechnicalReportsController extends AppController
 {
     /** variable para asignar las iniciales que correspondan a la facultad/escuela*/
-    public $escuela = 'INGELEC';
+    public $escuela = 'I';
 
 
      public function isAuthorized($user)
@@ -111,12 +112,12 @@ class TechnicalReportsController extends AppController
         //variable para cargar los datos del activo ya asignado
         $Assets = TableRegistry::get('Assets');
         $assetsQuery = $Assets->find()
-                         ->select(['assets.plaque','brands.name','models.name','assets.series','assets.description'])
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.description'])
                          ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -126,17 +127,17 @@ class TechnicalReportsController extends AppController
                                     'conditions' => ['models.id_brand = brands.id']
                                 ]
                                 ])
-                         ->where(['assets.plaque' => $technicalReport->assets_id ])
+                         ->where(['Assets.plaque' => $technicalReport->assets_id ])
                         ->toList();
 
 
         $assets;               
         //* se acomodan los valores dentro 
-        $assets[0]['plaque']= $assetsQuery[0]->assets['plaque'];
+        $assets[0]['plaque']= $assetsQuery[0]['plaque'];
         $assets[0]['brand']= $assetsQuery[0]->brands['name'];
         $assets[0]['model']= $assetsQuery[0]->models['name'];
-        $assets[0]['series']= $assetsQuery[0]->assets['series'];
-        $assets[0]['description']= $assetsQuery[$i]->assets['description'];
+        $assets[0]['series']= $assetsQuery[0]['series'];
+        $assets[0]['description']= $assetsQuery[0]['description'];
 
         // se realiza una conversion a objeto para que la vista lo use sin problemas
         $assets=(object)$assets[0];
@@ -206,7 +207,8 @@ class TechnicalReportsController extends AppController
         }// if post
         
         // En caso de que la acción sea simplemente cargar la vista
-        $assets = $this->TechnicalReports->Assets->find('list', ['limit' => 200]);
+        $this->Assets = $this->loadModel('Assets');
+        $assets = $this->Assets->find('all');
         
         // Le paso a la vista los valores de assets y el ID que se va a desplegar.
         $this->set(compact('technicalReport', 'assets','CompleteID'));
@@ -245,12 +247,12 @@ class TechnicalReportsController extends AppController
         //variable para cargar los datos del activo ya asignado
         $Assets = TableRegistry::get('Assets');
         $assetsQuery = $Assets->find()
-                         ->select(['assets.plaque','brands.name','models.name','assets.series','assets.description'])
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.description'])
                          ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -260,22 +262,86 @@ class TechnicalReportsController extends AppController
                                     'conditions' => ['models.id_brand = brands.id']
                                 ]
                                 ])
-                         ->where(['assets.plaque' => $technicalReport->assets_id ])
+                         ->where(['Assets.plaque' => $technicalReport->assets_id ])
                         ->toList();
 
 
         $assets;               
         //* se acomodan los valores dentro 
-        $assets[0]['plaque']= $assetsQuery[0]->assets['plaque'];
+
+        $assets[0]['plaque']= $assetsQuery[0]['plaque'];
         $assets[0]['brand']= $assetsQuery[0]->brands['name'];
         $assets[0]['model']= $assetsQuery[0]->models['name'];
-        $assets[0]['series']= $assetsQuery[0]->assets['series'];
-        $assets[0]['description']= $assetsQuery[$i]->assets['description'];
+        $assets[0]['series']= $assetsQuery[0]['series'];
+        $assets[0]['description']= $assetsQuery[0]['description'];
 
         // se realiza una conversion a objeto para que la vista lo use sin problemas
         $assets=(object)$assets[0];
         $this->set(compact('technicalReport', 'assets','internalID'));
     }
+
+
+    public function finalizar($id = null)
+    {
+        $technicalReport = $this->TechnicalReports->get($id, [
+            'contain' => []
+        ]);
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $technicalReport = $this->TechnicalReports->patchEntity($technicalReport, $this->request->getData());
+            if ($this->TechnicalReports->save($technicalReport)) {
+                AppController::insertLog($technicalReport['technical_report_id'], TRUE);
+                $this->Flash->success(__('Los cambios han sido guardados.'));
+
+                return $this->redirect(['action' => 'index']);
+            }
+            //debug($technicalReport);
+            AppController::insertLog($technicalReport['technical_report_id'], FALSE);
+            $this->Flash->error(__('El reporte técnico no se pudo guardar.'));
+
+        }
+
+        $internalID= $this->escuela."-".$technicalReport->internal_id."-".$technicalReport->year;
+
+        //variable para cargar los datos del activo ya asignado
+        $Assets = TableRegistry::get('Assets');
+        $assetsQuery = $Assets->find()
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.description'])
+                         ->join([
+                            'models' => [
+                                    'table' => 'models',
+                                    'type'  => 'LEFT',
+                                    'conditions' => ['Assets.models_id= models.id']
+                                ]
+                                ])
+                         ->join([
+                            'brands' => [
+                                    'table' => 'brands',
+                                    'type'  => 'LEFT',
+                                    'conditions' => ['models.id_brand = brands.id']
+                                ]
+                                ])
+                         ->where(['Assets.plaque' => $technicalReport->assets_id ])
+                        ->toList();
+
+
+        $assets;               
+        //* se acomodan los valores dentro 
+
+        $assets[0]['plaque']= $assetsQuery[0]['plaque'];
+        $assets[0]['brand']= $assetsQuery[0]->brands['name'];
+        $assets[0]['model']= $assetsQuery[0]->models['name'];
+        $assets[0]['series']= $assetsQuery[0]['series'];
+        $assets[0]['description']= $assetsQuery[0]['description'];
+
+        // se realiza una conversion a objeto para que la vista lo use sin problemas
+        $assets=(object)$assets[0];
+        $this->set(compact('technicalReport', 'assets','internalID'));
+    }
+
+
+
+
 
     /**
      * Delete method
@@ -300,6 +366,25 @@ class TechnicalReportsController extends AppController
     }
 
 
+    public function cancel($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $technicalReport = $this->TechnicalReports->get($id);
+        debug($technicalReport);
+        die();
+        //$technicalReport->state
+        if ($this->TechnicalReports->delete($technicalReport)) {
+            AppController::insertLog($technicalReport['technical_report_id'], TRUE);
+            $this->Flash->success(__('El informe técnico se ha eliminado.'));
+        } else {
+            AppController::insertLog($technicalReport['technical_report_id'], FALSE);
+            $this->Flash->error(__('El informe técnico no se pudo eliminar, por favor intente de nuevo'));
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
+
+
     public function search()
     {
         //obtiene la placa
@@ -308,12 +393,12 @@ class TechnicalReportsController extends AppController
         $assets = TableRegistry::get('Assets');
         //$searchedAsset= $assets->get($id);
         $assetsQuery = $assets->find()
-                         ->select(['assets.plaque','brands.name','models.name','assets.series','assets.description'])
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.description'])
                          ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -323,7 +408,7 @@ class TechnicalReportsController extends AppController
                                     'conditions' => ['models.id_brand = brands.id']
                                 ]
                                 ])
-                         ->where(['assets.plaque' => $id])
+                         ->where(['Assets.plaque' => $id])
                          ->toList();
         
         if(empty($assetsQuery) )
@@ -336,11 +421,11 @@ class TechnicalReportsController extends AppController
         for($i=0;$i<$size;$i++)
         {
             //* se acomodan los valores dentro de un mismo [$i]
-            $searchedAsset[$i]['plaque']= $assetsQuery[$i]->assets['plaque'];
+            $searchedAsset[$i]['plaque']= $assetsQuery[$i]['plaque'];
             $searchedAsset[$i]['brand']= $assetsQuery[$i]->brands['name'];
             $searchedAsset[$i]['model']= $assetsQuery[$i]->models['name'];
-            $searchedAsset[$i]['series']= $assetsQuery[$i]->assets['series'];
-            $searchedAsset[$i]['description']= $assetsQuery[$i]->assets['description'];
+            $searchedAsset[$i]['series']= $assetsQuery[$i]['series'];
+            $searchedAsset[$i]['description']= $assetsQuery[$i]['description'];
 
             // se realiza una conversion a objeto para que la vista lo use sin problemas
             $searchedAsset[$i]= (object)$searchedAsset[$i];
@@ -381,12 +466,12 @@ class TechnicalReportsController extends AppController
         //variable para cargar los datos del activo ya asignado
         $Assets = TableRegistry::get('Assets');
         $assetsQuery = $Assets->find()
-                         ->select(['assets.plaque','brands.name','models.name','assets.series','assets.description'])
+                         ->select(['Assets.plaque','brands.name','models.name','Assets.series','Assets.description'])
                          ->join([
                             'models' => [
                                     'table' => 'models',
                                     'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
+                                    'conditions' => ['Assets.models_id= models.id']
                                 ]
                                 ])
                          ->join([
@@ -396,17 +481,17 @@ class TechnicalReportsController extends AppController
                                     'conditions' => ['models.id_brand = brands.id']
                                 ]
                                 ])
-                         ->where(['assets.plaque' => $technicalReport->assets_id ])
+                         ->where(['Assets.plaque' => $technicalReport->assets_id ])
                         ->toList();
 
 
         $assets;               
         //* se acomodan los valores dentro 
-        $assets[0]['plaque']= $assetsQuery[0]->assets['plaque'];
+        $assets[0]['plaque']= $assetsQuery[0]['plaque'];
         $assets[0]['brand']= $assetsQuery[0]->brands['name'];
         $assets[0]['model']= $assetsQuery[0]->models['name'];
-        $assets[0]['series']= $assetsQuery[0]->assets['series'];
-        $assets[0]['description']= $assetsQuery[$i]->assets['description'];
+        $assets[0]['series']= $assetsQuery[0]['series'];
+        $assets[0]['description']= $assetsQuery[$i]['description'];
 
         // se realiza una conversion a objeto para que la vista lo use sin problemas
         $assets=(object)$assets[0];
@@ -467,7 +552,7 @@ class TechnicalReportsController extends AppController
 
             debug($results);
             debug($technicalReport);
-            die();
+            //die();
 
             require_once 'dompdf/autoload.inc.php';
             //initialize dompdf class
@@ -549,8 +634,7 @@ class TechnicalReportsController extends AppController
      public function generate($id = null)
     {
 
-                    debug($this->request->getData());
-            die();
+
 
         // se crea una entidad para luego poder hacer los validadores
         $technicalReport= $this->TechnicalReports->get($id);

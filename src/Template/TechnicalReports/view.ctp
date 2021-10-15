@@ -177,7 +177,7 @@ label{
 
 <?php if(($technicalReport->descargado == null) && ($technicalReport->file_name == null )) : ?> 
 
-    <?= $this->Form->postLink(__('Eliminar'), ['controller'=> 'TechnicalReports', 'action' => 'delete', $technicalReport->technical_report_id], ['class' => 'btn btn-primary', 'confirm' => __('¿Seguro que desea eliminar la Ubicación #'.$technicalReport->technical_report_id.' ?', $technicalReport->technical_report_id)]) ?>
+    <?= $this->Form->postLink(__('Eliminar'), ['controller'=> 'TechnicalReports', 'action' => 'cancel', $technicalReport->technical_report_id], ['class' => 'btn btn-primary', 'confirm' => __('¿Seguro que desea eliminar la Ubicación #'.$technicalReport->technical_report_id.' ?', $technicalReport->technical_report_id)]) ?>
 
 <?php endif; ?>
 </form>

@@ -32,6 +32,7 @@ class LoansController extends AppController
 
         foreach ($query as $roles) {
             $rls = $roles['permissions'];
+
             foreach ($rls as $item){
                 //$permisos[(int)$item['id']] = 1;
                 if($item['nombre'] == 'Insertar Prestamos'){
@@ -43,9 +44,9 @@ class LoansController extends AppController
                 }else if($item['nombre'] == 'Consultar Prestamos'){
                     $allowC = true;
                 }
+
             }
         } 
-
 
         $this->set('allowI',$allowI);
         $this->set('allowM',$allowM);
@@ -88,6 +89,8 @@ class LoansController extends AppController
      */
     public function view($id = null)
     {
+
+
         if ($this->request->is(['patch', 'post', 'put'])) {
             $this->loadModel('Assets');
 
@@ -114,7 +117,7 @@ class LoansController extends AppController
                 $this->Flash->error(__('Error al subir el archivo'));
                 return $this->redirect(['action' => 'view', $loan->id]);
             }
-            $assets = $this->Loans->Assets->find('list', ['limit' => PHP_INT_MAX]);
+            $assets = $this->Loans->Assets->find('list');
             $users = $this->Loans->Users->find('list', ['limit' => PHP_INT_MAX ]);
             $this->set(compact('assets', 'loan', 'users'));
 
@@ -126,20 +129,38 @@ class LoansController extends AppController
             'contain' => ['Users']
         ]);
         $this->loadModel('Assets');
-        $query = $this->Assets->find()
-
-                        ->select(['assets.plaque', 'assets.models_id', 'assets.series'])
-                        ->where(['assets.loan_id' => $id])
-                        ->toList();
-
-        $size = count($query);
-
-        $result = array_fill(0, $size, NULL);
         
-        for($i = 0; $i < $size; $i++)
-        {
-            $result[$i] =(object)$query[$i]->assets;
-        }
+
+        $result = $this->Assets->find()          
+        ->select([
+            'Assets.plaque',
+            'Types.name',
+            'Models.name',
+            'Assets.series',
+            'Assets.state',
+            'Brands.name',
+        ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->where(['Assets.loan_id' => $id])
+            ;
+ 
         $this->set(compact('loan', 'result'));
     }
 
@@ -153,48 +174,68 @@ class LoansController extends AppController
         $loan = $this->Loans->newEntity();
         if ($this->request->is('post')) {
             $listaPlaques = $this->request->getData('checkList');
-            $listaPlaques = explode(',', $listaPlaques);
             
+            $listaPlaques = array_filter( explode(",", $listaPlaques ));
+
             $random = uniqid();
             $loan->id = $random;
             $loan->estado = 'En proceso';
             $loan = $this->Loans->patchEntity($loan, $this->request->getData());
-            
-            if ($this->Loans->save($loan)) {
-                
-                foreach($listaPlaques as $plaque){
+
+            //debug();
+            //die();
+
+            if(!empty($listaPlaques)){
+
+                if ($this->Loans->save($loan)) {
                     
-                    
-                    $asset= $this->Assets->get($plaque, [
-                        'contain' => []
-                    ]);
-                    
-                    $asset->loan_id = $random;
-                    $asset->state = 'Prestado';
-                    $asset->deletable = false;
-                    
-                    if(!($this->Assets->save($asset))){
-                        AppController::insertLog($loan['id'], FALSE);
-                        $this->Flash->error(__('El prÃ©stamo no se pudo guardar. Uno de los activos no se pudo guardar correctamente'));
-                        return $this->redirect(['action' => 'index']);
+                    foreach($listaPlaques as $plaque){
+                        
+                        $asset= $this->Assets->get($plaque, [
+                            'contain' => []
+                        ]);
+                        
+                        $asset->loan_id = $random;
+                        $asset->state = 'Prestado';
+                        $asset->deletable = false;
+                        
+                        if(!($this->Assets->save($asset))){
+                            debug('didnt save asset');
+                            AppController::insertLog($loan['id'], FALSE);
+                            $this->Flash->error(__('El prÃ©stamo no se pudo guardar. Uno de los activos no se pudo guardar correctamente'));
+                            $this->Loans->delete($loan);
+                            return $this->redirect(['action' => 'index']);
+                        }
                     }
+                    debug('success');
+                    AppController::insertLog($loan['id'], TRUE);
+                    $this->Flash->success(__('Verifique la informaciÃ³n del prÃ©stamo y suba el archivo firmado para finalizar'));
+                    return $this->redirect(['action' => 'finalizar', $loan->id]);
                 }
-                AppController::insertLog($loan['id'], TRUE);
-                $this->Flash->success(__('Verifique la informaciÃ³n del prÃ©stamo y suba el archivo firmado para finalizar'));
-                return $this->redirect(['action' => 'finalizar', $loan->id]);
+
+                $this->Flash->error(__('El prÃ©stamo no se pudo guardar, por favor intente nuevamente.'));
+                return $this->redirect(['action' => 'index']);    
+
+            }else{
+
+                $this->Flash->error(__('El prÃ©stamo no se pudo guardar. Debe seleccionar al menos un activo.'));
+                
+
             }
+
+        
             
-            $this->Flash->error(__('El prÃ©stamo no se pudo guardar, por favor intente nuevamente.'));
-            return $this->redirect(['action' => 'index']);
+            
         }
+        
 
         $this->loadModel('Assets');
 
-        $query = $this->Assets->find()
-                        ->select(['assets.plaque', 'assets.models_id', 'assets.series'])
-                        ->where(['assets.state' => "Disponible"])
-                        ->where(['assets.lendable' => true])
-                        ->where(['assets.deleted' => false])
+        $query = $this->Assets->find('all')
+                        ->select(['Assets.plaque', 'Assets.models_id', 'Assets.series'])
+                        ->where(['Assets.state' => "Disponible"])
+                        ->where(['Assets.lendable' => true])
+                        ->where(['Assets.deleted' => false])
                         ->toList();
 
         $size = count($query);
@@ -206,14 +247,133 @@ class LoansController extends AppController
             $result[$i] =(object)$query[$i]->assets;
         }
 
-        $assets = $this->Assets->find('list', [
-            'conditions' => ['assets.state' => 'Disponible']
+
+        $users = $this->Assets->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
         ]);
-        $users = $this->Loans->Users->find('list', ['limit' => PHP_INT_MAX ]);
-        $this->set(compact('assets', 'loan', 'users', 'result'));
+
+
+        //Buscca los activos para cargarlos en el grid.
+
+        $this->loadModel('Assets');
+
+
+        if(!empty($check)){
+
+            $asset_old = $this->Assets->find()          
+                ->select([
+                    'Assets.plaque',
+                    'Types.name',
+                    'Models.name',
+                    'Assets.series',
+                    'Assets.state',
+                    'Brands.name',
+                ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->where(['Assets.plaque IN' => $check]);
+                ;
+
+            $this->set('asset_old', $this->paginate($asset_old));
+
+            $asset = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->where(['Assets.state' => 'Disponible'])
+                ->where(['Assets.plaque NOT IN' => $check])
+                ;
+
+
+
+        }else{
+
+            $asset = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->where(['Assets.state' => 'Disponible'])
+                ;
+
+
+
+        }
+
+
+        $this->set(compact('asset', 'loan', 'users'));
+
+
     }
 
-    /*Segundo paso para ingresar prestamo*/
+    /*Segundo paso para ingresar prestamo
     public function finalizar($id)
     {
         $loan = $this->Loans->get($id, [
@@ -238,62 +398,129 @@ class LoansController extends AppController
         }
 
         $this->loadModel('Assets');
-        $query = $this->Assets->find()
-
-                        ->select(['assets.plaque', 'assets.models_id', 'assets.series'])
-                        ->where(['assets.loan_id' => $id])
-                        ->toList();
-
-        $size = count($query);
-
-        $result = array_fill(0, $size, NULL);
-        
-        for($i = 0; $i < $size; $i++)
-        {
-            $result[$i] =(object)$query[$i]->assets;
-        }
+        $result = $this->Assets->find()          
+        ->select([
+            'Assets.plaque',
+            'Types.name',
+            'Models.name',
+            'Assets.series',
+            'Assets.state',
+            'Brands.name',
+        ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->where(['Assets.loan_id' => $id])
+            ;
         $this->set(compact('loan', 'result'));
     }
 
+    */
+
     /*Terminar para varios activos*/
-    public function terminar($id)
+    public function finalizar($id)
     {
         $this->loadModel('Assets');
         
         $loan = $this->Loans->get($id, [
             'contain' => []
         ]);
-        
-        
-        $loan->estado = 'Terminado';
-        
-        if ($this->Loans->save($loan)){
-            
-            $assets = $this->Assets->find()
-            ->where(['assets.loan_id' => $id])
-            ->toList();
-                
-            foreach($assets as $asset){
-                $asset->state = 'Disponible';
-                $asset->loan_id = NULL;
 
-                if(!($this->Assets->save($asset))){
-                    $this->Flash->error(__('Error al terminar el prÃ©stamo'));
-                    return $this->redirect(['action' => 'index']);
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+
+/*
+	    Estas lÃneas se encargan de manejar la carga de archivos, cuando lo programaron por primera vez, trataban de meter el archivo en la base y la pÃgina se caÃa, lo cual no tiene sentido. Como tampoco se tiene  mucha informaciÃn sobre la clases y cÃmo se asigna, por lo que se soluciona por PHP.
+	    Edit: se agrega cÃdigo en las lÃneas 447 a 456
+	    $devolucion =  $this->request->getData()['input file'];  // Esto es lo que habÃa en un princio. Ni sirve ni tiene sentido porque trata de meter el archivo en la base de datos y, evidentemente se trae la pÃgina, pero no da error siempre porque la sintaxis estÃ¡ ma y devuelve NULL.
+*/
+            $direccion = './files/Uploads/Loans/';
+	    $loan->file_devolucion = $loan->id . '.' . $_FILES['file_devolucion']['name'];
+	    $loan->file_devolucion_dir = $direccion;
+	    $ubicacion_final = $direccion . ($loan->id . '.' . $_FILES['file_devolucion']['name']);
+	    move_uploaded_file(($_FILES['file_devolucion']['tmp_name']), $ubicacion_final);
+	    // $this->Flash->success(__('Error, sÃlo se pueden subir archivos pdf.'));
+
+            $loan->estado = 'Terminado';
+            $loan->fecha_devolucion = date('y-m-d', time());
+     
+            if ($this->Loans->save($loan)){
+
+              
+                $assets = $this->Assets->find()
+                ->where(['Assets.loan_id' => $id])
+                ->toList();
+                    
+                foreach($assets as $asset){
+                    $asset->state = 'Disponible';
+                    $asset->loan_id = NULL;
+
+                    if(!($this->Assets->save($asset))){
+                        $this->Flash->error(__('Error al terminar el prÃ©stamo'));
+                        $this->Loans->delete($loan);
+                        return $this->redirect(['action' => 'index']);
+                    }
                 }
+
+                $this->Flash->success(__('El prÃ©stamo ha sido finalizado.'));
+                return $this->redirect(['action' => 'index']);
+
+            }
+            else{
+                $this->Flash->error(__('Error al finalizar el prÃ©stamo'));
+                return $this->redirect(['action' => 'index']);
             }
 
-            $this->Flash->success(__('El prÃ©stamo ha sido finalizado.'));
-            return $this->redirect(['action' => 'index']);
+        }
 
-        }
-        else{
-            $this->Flash->error(__('Error al finalizar el prÃ©stamo'));
-            return $this->redirect(['action' => 'index']);
-        }
-        $assets = $this->Loans->Assets->find('list', ['limit' => PHP_INT_MAX]);
-        $users = $this->Loans->Users->find('list', ['limit' => PHP_INT_MAX ]);
-        $this->set(compact('assets', 'loan', 'users'));
+
+        $this->loadModel('Assets');
+        $result = $this->Assets->find()          
+        ->select([
+            'Assets.plaque',
+            'Types.name',
+            'Models.name',
+            'Assets.series',
+            'Assets.state',
+            'Brands.name',
+        ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->where(['Assets.loan_id' => $id])
+            ;
+        $this->set(compact('loan', 'result'));
+
     }
 
     /**
@@ -359,14 +586,35 @@ class LoansController extends AppController
         $this->Assets = $this->loadModel('Assets');
         $this->AssetsTransfers = $this->loadModel('AssetsTransfers');
 
-        $conn = ConnectionManager::get('default');
-        $stmt = $conn->execute('SELECT * FROM assets
-            inner join loans on loan_id = id
-            where id =\'' . $id . '\';');
-
-        $results = $stmt ->fetchAll('assoc');
-
-
+        $results = $this->Assets->find()          
+        ->select([
+            'Assets.plaque',
+            'Types.name',
+            'Models.name',
+            'Assets.series',
+            'Assets.state',
+            'Brands.name',
+        ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->where(['Assets.loan_id' => $id])
+            ;
          require_once 'dompdf/autoload.inc.php';
         //initialize dompdf class
         $document = new Dompdf();
@@ -395,7 +643,7 @@ class LoansController extends AppController
             height: 50px;
         }
         </style>
-<center><img src="C:\xampp\htdocs\Decanatura\src\Controller\images\logoucr.png"></center>
+<center><img src="/var/www/html/Activos/src/Controller/images/logoucr.png"></center>
 <h2 align="center">UNIVERSIDAD DE COSTA RICA</h2>
 <h2 align="center">UNIDAD DE ACTIVOS FIJOS</h2>
 <h2 align="center">PRESTAMO DE ACTIVO FIJO</h2>
@@ -410,20 +658,21 @@ class LoansController extends AppController
 <tbody>
 <tr>
 <th align="center">Placa</th>
-<th align="center">Descripcion del Activo</th>
+<th align="center">Tipo</th>
 <th align="center">Marca</th>
 <th align="center">Modelo</th>
 <th align="center">Serie</th>
+
 </tr>';
 
         foreach ($results as $item) {
             $html .= 
             '<tr>
-             <td align="center">' . $item['plaque'] . '</td>
-             <td align="center">' . $item['description'] . '</td>
-             <td align="center">' . $item['brand'] . '</td>
-             <td align="center">' . $item['models_id'] . '</td>
-             <td align="center">' . $item['series'] . '</td>
+             <td align="center">' . $item->plaque . '</td>
+             <td align="center">' . $item->Types['name'] . '</td>
+             <td align="center">' . $item->Brands['name'] . '</td>
+             <td align="center">' . $item->Models['name'] . '</td>
+             <td align="center">' . $item->series . '</td>
              </tr>';
         }
 

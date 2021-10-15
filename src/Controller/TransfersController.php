@@ -18,7 +18,8 @@ class TransfersController extends AppController
 {
 
 
-    private $UnidadAcadémica='Ingeniería';
+    private $UnidadAcademica='Ingeniería';
+    private $Acronimo = 'IN';
 
 
  public function isAuthorized($user)
@@ -43,13 +44,13 @@ class TransfersController extends AppController
             $rls = $roles['permissions'];
             foreach ($rls as $item){
                 //$permisos[(int)$item['id']] = 1;
-                if($item['nombre'] == 'Insertar Usuarios'){
+                if($item['nombre'] == 'Insertar Traslados'){
                     $allowI = true;
-                }else if($item['nombre'] == 'Modificar Usuarios'){
+                }else if($item['nombre'] == 'Modificar Traslados'){
                     $allowM = true;
-                }else if($item['nombre'] == 'Eliminar Usuarios'){
+                }else if($item['nombre'] == 'Eliminar Traslados'){
                     $allowE = true;
-                }else if($item['nombre'] == 'Consultar Usuarios'){
+                }else if($item['nombre'] == 'Consultar Traslados'){
                     $allowC = true;
                 }
             }
@@ -83,9 +84,39 @@ class TransfersController extends AppController
      */
     public function index()
     {
+
+        $this->loadModel('Transfers');
+
+        $transfers = $this->Transfers->find()
+            ->select([
+                'Transfers.transfers_id',
+                'Transfers.file_name',
+                'Transfers.date',
+                'Transfers.Acade_Unit_recib',
+                'asset_list' => 'group_concat(Assets_Transfers.assets_id)'
+            ])
+            ->join([
+        'table'=>'assets_transfers',
+        'alias' => 'Assets_Transfers',
+        'type'=>'INNER',
+        'conditions'=> 'Transfers.transfers_id = Assets_Transfers.transfer_id'
+            ])
+            ->group('Transfers.transfers_id');
+            ;
+
+
+
+            $this->set('transfers', $this->paginate($transfers));
+
+    /*
+        ORIGINAL
+
         $transfers = $this->paginate($this->Transfers);
 
         $this->set(compact('transfers'));
+    
+    */
+
     }
 
     /**
@@ -103,8 +134,50 @@ class TransfersController extends AppController
         // obtengo la tabla assets
         $assets_transfers = TableRegistry::get('AssetsTransfers');
 
+        $this->loadModel('Assets');
+
+        $result = $this->Assets->find()
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets_Transfers.transfers_state',
+                'Brands.name',
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'INNER',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'INNER',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->join([
+        'table'=>'assets_transfers',
+        'alias' => 'Assets_Transfers',
+        'type'=>'INNER',
+        'conditions'=> 'Assets.plaque= Assets_Transfers.assets_id'
+            ])
+            ->where(['Assets_Transfers.transfer_id'=>$id])
+            ;
+
+
+
+
         // reallizo un join  a assets_tranfers para obtener los activos
         //asosiados a un traslado
+        /*
         $query = $assets_transfers->find()
                     ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
                     ->join([
@@ -125,7 +198,7 @@ class TransfersController extends AppController
                             'brands' => [
                                     'table' => 'brands',
                                     'type'  => 'LEFT',
-                                   'conditions' => ['models.id_brand = brands.id']
+                                   'conditions' => ['Assets.brand = brands.id']
                                 ]
                     ])
                     ->where(['AssetsTransfers.transfer_id'=>$id])
@@ -150,7 +223,9 @@ class TransfersController extends AppController
         }
         //$user =$this->Auth->user();
         
-        $Unidad= $this->UnidadAcadémica;
+
+        */
+        $Unidad= $this->UnidadAcademica;
 
         $this->set(compact('transfer','result','Unidad'));
     }
@@ -162,69 +237,123 @@ class TransfersController extends AppController
      */
     public function add()
     {
+
         //empieza el área para la función de post///////////////
         $transfer = $this->Transfers->newEntity();
+
+        $check = array();
+        $states = array();
         
         if ($this->request->is('post')) {
 
-            $check= $this->request->getData("checkList");
+            $check = $this->request->getData("checkList");
             $check = explode(",",$check);
 
-            $transfer = $this->Transfers->patchEntity($transfer, $this->request->getData());
+            if($this->request->getData("checkList") == '') {
+                 AppController::insertLog($transfer['transfers_id'], TRUE);
+                $this->Flash->error(__('Debe ingresar por lo menos un Activo para trasladar.'));
 
-            //Se concatena el id de la vista con la constante en este caso (VRA-) que esdiferente para cada unidad académica
-            //$transfer->transfers_id = $this->request->getData('transfers_id');
-            $users = TableRegistry::get('users');
-            //se obtiene el nombre del usuario con la posición del dropdown
-            $users_query = $users->find()
-                ->select(['users.nombre','users.apellido1','users.apellido2'])->toList();
+            }else{
 
-            $array_funcionario = $users_query[$transfer->functionary];
-            $transfer->functionary = $array_funcionario->nombre.' '.$array_funcionario->apellido1.' '.$array_funcionario->apellido2;
-            //Se verifica que el id no esté duplicado, por alguna razón la base de datos no lo estaba haciendo.
+                $states = $this->request->getData("statesList");
+                $states = explode(",",$states);
 
-            $returnId = $this->Transfers->find('all')
-            ->where([
-            'Transfers.transfers_id' => $transfer->transfers_id
-            ])
-            ->first();
-            if($returnId){
-                $transfer->setError('transfers_id', ['El número de traslado ya existe.']);
-            }
-                    //comienza el ciclo para agregar la relación entre activos y acta.
-            if ($this->Transfers->save($transfer)) {
-                //se saca la lista de placas señaladas y luego se pasan a Array
-                $check= $this->request->getData("checkList");
-                $check = explode(",",$check);
-                foreach($check as $placa)
-                {
-                    $transferAssetTable = TableRegistry::get('AssetsTransfers');
-                    $transferAsset = $transferAssetTable->newEntity();
-                    //se asigna id de traslado a tabla de relación
-                    $transferAsset->transfer_id =  $transfer->transfers_id;
-                    $transferAsset->assets_id = $placa;
-                    //se guarda en tabla conjunta (assets y traslado)
-                    $transferAssetTable->save($transferAsset);
+                $transfer = $this->Transfers->patchEntity($transfer, $this->request->getData());
 
-                    //Se le cambia el estado al activo.
-                    $assets = TableRegistry::get('Assets')->find('all');
+                //Se concatena el id de la vista con la constante en este caso (VRA-) que esdiferente para cada unidad académica
+                //$transfer->transfers_id = $this->request->getData('transfers_id');
+                $users = TableRegistry::get('users');
+                //se obtiene el nombre del usuario con la posición del dropdown
+                $functionary = $users->find()
+                    ->select(['users.nombre','users.apellido1','users.apellido2'])
+                    ->where(['users.id' => $this->request->getData("functionary")])
+                    ->first();
+                $transfer->functionary = $functionary['nombre'] .' '.$functionary['apellido1'].' '.$functionary['apellido2'];
+                $transfer->identification = $this->request->getData("functionary");
+     
+
+                //Se verifica que el id no esté duplicado, por alguna razón la base de datos no lo estaba haciendo.
+
+                $returnId = $this->Transfers->find('all')
+                ->where([
+                'Transfers.transfers_id' => $transfer->transfers_id
+                ])
+                ->first();
+                
+                if($returnId ){
+                    $transfer->setError('transfers_id', ['El número de traslado ya existe.']);
+                }else if($transfer->transfers_id == ''){
+                    $transfer->setError('transfers_id', ['Debe tener un número de traslado.']);
+                }else{
+
+
+                    //Se verifica que todos los activos seleccionados sigan disponibles
+                    $this->loadModel('Assets');
+                    $not_available = $this->Assets->find()          
+                        ->select([
+                            'Assets.plaque'
+                        ])
+                        ->where(['Assets.state !=' => 'Disponible'])
+                        ->where(['Assets.plaque IN' => $check]);
+                        ;
+
+
+                    if(!empty($not_available->toList())){
+                        $this->Flash->error(__('Hay activos que ya no están disponibles.'));
                         
-                    $assets->update()
-                            ->set(['state' => "Trasladado"])
-                            ->where(['plaque IN' => $placa])
-                            ->execute();
-                }
-                $this->Flash->success(__('La transferencia fue exitosa.'));
-                return $this->redirect(['action' => 'viewDownload', $transfer->transfers_id]);
-                }
-            //debug($transfer->errors());
-            AppController::insertLog($transfer['transfers_id'], TRUE);
-            $this->Flash->error(__('No se pudo realizar la transferencia.'));
-        }
+                    }else{
 
+
+                        $transfer->transfers_id = $this->Acronimo . '-' . $transfer->transfers_id;
+
+                                //comienza el ciclo para agregar la relación entre activos y acta.
+
+                        
+                        if($transfer->identification == ''){
+                            $transfer->setError(
+                                'identification',
+
+                             ['El campo es requerido']
+
+                            );
+                        }
+                        //  debug($transfer);
+                        //die();
+
+                        if ($this->Transfers->save($transfer)) {
+                            foreach($check as $index => $placa)
+                            {
+                                $transferAssetTable = TableRegistry::get('AssetsTransfers');
+                                $transferAsset = $transferAssetTable->newEntity();
+                                //se asigna id de traslado a tabla de relación
+                                $transferAsset->transfer_id =  $transfer->transfers_id;
+                                $transferAsset->assets_id = $placa;
+                                $transferAsset->transfers_state = $states[$index];
+                                //se guarda en tabla conjunta (assets y traslado)
+                                $transferAssetTable->save($transferAsset);
+
+                                //Se le cambia el estado al activo.
+                                $assets = TableRegistry::get('Assets')->find('all');
+                                    
+                                $assets->update()
+                                        ->set(['state' => "Trasladado"])
+                                        ->where(['plaque IN' => $placa])
+                                        ->execute();
+                            }
+                            $this->Flash->success(__('El traslado fue exitoso.'));
+                            return $this->redirect(['action' => 'viewDownload', $transfer->transfers_id]);
+                        }
+                        //debug($transfer->errors());
+                        AppController::insertLog($transfer['transfers_id'], TRUE);
+                        $this->Flash->error(__('No se pudo realizar el traslado.'));
+                    }
+                }
+            }
+        }
 
         // obtengo la tabla assets
         $assets_transfers = TableRegistry::get('AssetsTransfers');
+
 
         // reallizo un join  a assets_tranfers para obtener los activos
         //asosiados a un traslado
@@ -248,57 +377,140 @@ class TransfersController extends AppController
         }
 
         //Buscca los activos para cargarlos en el grid.
-        $assetsQuery = TableRegistry::get('Assets');
-        $assetsQuery = $assetsQuery->find()
-                        ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
-                        ->join([
-                            'models' => [
-                                    'table' => 'models',
-                                    'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
-                                ]
-                                ])
-                        ->join([
-                            'brands' => [
-                                    'table' => 'brands',
-                                    'type'  => 'LEFT',
-                                   'conditions' => ['models.id_brand = brands.id']
-                                ]
-                        ])
-                        ->where(['assets.state = "Disponible"'])
-                        ->toList();
-        $size = count($assetsQuery);
-        $asset=   array_fill(0, $size, NULL);
-        
-        for($i=0;$i<$size;$i++)
-        {
-            //* se acomodan los valores dentro de un mismo [$i]
-            $asset[$i]['plaque']= $assetsQuery[$i]->assets['plaque'];
-            $asset[$i]['brand']= $assetsQuery[$i]->brands['name'];
-            $asset[$i]['model']= $assetsQuery[$i]->models['name'];
-            $asset[$i]['series']= $assetsQuery[$i]->assets['series'];
-            $asset[$i]['state']= $assetsQuery[$i]->assets['state'];
 
-            // se realiza una conversion a objeto para que la vista lo use sin problemas
-            $asset[$i]= (object)$asset[$i];
+        $this->loadModel('Assets');
+
+
+        if(!empty($check)){
+
+            $asset_old = $this->Assets->find()          
+                ->select([
+                    'Assets.plaque',
+                    'Types.name',
+                    'Models.name',
+                    'Assets.series',
+                    'Assets.state',
+                    'Brands.name',
+                ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->where(['Assets.plaque IN' => $check]);
+                ;
+
+            $this->set('asset_old', $this->paginate($asset_old));
+
+            $asset = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->where(['Assets.state' => 'Disponible'])
+                ->where(['Assets.plaque NOT IN' => $check])
+                ;
+
+
+
+        }else{
+
+            $asset = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'LEFT',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->where(['Assets.state' => 'Disponible'])
+                ;
+
+
+
         }
+
+
+/*
+        $asset = $this->Assets->find('all', [
+            'conditions' => ['Assets.state' => 'Disponible']
+        ]);
+*/
 
         /** obtengo una lista de usuarios para cargar un dropdown list en la vista */
-        $usersTable= TableRegistry::get('Users');
-        $queryUsers = $usersTable->find()
-                        ->select(['users.nombre','users.apellido1','users.apellido2'])
-                        ->toList();
-
-        $size = count($queryUsers);
-        $users= array_fill(0, $size, NULL);
-        /** se concatena el nombre y se coloca en un mismo array*/
-        for($i=0;$i<$size;$i++)
-        {
-            $users[$i] =$queryUsers[$i]->users['nombre'] ." ".$queryUsers[$i]->users['apellido1']." ".$queryUsers[$i]->users['apellido2'];
-        }
+        $this->loadModel('Users');
+        $users = $this->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
         // variable para colocar la unidad que entrega
-        $paramUnidad = $this->UnidadAcadémica;
-        $this->set(compact('transfer', 'asset', 'result','tmpId','users','paramUnidad'));
+        $paramUnidad = $this->UnidadAcademica;
+        $paramAcronimo = $this->Acronimo;
+        $this->set(compact('transfer', 'result','tmpId','users','paramUnidad', 'states','paramAcronimo'));
+        $this->set('asset', $this->paginate($asset));
+
+
+        //debug($asset->toList());
+        //die();
 
     }
 
@@ -313,170 +525,226 @@ class TransfersController extends AppController
     {
         $transfer = $this->Transfers->get($id);
 
-        // obtengo la tabla assets
-        $assets_transfers = TableRegistry::get('AssetsTransfers');
-
-        // realizo un join  a assets_tranfers para obtener los activos
-        //asosiados a un traslado
-        $query = $assets_transfers
-                    ->find('all')
-                    ->select(['assets.plaque'])
-                    ->join([
-                      'assets'=> [
-                        'table'=>'assets',
-                        'type'=>'INNER',
-                        'conditions'=> [ 'assets.plaque= AssetsTransfers.assets_id']
-                        ]
-                    ])
-
-                    ->where(['AssetsTransfers.transfer_id'=>$id])
-
-                    ->toList();
-
-        // Aqui paso el resultado de $query a un objeto
-        $size = count($query);
-        $result=   array_fill(0, $size, NULL);
-        
-        for($i=0;$i<$size;$i++)
-        {
-            $result[$i] =(object)$query[$i]->assets;
-        }       
-
-         /** Se colocan el contenido de $result en un array llamado $temp de manera
-        que se pueda usar el método arrar_diff facilmente y para consultar los activos
-        que previamente pertenecen al traslado que se edita*/
-
-
-        $temp =  array_fill(0, $size, NULL);
-        $i=0;
-        foreach ($result as $res)
-        {
-            $temp[$i] = $res -> plaque;
-            $i++;
-        }
+        $check = array();
+        $states = array();
 
         if ($this->request->is(['patch', 'post', 'put'])) {
 
+            $check = $this->request->getData("checkList");
+            $check = explode(",",$check);
+
+            if($this->request->getData("checkList") == '') {
+                 AppController::insertLog($transfer['transfers_id'], TRUE);
+                $this->Flash->error(__('Debe ingresar por lo menos un Activo para trasladar.'));
+
+            }else{
 
             //saco la lista de placas señaladas y luego las paso a Array
-            $check= $this->request->getData("checkList");
-            $checks = explode(",",$check);
-             
-            $transfer = $this->Transfers->patchEntity($transfer, $this->request->getData());
-            if ($this->Transfers->save($transfer)) {
-                AppController::insertLog($transfer['transfers_id'], TRUE);
-                $this->Flash->success(__('Los cambios han sido guardados.'));
+
+                $states = $this->request->getData("statesList");
+                $states = explode(",",$states);
+
+                 
+                $transfer = $this->Transfers->patchEntity($transfer, $this->request->getData());
+
+                if($transfer->transfers_id == ''){
+                    $transfer->setError('transfers_id', ['Debe tener un número de traslado.']);
+                }else{
+
+
+                    if ($this->Transfers->save($transfer)) {
+                        AppController::insertLog($transfer['transfers_id'], TRUE);
+                        $this->Flash->success(__('Los cambios han sido guardados.'));
 
 
 
-                $nuevos = array_diff($checks,  $temp);
-                $viejos = array_diff($temp,  $checks);
-                
-                
-                //debug($nuevos);
-                //debug($viejos);
-
-                $assets = TableRegistry::get('Assets')->find('all');
-
-                if (count($viejos) > 0)
-                {
-
-                  $assets_transfers->deleteall(array('transfer_id'=>$id, 'assets_id IN' => $viejos), false);
-
-                  $assets->update()
-                    ->set(['state' => "Disponible"])
-                    ->where(['plaque IN' => $viejos])
-                    ->execute();
-                }
-
-                if (count($nuevos) > 0)
-                {
-                    foreach ($nuevos as $n)
-                    {
-                        $at = TableRegistry::get('AssetsTransfers')->newEntity([
-                                'transfer_id'=> $id,
-                                'assets_id' => $n
-                        ]);
-
-                        $at->assets_id = $n;
-                        $at->transfer_id = $id;
+                        $nuevos = array_diff($checks,  $temp);
+                        $viejos = array_diff($temp,  $checks);
                         
-                        $assets_transfers->save($at);
+                        
+                        //debug($nuevos);
+                        //debug($viejos);
+
+                        $assets = TableRegistry::get('Assets')->find('all');
+
+                        if (count($viejos) > 0)
+                        {
+
+                          $assets_transfers->deleteall(array('transfer_id'=>$id, 'assets_id IN' => $viejos), false);
+
+                          $assets->update()
+                            ->set(['state' => "Disponible"])
+                            ->where(['plaque IN' => $viejos])
+                            ->execute();
+                        }
+
+                        if (count($nuevos) > 0)
+                        {
+                            foreach ($nuevos as $index => $n)
+                            {
+                                $at = TableRegistry::get('AssetsTransfers')->newEntity([
+                                        'transfer_id'=> $id,
+                                        'assets_id' => $n,
+                                        'Transfers_state' => $states[$index]
+                                ]);
+
+                                $at->assets_id = $n;
+                                $at->transfer_id = $id;
+                                $at->transfers_state = $states[$index];
+                                
+                                $assets_transfers->save($at);
+                            }
+
+                            $assets->update()
+                            ->set(['state' => "Trasladado"])
+                            ->where(['plaque IN' => $nuevos])
+                            ->execute();
+                        }
+                        return $this->redirect(['action' => 'index']);
                     }
 
-                    $assets->update()
-                    ->set(['state' => "Trasladado"])
-                    ->where(['plaque IN' => $nuevos])
-                    ->execute();
                 }
-                return $this->redirect(['action' => 'index']);
+
+                AppController::insertLog($transfer['transfers_id'], FALSE);
+                //debug($transfer);
+                $this->Flash->error(__('El traslado no se pudo guardar, porfavor intente nuevamente'));
             }
-            AppController::insertLog($transfer['transfers_id'], FALSE);
-            //debug($transfer);
-            $this->Flash->error(__('El traslado no se pudo guardar, porfavor intente nuevamente'));
-
         }
 
+        //No hay post carga listas de activos
+
+        $this->loadModel('Assets');
 
 
-        $assetsQuery = TableRegistry::get('Assets');
-        $assetsQuery = $assetsQuery->find()
-                        ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
-                        ->join([
-                            'models' => [
-                                    'table' => 'models',
-                                    'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
-                                ]
-                                ])
-                        ->join([
-                            'brands' => [
-                                    'table' => 'brands',
-                                    'type'  => 'LEFT',
-                                   'conditions' => ['models.id_brand = brands.id']
-                                ]
-                        ])
-                        ->join([
-                      'assets_transfers'=> [
-                        'table'=>'assets_transfers',
-                        'type'=>'LEFT',
-                        'conditions'=> [ 'assets.plaque= assets_transfers.assets_id']
-                        ]
-                        ])
-                        ->where(['assets.state = "Disponible" or assets_transfers.transfer_id = "'.$id.'"'])
-                        ->toList();
-        $size = count($assetsQuery);
-        $asset=   array_fill(0, $size, NULL);
-        
-        for($i=0;$i<$size;$i++)
-        {
-            //* se acomodan los valores dentro de un mismo [$i]
-            $asset[$i]['plaque']= $assetsQuery[$i]->assets['plaque'];
-            $asset[$i]['brand']= $assetsQuery[$i]->brands['name'];
-            $asset[$i]['model']= $assetsQuery[$i]->models['name'];
-            $asset[$i]['series']= $assetsQuery[$i]->assets['series'];
-            $asset[$i]['state']= $assetsQuery[$i]->assets['state'];
+        $assets = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'INNER',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'INNER',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->where(['Assets.state' => 'Disponible'])
+            ;
 
-            // se realiza una conversion a objeto para que la vista lo use sin problemas
-            $asset[$i]= (object)$asset[$i];
-        }
 
         /** obtengo una lista de usuarios para cargar un dropdown list en la vista */
         $usersTable= TableRegistry::get('Users');
         $queryUsers = $usersTable->find()
-                        ->select(['users.nombre','users.apellido1','users.apellido2'])
+                        ->select(['Users.nombre','Users.apellido1','Users.apellido2'])
                         ->toList();
 
         $size = count($queryUsers);
-        $users= array_fill(0, $size, NULL);
-        /** se concatena el nombre y se coloca en un mismo array*/
-        for($i=0;$i<$size;$i++)
-        {
-            $users[$i] =$queryUsers[$i]->users['nombre'] ." ".$queryUsers[$i]->users['apellido1']." ".$queryUsers[$i]->users['apellido2'];
+        /** obtengo una lista de usuarios para cargar un dropdown list en la vista */
+        $this->loadModel('Users');
+        $users = $this->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
+
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+
+            $current_assets = $this->Assets->find()          
+                ->select([
+                    'Assets.plaque',
+                    'Types.name',
+                    'Models.name',
+                    'Assets.series',
+                    'Assets.state',
+                    'Brands.name',
+                ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'INNER',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'INNER',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'INNER',
+            'conditions' => 'Assets.brand = Brands.id',
+                ])
+                ->where(['Assets.plaque IN' => $check]);
+                ;
+        }else{
+
+            $current_assets = $this->Assets->find()
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets_Transfers.transfers_state',
+                'Brands.name',
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'INNER',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'INNER',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->join([
+        'table'=>'assets_transfers',
+        'alias' => 'Assets_Transfers',
+        'type'=>'INNER',
+        'conditions'=> 'Assets.plaque= Assets_Transfers.assets_id'
+            ])
+            ->where(['Assets_Transfers.transfer_id'=>$id])
+            ;
+
         }
 
-        $Unidad= $this->UnidadAcadémica;
-        $this->set(compact('transfer', 'asset', 'result','Unidad','users'));
+
+
+        //debug($asset[0]);
+        //die();
+
+        $Unidad= $this->UnidadAcademica;
+        $this->set(compact('transfer', 'assets', 'current_assets','Unidad','users','states'));
 
     }
 
@@ -536,9 +804,11 @@ class TransfersController extends AppController
 
 
             //saco la lista de placas señaladas y luego las paso a Array
-
-             
+            //debug($this->request->getData());
+            //die();        
+            
             $transfer = $this->Transfers->patchEntity($transfer, $this->request->getData());
+
             if ($this->Transfers->save($transfer)) {
                 AppController::insertLog($transfer['transfers_id'], TRUE);
                 $this->Flash->success(__('Los cambios han sido guardados.'));
@@ -547,55 +817,45 @@ class TransfersController extends AppController
             }
         }
         // obtengo la tabla assets
-        $assets_transfers = TableRegistry::get('AssetsTransfers');
+        $this->loadModel('Assets');
 
-        // reallizo un join  a assets_tranfers para obtener los activos
-        //asosiados a un traslado
-        $query = $assets_transfers->find()
-                    ->select(['assets.plaque','brands.name','models.name','assets.series','assets.state'])
-                    ->join([
-                      'assets'=> [
-                        'table'=>'assets',
-                        'type'=>'INNER',
-                        'conditions'=> [ 'assets.plaque= AssetsTransfers.assets_id']
-                        ]
-                    ])
-                    ->join([
-                            'models' => [
-                                    'table' => 'models',
-                                    'type'  => 'LEFT',
-                                    'conditions' => ['assets.models_id= models.id']
-                                ]
-                                ])
-                    ->join([
-                            'brands' => [
-                                    'table' => 'brands',
-                                    'type'  => 'LEFT',
-                                   'conditions' => ['models.id_brand = brands.id']
-                                ]
-                    ])
-                    ->where(['AssetsTransfers.transfer_id'=>$id])
-                    ->toList();
-
+        $result = $this->Assets->find()
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets_Transfers.transfers_state',
+                'Brands.name',
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'INNER',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'INNER',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->join([
+        'table'=>'assets_transfers',
+        'alias' => 'Assets_Transfers',
+        'type'=>'INNER',
+        'conditions'=> 'Assets.plaque= Assets_Transfers.assets_id'
+            ])
+            ->where(['Assets_Transfers.transfer_id'=>$id])
+            ;
         
-        $size = count($query);
-        $result=   array_fill(0, $size, NULL);
-        
-        for($i=0;$i<$size;$i++)
-        {
-            //* se acomodan los valores dentro de un mismo [$i]
-            $result[$i]['plaque']= $query[$i]->assets['plaque'];
-            $result[$i]['brand']= $query[$i]->brands['name'];
-            $result[$i]['model']= $query[$i]->models['name'];
-            $result[$i]['series']= $query[$i]->assets['series'];
-            $result[$i]['state']= $query[$i]->assets['state'];
-
-            // se realiza una conversion a objeto para que la vista lo use sin problemas
-            $result[$i]= (object)$result[$i];
-
-        }
-        
-        $Unidad= $this->UnidadAcadémica;
+        $Unidad= $this->UnidadAcademica;
 
         $this->set(compact('transfer','result','Unidad'));
     }
@@ -620,6 +880,8 @@ public function download($id = null)
         // Aqui queda el resultado, en un vector genérico, de lo que contiene la vista
         $transferArray= explode(',',$this->request->data('pdf') );
 
+        debug($this->request->data('pdf'));
+        
         //re realiza una relacion 1 a 1
         $transferTMP['residues_id']= $id;
         $date = new Date($transferArray[0]);
@@ -644,7 +906,7 @@ public function download($id = null)
             $plaques= explode(',',$this->request->data('plaques') );
 
             //  las placas se pasan a un formato de string de manera que seaan válidas en
-            //el where assets.plaque in
+            //el where Assets.plaque in
             $plaqueList;
             $plaqueList.="'".$plaques[0]."'";
             $size=count($plaques);
@@ -652,7 +914,7 @@ public function download($id = null)
             {
                 $plaqueList.=",'".$plaques[$p]."'";
             }
-
+            /*
             $conn = ConnectionManager::get('default');
             $stmt = $conn->execute("select a.plaque, a.description, b.name as brand, m.name as model, a.series, a.state
             from assets a
@@ -661,8 +923,49 @@ public function download($id = null)
             inner join brands b on  b.id=a.brand
             inner join models m on m.id=a.models_id
             where a.plaque in (" . $plaqueList . ");");
+        ¨   */
+            //MASTER
 
-            $results = $stmt ->fetchAll('assoc');
+        $this->loadModel('Assets');
+
+        $results = $this->Assets->find()
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets_Transfers.transfers_state',
+                'Brands.name',
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'INNER',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'INNER',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->join([
+        'table'=>'assets_transfers',
+        'alias' => 'Assets_Transfers',
+        'type'=>'INNER',
+        'conditions'=> 'Assets.plaque= Assets_Transfers.assets_id'
+            ])
+            ->where(['Assets_Transfers.transfer_id'=>$id])
+            ;
+
+
+            //$results = $stmt ->fetchAll('assoc');
 
 
             require_once 'dompdf/autoload.inc.php';
@@ -695,7 +998,7 @@ public function download($id = null)
             </style>
 
 
-            <center><img src="C:\xampp\htdocs\Decanatura\src\Controller\images\logoucr.png"></center>
+            <center><img src="https://botw-pd.s3.amazonaws.com/styles/logo-thumbnail/s3/032011/logo_ucr.png"></center>
             <h2 align="center">Universidad de Costa Rica</h2>
             <h2 align="center">Vicerrector&iacute;a de Administraci&oacute;n</h2>
             <h2 align="center">Oficina de Administraci&oacute;n Financiera</h2>
@@ -712,7 +1015,7 @@ public function download($id = null)
                 <th align="center"><span style="font-weight:bold">RECIBE</span></th>
             </tr>
             <tr>
-                <td height="50"><strong>Unidad: '.$this->UnidadAcadémica.'</td>
+                <td height="50"><strong>Unidad: '.$this->UnidadAcademica.'</td>
                 <td height="50"><strong>Unidad: '.$transfer->Acade_Unit_recib.'</td>
             </tr>
             <tr>
@@ -731,22 +1034,24 @@ public function download($id = null)
             <tr>
             <th align="center">Descripcion del Activo</th>
             <th align="center">Placa</th>
+            <th align="center">Tipo</th>
             <th align="center">Marca</th>
             <th align="center">Modelo</th>
             <th align="center">Serie</th>
             <th align="center">Estado Actual</th>
             </tr>';
 
-            for($a=0;$a < $size; $a++) {
-            $html .= 
-            '<tr>
-            <td align="center">' . $results[$a]['description'] . '</td>
-             <td align="center">' . $results[$a]['plaque'] . '</td>
-             <td align="center">' . $results[$a]['brand'] . '</td>
-             <td align="center">' . $results[$a]['model'] . '</td>
-             <td align="center">' . $results[$a]['series'] . '</td>
-             <td align="center">' . $results[$a]['state'] . '</td>
-             </tr>';
+            foreach ($results as $a) {
+                $html .= 
+                '<tr>
+                <td align="center">' . $a->description . '</td>
+                 <td align="center">' . $a->plaque . '</td>
+                 <td align="center">' . $a->Types['name'] . '</td>
+                 <td align="center">' . $a->Brands['name'] . '</td>
+                 <td align="center">' . $a->Models['name'] . '</td>
+                 <td align="center">' . $a->series . '</td>
+                 <td align="center">' . $a->Assets_Transfers['transfers_state'] . '</td>
+                 </tr>';
             }
 
 
@@ -759,7 +1064,9 @@ public function download($id = null)
             <p><strong>Original: Oficina de Administraci&oacute;n Financiera&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copia: Unidad que entrega&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copia: Unidad que recibe</strong></p>
             <p>&nbsp;</p>
             <p>&nbsp;</p>
-            <p align="center">Tels: 2511 5759/1149      www.oaf.ucr.ac.cr     correo electrónico: activosfijos.oaf@ucr.ac.cr</p>
+            <p align="center">Tels: 2511 5759/1149 </p>      
+            <p align="center">www.oaf.ucr.ac.cr</p>      
+            <p align="center">correo electrónico: activosfijos.oaf@ucr.ac.cr</p>
             ';
 
 
@@ -793,7 +1100,7 @@ public function download($id = null)
         // linea para marcar el desecho como descargado, haciendo que ya no se pueda borrar
         $transfer->descargado = true;
 
-
+        /*
         $conn = ConnectionManager::get('default');
         $stmt = $conn->execute("select a.plaque, a.description, b.name as brand, m.name as model, a.series, a.state
             from assets a
@@ -803,6 +1110,48 @@ public function download($id = null)
             inner join models m on m.id=a.models_id
             where tr.transfers_id = '" . $id . "';");
         $results = $stmt ->fetchAll('assoc');
+
+        */
+
+        $this->loadModel('Assets');
+
+        $results = $this->Assets->find()
+            ->select([
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets_Transfers.transfers_state',
+                'Brands.name',
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'INNER',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'INNER',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            ->join([
+        'table'=>'assets_transfers',
+        'alias' => 'Assets_Transfers',
+        'type'=>'INNER',
+        'conditions'=> 'Assets.plaque= Assets_Transfers.assets_id'
+            ])
+            ->where(['Assets_Transfers.transfer_id'=>$id])
+            ;
+
+
         $size= count($results);
         /*debug($results);
         die();*/
@@ -836,7 +1185,7 @@ public function download($id = null)
             </style>
 
 
-            <center><img src="C:\xampp\htdocs\Decanatura\src\Controller\images\logoucr.png"></center>
+            <center><img src="https://botw-pd.s3.amazonaws.com/styles/logo-thumbnail/s3/032011/logo_ucr.png"></center>
             <h2 align="center">Universidad de Costa Rica</h2>
             <h2 align="center">Vicerrector&iacute;a de Administraci&oacute;n</h2>
             <h2 align="center">Oficina de Administraci&oacute;n Financiera</h2>
@@ -853,7 +1202,7 @@ public function download($id = null)
                 <th align="center"><span style="font-weight:bold">RECIBE</span></th>
             </tr>
             <tr>
-                <td height="50"><strong>Unidad: '.$this->UnidadAcadémica.'</td>
+                <td height="50"><strong>Unidad: '.$this->UnidadAcademica.'</td>
                 <td height="50"><strong>Unidad: '.$transfer->Acade_Unit_recib.'</td>
             </tr>
             <tr>
@@ -870,14 +1219,28 @@ public function download($id = null)
             <table width="0" border="1">
             <tbody>
             <tr>
-            <th align="center">Descripcion del Activo</th>
             <th align="center">Placa</th>
+            <th align="center">Tipo</th>
             <th align="center">Marca</th>
             <th align="center">Modelo</th>
             <th align="center">Serie</th>
             <th align="center">Estado Actual</th>
             </tr>';
 
+
+            foreach ($results as $a) {
+                $html .= 
+                '<tr>
+                 <td align="center">' . $a->plaque . '</td>
+                 <td align="center">' . $a->Types['name'] . '</td>
+                 <td align="center">' . $a->Brands['name'] . '</td>
+                 <td align="center">' . $a->Models['name'] . '</td>
+                 <td align="center">' . $a->series . '</td>
+                 <td align="center">' . $a->Assets_Transfers['transfers_state'] . '</td>
+                 </tr>';
+            }
+
+/*
         for($a=0;$a < $size; $a++) {
             $html .= 
             '<tr>
@@ -890,7 +1253,7 @@ public function download($id = null)
              </tr>';
         }
 
-
+*/
         $html .=
 
             '</table>
@@ -900,7 +1263,9 @@ public function download($id = null)
             <p><strong>Original: Oficina de Administraci&oacute;n Financiera&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copia: Unidad que entrega&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copia: Unidad que recibe</strong></p>
             <p>&nbsp;</p>
             <p>&nbsp;</p>
-            <p align="center">Tels: 2511 5759/1149      www.oaf.ucr.ac.cr     correo electrónico: activosfijos.oaf@ucr.ac.cr</p>
+            <p align="center">Tels: 2511 5759/1149 </p>      
+            <p align="center">www.oaf.ucr.ac.cr</p>      
+            <p align="center">correo electrónico: activosfijos.oaf@ucr.ac.cr</p>
             ';
 
 

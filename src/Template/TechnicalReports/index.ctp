@@ -14,33 +14,17 @@
        <table id="technicalReports-grid" class="table table-striped">
         <thead>
             <tr>
-                <th scope="col" class="actions">Acciones</th>
+                
                 <th scope="col">Identificador</th>
                 <th scope="col">Fecha</th>
                 <th scope="col">Recomendación</th>
                 <th scope="col">Estado</th>
+                <th scope="col" class="actions">Acciones</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($technicalReports as $technicalReport): ?>
                 <tr>
-                    <td class="actions">
-                        <?php if($allowC) : ?>
-                            <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $technicalReport->technical_report_id], array('escape' => false)) ?>
-                        <?php endif; ?> 
-                        <?php if($allowM) : ?>
-                            <?php if($technicalReport->file_name == null) : ?> 
-
-                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $technicalReport->technical_report_id], array('escape' => false)) ?>
-                            <?php endif; ?>         
-                        <?php endif; ?> 
-                        <?php if($allowE) : ?> 
-                            <?php if(($technicalReport->descargado == null) && ($technicalReport->file_name == null )) : ?> 
-
-                            <?= $this->Form->postlink($this->Html->tag('i', '', array('class' => 'fa fa-trash')), ['action' => 'delete', $technicalReport->technical_report_id], ['escape' => false, 'confirm' => __('¿Seguro quiere borrar el reporte # '.$technicalReport->technical_report_id.' ?', $technicalReport->technical_report_id)]) ?>
-                            <?php endif; ?> 
-                        <?php endif; ?> 
-                    </td>
 
                     <td><?= h($technicalReport->facultyInitials."-".$technicalReport->internal_id."-".$technicalReport->year) ?></td>
                     <td><?= h($technicalReport->date ) ?></td>
@@ -83,17 +67,43 @@
                           Completado
                       <?php endif; ?>
                   </td>
+                  <td class="actions">
+                        <?php if($allowC) : ?>
+                            <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-eye')), ['action' => 'view', $technicalReport->technical_report_id], array('escape' => false)) ?>
+                        <?php endif; ?> 
+                        <?php if($allowM) : ?>
+                            <?php if($technicalReport->file_name == null) : ?> 
+
+                                <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-edit')), ['action' => 'edit', $technicalReport->technical_report_id], array('escape' => false)) ?>
+                            <?php endif; ?>         
+                        <?php endif; ?> 
+                        <?php if($allowM) : ?> 
+                            <?php if(($technicalReport->descargado == null) && ($technicalReport->file_name == null )) : ?> 
+
+                             <?= $this->Html->link($this->Html->tag('i', '', array('class' => 'fa fa-upload')), ['action' => 'finalizar', $technicalReport->technical_report_id], array('escape' => false)) ?>
+
+                            <?php endif; ?> 
+                        <?php endif; ?> 
+
+                        <?php if($allowE) : ?> 
+                            <?php if(($technicalReport->descargado == null) && ($technicalReport->file_name == null )) : ?> 
+
+                            <?= $this->Form->postlink($this->Html->tag('i', '', array('class' => 'fa fa-times')), ['action' => 'cancel', $technicalReport->technical_report_id], ['escape' => false, 'confirm' => __('¿Seguro quiere cancelar el reporte # '.$technicalReport->technical_report_id.' ?', $technicalReport->technical_report_id)]) ?>
+                            <?php endif; ?> 
+                        <?php endif; ?> 
+                    </td>
 
               </tr>
           <?php endforeach; ?>
       </tbody>
        <tfoot>
                     <tr>
-                        <td></td>
+                        
                         <th>Identificador</th>
                         <th>Fecha</th>
                         <th>Recomendación</th>
                         <th>Estado</th>
+                        <td></td>
                     </tr>
 
                 </tfoot>
@@ -112,8 +122,9 @@
 }
 </style>
 
-
+<?php if($allowI) : ?>
 <?= $this->Html->link(__('Insertar informe técnico'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
+<?php endif; ?>
 
 <script type="text/javascript">
 

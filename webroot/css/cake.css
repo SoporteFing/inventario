@@ -393,7 +393,7 @@ fieldset legend {
     width: 100%;
     line-height: 2rem;
 }
-
+/*
 .form button[type="submit"] {
     float: right;
     text-transform: uppercase;
@@ -404,7 +404,7 @@ fieldset legend {
     background: #BE840B;
     box-shadow: none;
 }
-
+*/
 button {
     background: #966600;
 }

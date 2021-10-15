@@ -68,12 +68,12 @@
 
       <div class="row">
         <label>Marca:</label>
-        <?php echo '<input type="text" class="form-control col-sm-9" readonly="readonly" value="' . htmlspecialchars($asset->brand) . '">'; ?>       
+        <?php echo '<input type="text" class="form-control col-sm-9" readonly="readonly" value="' . htmlspecialchars($brand->name) . '">'; ?>       
       </div>
       
       <div class="row">
         <label>Modelo:</label>
-        <?php echo '<input type="text" class="form-control col-sm-8" readonly="readonly" value="' . htmlspecialchars($asset->model->name) . '">'; ?>      
+        <?php echo '<input type="text" class="form-control col-sm-8" readonly="readonly" value="' . htmlspecialchars($model->name) . '">'; ?>      
       </div>
 	  
 	  <div class="row">

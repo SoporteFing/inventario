@@ -55,7 +55,7 @@ class UsersTable extends Table
             ->requirePresence('correo', 'update')
             ->add('correo',[ 
                 [
-                'rule'=>['custom', ' /^.+@.+\.com$/ '],
+                'rule'=>['custom', ' /^.+@.+\..+$/ '],
                 'message'=>'Debe seguir el formato: correo@ejemplo.com'
                 ]
             ])
@@ -106,7 +106,6 @@ class UsersTable extends Table
             ->maxLength('id', 15,'La identificación debe contener 15 dígitos máximo' )
             ->minLength('id', 9,'La identificación debe contener 9 dígitos mínimo. Asegúrese de incluir los 0 en su identificación.' )
             ->requirePresence('id', 'create')
-            ->requirePresence('id', 'update')
             ->add('id',[ 
                 [
                 'rule'=>['custom', ' /^[a-zA-Z0-9]+$/ '],
@@ -121,7 +120,6 @@ class UsersTable extends Table
             ->scalar('username')
             ->maxLength('username', 100)
             ->requirePresence('username', 'create')
-            ->requirePresence('username', 'update')
             ->notEmpty('username');
 
         $validator
@@ -129,15 +127,15 @@ class UsersTable extends Table
             ->maxLength('password', 60)
             ->minLength('password', 8, 'La constraseña debe tener mínimo 8 caracteres')
             ->requirePresence('password', 'create')
-            ->requirePresence('password', 'update')
-            ->notEmpty('residues_id', 'La constraseña es requerida.');
+            ->notEmpty('password', 'La constraseña es requerida.')
+            ->allowEmpty('password','update') ;
 
         $validator
             ->scalar('password2')
             ->maxLength('password2', 60)
-            ->requirePresence('password', 'create')
-            ->requirePresence('password', 'update')
-            ->notEmpty('residues_id', 'La confirmación de constraseña es requerida.');
+            ->requirePresence('password2', 'create')
+            ->notEmpty('password', 'La confirmación de constraseña es requerida.')
+            ->allowEmpty('password','update') ;
 
         $validator
             ->integer('id_rol')

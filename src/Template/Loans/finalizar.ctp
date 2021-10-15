@@ -106,7 +106,9 @@
 	 <b>1- <?= $this->Html->link(__('Descargar'), ['controller'=> 'Loans', 'action' => 'download',$loan->id], [ 'confirm' => __('Seguro que desea descargar el archivo?')]) ?> el formulario para llenar y luego subirlo al sitema.</b>
     <br><br>
     <div >
-    <b><?php echo $this->Form->input('file_solicitud',['type' => 'file','label' => '2- Subir Formulario de Préstamo una vez lleno para Finalizar', 'class' => 'form-control-file']); ?></b>
+    <b><?php 
+	    echo $this->Form->input('file_devolucion',['type' => 'file','label' => '2- Subir Formulario de Préstamo una vez lleno para Finalizar', 'class' => 'form-control-file']);
+    ?></b>
      </div>
      <div class=\"col-12 text-right\">
 	
@@ -120,7 +122,6 @@
 
     <?= $this->Html->link(__('Cancelar'), ['controller' => 'Loans', 'action' => 'index'], ['class' => 'btn btn-primary']) ?>
     <?= $this->Form->button(__('Aceptar'), ['class' => 'btn btn-primary']) ?>
-    
 <br><br><br>
 </div>
 

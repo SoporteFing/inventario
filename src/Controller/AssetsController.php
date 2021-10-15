@@ -3,6 +3,7 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\Event\Event;
 use Imagine;
+
 /**
 * Controlador para los activos de la aplicaciÃ³n
 */
@@ -10,8 +11,6 @@ class AssetsController extends AppController
 {
     public function isAuthorized($user)
     {
-
-
         $this->Roles = $this->loadModel('Roles');
         $this->Permissions = $this->loadModel('Permissions');
         $this->RolesPermissions = $this->loadModel('RolesPermissions');
@@ -31,13 +30,13 @@ class AssetsController extends AppController
             $rls = $roles['permissions'];
             foreach ($rls as $item){
                 //$permisos[(int)$item['id']] = 1;
-                if($item['nombre'] == 'Insertar Usuarios'){
+                if($item['nombre'] == 'Insertar Activos'){
                     $allowI = true;
-                }else if($item['nombre'] == 'Modificar Usuarios'){
+                }else if($item['nombre'] == 'Modificar Activos'){
                     $allowM = true;
-                }else if($item['nombre'] == 'Eliminar Usuarios'){
+                }else if($item['nombre'] == 'Eliminar Activos'){
                     $allowE = true;
-                }else if($item['nombre'] == 'Consultar Usuarios'){
+                }else if($item['nombre'] == 'Consultar Activos'){
                     $allowC = true;
                 }
             }
@@ -54,7 +53,7 @@ class AssetsController extends AppController
             return $allowI;
         }else if($this->request->getParam('action') == 'edit'){
             return $allowM;
-        }else if($this->request->getParam('action') == 'delete'){
+        }else if($this->request->getParam('action') == 'softDelete'){
             return $allowE;
         }else if($this->request->getParam('action') == 'view'){
             return $allowC;
@@ -69,51 +68,129 @@ class AssetsController extends AppController
      */
     public function index()
     {
-        $this->paginate = [
-            'contain' => ['Users', 'Locations','Models']
-        ];
-        $assets = $this->paginate($this->Assets);
-        $this->set(compact('assets'));
+
+        $as = $this->Assets->find();
+        $assets = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Assets.deleted',
+                'Types.name',
+                'Models.name',
+                'Assets.year',
+                'Locations.nombre',
+                'Locations.location_id',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+                'Users.nombre',
+                'Users.apellido1',
+                'Users.apellido2',
+
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'users',
+        'alias' => 'Users',
+        'type' => 'INNER',
+        'conditions' => 'Assets.assigned_to = Users.id',
+            ])
+            ->join([
+        'table' => 'locations',
+        'alias' => 'Locations',
+        'type' => 'INNER',
+        'conditions' => 'Assets.location_id = Locations.location_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            
+            ->where(['Assets.deleted' => '0'])
+            ;
+
+
+    $this->set('assets', $this->paginate($assets));
+
     }
     /**
      * MÃ©todo para ver los datos completos de un activo
      */
     public function view($id = null)
     {
+
         $asset = $this->Assets->get($id, [
             'contain' => ['Users', 'Locations', 'Models', 'Types']
         ]);
+
+        $this->Models = $this->loadmodel('Models');
+
+        if($asset->models_id != null){    
+            $model = $this->Models->get($asset->models_id, [
+                'contain' => []
+            ]);
+        }
+
+        $this->loadModel('Brands');
+        if($asset->brand != null){
+            
+            $brand = $this->Brands->get($asset->brand, [
+                'contain' => []
+            ]);
+        }
+
         $this->set('asset', $asset);
+        $this->set('model', $model);
+        $this->set('brand', $brand);
+
     }
     /**
      * MÃ©todo para agregar nuevos activos al sistema
      */
     public function add()
     {
+
         $asset = $this->Assets->newEntity();
         if ($this->request->is('post')) {
             
-
+ 
 
             $random = uniqid();
             $fecha = date('Y-m-d H:i:s');
             $asset->created = $fecha;
             $asset->modified = $fecha;
             $asset->unique_id = $random;
-            $asset->deletable = true;
+            $asset->deletable = false;
             $asset->deleted = false;
             $asset->state = "Disponible";
             $asset = $this->Assets->patchEntity($asset, $this->request->getData());
 
-            //print_r($asset);
-            //die();
 
 			if ($_POST['models_id'] == '') {
 				$asset->models_id = null;
 			}
 
+            if ($_POST['brands_id'] != '') {
+                $asset->brand = $_POST['brands_id'];
+            }
 
-            /** varifica que el id no sea repetido y se setea el error manualmente */
+            if ($_POST['series'] != '') {
+                $asset->series = null;
+            }
+
+            /** verifica que el id no sea repetido y se setea el error manualmente */
             $returnId = $this->Assets->find('all')
             ->where([
             'Assets.plaque' => $asset->plaque
@@ -128,20 +205,44 @@ class AssetsController extends AppController
                 AppController::insertLog($asset['plaque'], TRUE);
                 $this->Flash->success(__('El activo fue guardado exitosamente.'));
                 return $this->redirect(['action' => 'index']);
+            }else{
+                foreach ($asset->getErrors() as $field => $error) {
+                    if($field == 'series'){
+                        foreach ($error as $id => $message) {
+                            if($id == '_isUnique'){
+                                //debug($message);
+                                $asset->setError('series', [$message]);
+                            }
+                        }
+                    }
+                } 
+
             }
             AppController::insertLog($asset['plaque'], FALSE);
-            $this->Flash->error(__('El activo no se pudo guardar, por favor intente nuevamente. Placa existente'));
+            $this->Flash->error(__('El activo no se pudo guardar, por favor intente nuevamente.'));
         }
         
         $this->loadModel('Brands');
         $brands = $this->Brands->find('list', ['limit' => 200]);
-        $users = $this->Assets->Users->find('list', ['limit' => 200]);
+
+        $users = $this->Assets->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
+
         $locations = $this->Assets->Locations->find('list', ['limit' => 200]);
 		$types = $this->Assets->Types->find('list', ['limit' => 200]);
-        
-        
+    
+
         $this->set(compact('asset', 'brands', 'users', 'locations', 'models', 'types'));
     }
+
+
     /**
      * MÃ©todo para editar un activo en el sistema
      */
@@ -150,32 +251,86 @@ class AssetsController extends AppController
         $asset = $this->Assets->get($id, [
             'contain' => []
         ]);
+
+        //debug($asset);
+        //die();
+
+        $this->loadModel('Models');
+
+        if($asset->models_id != null){    
+            $model = $this->Models->get($asset->models_id, [
+                'contain' => []
+            ]);
+        }
+
+
+        $this->loadModel('Brands');
+        if($asset->brand != null){
+            
+            $brand = $this->Brands->get($asset->brand, [
+                'contain' => []
+            ]);
+        }
+
         if ($this->request->is(['patch', 'post', 'put'])) {
             $fecha = date('Y-m-d H:i:s');
             $asset->modified = $fecha;
             
             $asset = $this->Assets->patchEntity($asset, $this->request->getData());
-			/*if ($_POST['models_id'] == '') {
+			if ($_POST['models_id'] == '') {
 				$asset->models_id = null;
 			}
+            if ($_POST['series'] == '') {
+                $asset->series = null;
+            }
+
             if ($this->Assets->save($asset)) {
                 AppController::insertLog($asset['plaque'], TRUE);
                 $this->Flash->success(__('El activo fue guardado exitosamente.'));
                 return $this->redirect(['action' => 'index']);
-            }*/
-            debug($asset);
+            }
+            
             AppController::insertLog($asset['plaque'], FALSE);
             $this->Flash->error(__('El activo no se pudo guardar, por favor intente nuevamente.'));
         }
 
-        $this->loadModel('Brands');
-        $brands = $this->Brands->find('list', ['limit' => 200]);
-        $users = $this->Assets->Users->find('list', ['limit' => 200]);
+        
+        $brands = $this->Brands->find('list')          
+            ->select([
+                'Brands.id',
+                'Brands.name'
+            ])
+            ->distinct(['Brands.name'])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'RIGHT',
+        'conditions' => 'Models.id_brand = Brands.id',
+            ])
+            ->where(['Models.id_type' => $asset->type_id]);
+
+        $this->loadModel('Models');
+        $models = $this->Models->find('list')
+            ->where(['Models.id_brand' => $asset->brand]);
+
+        
+        $users = $this->Assets->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
+
         $locations = $this->Assets->Locations->find('list', ['limit' => 200]);
 		$types = $this->Assets->Types->find('list', ['limit' => 200]);
 		
-        $this->set(compact('asset', 'brands', 'users', 'locations', 'models', 'types'));
+        $this->set(compact('asset', 'brands', 'users', 'locations', 'models', 'types', 'model','brand'));
+
     }
+
 
     /**
      * Restaura un activo desactivado
@@ -234,44 +389,93 @@ class AssetsController extends AppController
      */
     public function delete($asset)
     {
-        if ($this->Assets->delete($asset)) {
-            return 1;
-        } else {
-            return 0;
-        }
+        /* 
+        DEPRECATED 
+            if ($this->Assets->delete($asset)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        */
     }
 
     /**
      * MÃ©todo para mostrar listas dependientes
      */
-    public function dependentList()
+    public function brandsList()
+    {
+        $this->loadModel('Models');
+        $this->loadModel('Brands');
+        $this->loadModel('Types');
+
+        $type_id = $_GET['type_id'];
+        
+        $type = $this->Types->get($type_id);
+
+        if($type == NULL)
+        {
+            throw new NotFoundException(__('Tipo no encontrado') );      
+        }
+        
+        $brands = $this->Brands->find('list')          
+            ->select([
+                'Brands.id',
+                'Brands.name'
+            ])
+            ->distinct(['Brands.name'])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'RIGHT',
+        'conditions' => 'Models.id_brand = Brands.id',
+            ])
+            ->where(['Models.id_type' => $type_id]);
+
+        if(empty($brands))
+        {
+            throw new NotFoundException(__('Marcas no encontradas') );      
+        }
+
+        //debug($brands->toList());
+        //die();
+
+        $this->set('brands', $brands);
+
+        /*Asocia esta funciÃ³n a la vista /Templates/Layout/model_list.ctp*/
+        $this->render('/Layout/brand_list');
+    }
+    
+    /**
+     * MÃ©todo para mostrar listas dependientes
+     */
+    public function modelsList()
     {
         $this->loadModel('Models');
         $this->loadModel('Brands');
         
         $brand_id = $_GET['brand_id'];
+        $type_id = $_GET['type_id'];
         
         $brand = $this->Brands->get($brand_id);
-
         if($brand == NULL)
         {
             throw new NotFoundException(__('Marca no encontrada') );      
         }
         
         $models = $this->Models->find('list')
-            ->where(['models.id_brand' => $brand->id]);
+            ->where(['Models.id_brand' => $brand_id, 'Models.id_type' => $type_id]);
         
         if(empty($models))
         {
             throw new NotFoundException(__('Modelos no encontrados') );      
         }
-
         $this->set('models', $models);
-
         /*Asocia esta funciÃ³n a la vista /Templates/Layout/model_list.ctp*/
         $this->render('/Layout/model_list');
     }
     
+
+
 
     /**
      * MÃ©todo para agregar activos por lotes
@@ -281,12 +485,12 @@ class AssetsController extends AppController
         $asset = $this->Assets->newEntity();
         //$asset = $this->Assets->newEntity();
         if ($this->request->is('post')) {
-
             //guarda en variables todos los campos reutilizables
             $cantidad = $this->request->getData('quantity');
             $placa = $this->request->getData('plaque');
             $marca = $this->request->getData('brand');
             $modelo = $this->request->getData('models_id');
+            $tipo = $this->request->getData('type_id');
 			//$type = $this->request->getData('type_id');
             if ($_POST['brand'] == '') {
                 $marca = null;
@@ -341,6 +545,7 @@ class AssetsController extends AppController
                         'plaque' => $placa,
                         'brand' => $marca,
                         'models_id' => $modelo,
+                        'type_id' => $tipo,
                         'series' => $serie,
                         'description' => $descripcion,
                         'owner_id' => $dueno,
@@ -362,6 +567,7 @@ class AssetsController extends AppController
                         'plaque' => $predicado . $numero,
                         'brand' => $marca,
                         'models_id' => $modelo,
+                        'type_id' => $tipo,
                         'series' => $serie,
                         'description' => $descripcion,
                         'owner_id' => $dueno,
@@ -389,8 +595,251 @@ class AssetsController extends AppController
         $this->loadModel('Brands');
         $brands = $this->Brands->find('list', ['limit' => 200]);
         //$types = $this->Assets->Types->find('list', ['limit' => 200]);
-        $users = $this->Assets->Users->find('list', ['limit' => 200]);
+        $users = $this->Assets->Users->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($row) {
+                return $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'];
+             }
+        ])
+        ->where([
+            'Users.username NOT IN' => 'root'
+        ]);
+
         $locations = $this->Assets->Locations->find('list', ['limit' => 200]);
-        $this->set(compact('asset', 'brands', 'users', 'locations','models'));
+        $types = $this->Assets->Types->find('list', ['limit' => 200]);
+        $this->set(compact('asset', 'types', 'brands', 'users', 'locations','models'));
+
     }
+
+    public function print()
+    {
+
+        $check = array();
+
+        if ($this->request->is('post')) {
+
+            $check = $this->request->getData("checkList");
+            $check = explode(",",$check);
+
+            if($this->request->getData("checkList") == '') {
+                AppController::insertLog($transfer['transfers_id'], TRUE);
+                $this->Flash->error(__('Debe ingresar por lo menos un Activo imprimir la Etiqueta.'));
+
+            }else{
+
+                $resp = '';
+
+                foreach ($check as $plaque) {
+                    $this->send_to_printer('Placa',$plaque);
+                    $resp = $this->status();
+                    $resp = true;
+                    //debug($resp);
+                    //print_r($resp);
+
+                    //revisar errores
+                    if($resp == false){
+                        $this->Flash->error(__('Ocurrio un error durante la impresion'));
+                        break;
+                    }
+                }
+                
+                if($resp != false){
+
+                    $this->request->session()->write(
+                        'printed', 
+                        $check
+                    );
+
+                    return $this->redirect(['action' => 'printresult']);
+                    
+                }
+
+            }
+
+        }
+        
+            $assets = $this->Assets->find()          
+            ->select([
+                'Assets.plaque',
+                'Assets.deleted',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'users',
+        'alias' => 'Users',
+        'type' => 'INNER',
+        'conditions' => 'Assets.assigned_to = Users.id',
+            ])
+            ->join([
+        'table' => 'locations',
+        'alias' => 'Locations',
+        'type' => 'INNER',
+        'conditions' => 'Assets.location_id = Locations.location_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'LEFT',
+        'conditions' => 'Assets.brand = Brands.id',
+            ])
+            
+            ->where(['Assets.deleted' => '0'])
+            ;
+
+        if(!empty($check)){
+ 
+                       
+            $printing_assets = $this->Assets->find()   
+            ->select([       
+                    'Assets.plaque',
+                    'Types.name',
+                    'Models.name',
+                    'Assets.series',
+                    'Assets.state',
+                    'Brands.name',
+                ])
+                ->join([
+            'table' => 'types',
+            'alias' => 'Types',
+            'type' => 'INNER',
+            'conditions' => 'Assets.type_id = Types.type_id',
+                ])
+                ->join([
+            'table' => 'models',
+            'alias' => 'Models',
+            'type' => 'INNER',
+            'conditions' => 'Assets.models_id = Models.id',
+                ])
+                ->join([
+            'table' => 'brands',
+            'alias' => 'Brands',
+            'type' => 'INNER',
+            'conditions' => 'Models.id_brand = Brands.id',
+                ])
+                ->where(['Assets.plaque IN' => $check]);
+                ;
+            $this->set('printing_assets', $this->paginate($printing_assets));
+            $this->set('result', $this->paginate($result));
+        }
+
+    
+    $this->set('assets', $this->paginate($assets));
+
+
+    
+    }
+
+
+  public function printresult(){
+
+    $printed = $this->request->session()->read('printed');  
+
+    if($printed != null){
+
+
+        $printing_assets = $this->Assets->find()   
+        ->select([       
+                'Assets.plaque',
+                'Types.name',
+                'Models.name',
+                'Assets.series',
+                'Assets.state',
+                'Brands.name',
+            ])
+            ->join([
+        'table' => 'types',
+        'alias' => 'Types',
+        'type' => 'INNER',
+        'conditions' => 'Assets.type_id = Types.type_id',
+            ])
+            ->join([
+        'table' => 'models',
+        'alias' => 'Models',
+        'type' => 'INNER',
+        'conditions' => 'Assets.models_id = Models.id',
+            ])
+            ->join([
+        'table' => 'brands',
+        'alias' => 'Brands',
+        'type' => 'INNER',
+        'conditions' => 'Models.id_brand = Brands.id',
+            ])
+            ->where(['Assets.plaque IN' => $printed]);
+            ;
+
+        $this->set('printing_assets', $this->paginate($printing_assets));
+
+        $this->Flash->success(__('Impresion Exitosa'));
+        
+
+    }else{
+
+        $this->set('printing_assets', null);
+            
+    }
+
+    
+  }
+  
+  private function send_to_printer($label,$code){
+	$fing_label = "GAP 3 mm, 0 mm\n DIRECTION 0,0\n REFERENCE 0,0\n OFFSET 0 mm\n SET PEEL OFF\n SET CUTTER OFF\n SET PARTIAL_CUTTER OFF\n CLS\n BITMAP 186,113,25,64,1,ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ8ã8ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿü     ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿü     ÿÿÿÿÿÿÿÿÿÿÿÿÀ?ÿÿÿÿü     ÿÿÿÿÿÿÿÿÿÿÿÿ€ÿÿÿÿü     ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿşÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿş?ÿÿÿÿÿÿÿÿÿÿÿÿÿÿïüÿÏşûÿ¿óş>ÿïÿóÿÿÿÿÿÿÿÿÀÃøpøğş< ş0ááÿÿÿÿÿÿÿÿàÃøx øğş< > áãÿÿÿÿÿÿÿÿáàÃøÿğxğş?ü<ããÿÿÿÿÿÿÿÿãğãøÿøpøş?ş‡ããÿüÿÿÿàãğÃøüxğş?ÿ?ÇããÿüÿÿÿàãáÃøş8ğş?ÿ?ÃááÿüÿÿÿÀàAÇøp 8ñş< ?ãááÿüÿÿÿÀàÃøp 8ğş8 ?ÃáãÿüÿÿÿààÃøá|xğş8?Çããÿüÿÿÿàãÿãğñüpøü8?‡ããÿüÿÿÿàãÿÃàpøxø|<~‡‡ÃãÿüÿÿÿààóÃ x`øø <8>ÃáÿüÿÿÿÀøÇxøü> ~ ÀáÿüÿÿÿÀüÃ~øÿ?ş0à1ãÿüÿÿÿàÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿãÿüÿÿÿàÿÿóÿÿÿÿÿÿÿÿÿÿÿÿÿãÿüÿÿÿàÿÿÇÿÿÿøÿÿÿÿÿÿÿÿÿãÿüÿÿÿàÿÿ‡ÿÿÿøÿÿÿÿÿÿÿÿáÿüÿÿÿÀÿÿÿÿÿøÿÿÿÿÿÿÿÿÿáÿüÿÿÿÀÿşÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿàÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿàÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿàÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿàÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿÀÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿÀÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüş   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿÀÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿüÿÿÿàÀş0üÁùƒÁùóà?8óÿüÿÿÿà€> ?ü ù€ÀùâÀ ?óÿüÿÿÿàÿü8x8øùğaïóÿüÿÿÿàÿø~<xüøññÿ‡ñÿüÿÿÿÀÿÎ?øş<üüøññÿÇñÿüÿÿÿÀÿÎ?øÿ8øüøóùÿÇóÿüÿÿÿàã?Çüÿ8ğøùóùÿÇ?óÿüÿÿÿà ?Çüÿ8øùãøÿÇóÿüÿÿÿà?Ïüÿ8üùóùÿÇÿóÿüÿÿÿà??øş<ÿüøóùÿÇøÿüÿÿÿÀŸøş<ÿüøóùÿÇŸøÿüÿÿÿÀø<|}üøóùÿ¿óÿüÿÿÿàÀ> ?ü ş À9óùÀ€?óÿüÿÿÿààş0ÿüÿÀ9ãøà?àÿóÿüÿÿÿàÿş?ÿüÿÿÿüùÿÿÿÿÿÿóÿüü   ÿş?ÿøÿÿÿüøÿÿÿÿÿÿñÿüü   ÿÿ?ÿøÿÿÿüøÿÿÿÿÿÿñÿüü   ÿş?ÿøÿÿÿıøÿÿÿÿÿğÿüü   ÿş?ÿüÿÿÿÿùÿÿÿÿÿğÿüü   ÿş?ÿüÿÿÿÿùÿÿÿÿÿ÷Ÿÿüü   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ \n CODEPAGE 1252\n TEXT 383,100,\"0\",180,15,15,\"$label\"\n TEXT 383,50,\"0\",180,15,15,\"$code\"\n QRCODE 45,20,H,4,A,0,M2,\"$code\"\n PRINT 1,1\n";//end
+	
+     
+
+    return $this->curl($fing_label);
+  }
+
+private function status(){
+
+
+    $stat = chr(27) + "!?";
+    #  $qrCode = "SIZE 4,2.5\n GAP 0,0\n DIRECTION 1\n CLS\n QRCODE 56,24,H,4,A,0,M2,\"ABCabc123\"\n PRINT 1\n";
+    #  $pTest = "DIRECTION 1\n SIZE 2,1\n GAP 3mm,0mm\n SPEED 4\n DENSITY 12\n CLS\n BAR 8,8,300,100\n PRINT 1\n";
+
+
+    return $this->curl($stat);
+
+}
+  
+
+private function curl($request){
+
+  $curl = curl_init();
+  // Set some options - we are passing in a useragent too here
+  curl_setopt_array($curl, array(
+    CURLOPT_RETURNTRANSFER => 1,
+    CURLOPT_URL => 'http://163.178.109.21/admin/cgi-bin/function.cgi',
+    CURLOPT_USERAGENT => 'Codular Sample cURL Request',
+	CURLOPT_USERNAME => 'rid',
+	CURLOPT_PASSWORD => '3xq23IAedH',
+    CURLOPT_POST => 1,
+    CURLOPT_POSTFIELDS => array(
+      send => $request
+    )
+  ));
+
+  $resp = curl_exec($curl);  // Send the request & save response to $resp
+
+  curl_close($curl);  // Close request to clear up some resources
+
+  return $resp;
+    }
+
 }

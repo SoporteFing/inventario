@@ -8,6 +8,7 @@ use Cake\ORM\Entity;
  *
  * @property string $transfer_id
  * @property string $assets_id
+ * @property string $transfer_state
  *
  * @property \App\Model\Entity\Transfer $transfer
  * @property \App\Model\Entity\Asset $asset

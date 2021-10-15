@@ -169,6 +169,7 @@ class AppController extends Controller
 
         foreach ($query as $roles) {
             $rls = $roles['permissions'];
+
             foreach ($rls as $item) {
                 if ($item['nombre'] == 'Consultar Usuarios') {
                     $allowU = true;
@@ -177,8 +178,6 @@ class AppController extends Controller
                 } else if ($item['nombre'] == 'Consultar Reporte Tecnico') {
                     $allowRT = true;
                 } else if ($item['nombre'] == 'Consultar Prestamos') {
-                    $allowUb = true;
-                } else if ($item['nombre'] == 'Consultar Ubicaciones') {
                     $allowP = true;
                 } else if ($item['nombre'] == 'Consultar Traslados') {
                     $allowT = true;
@@ -213,6 +212,11 @@ class AppController extends Controller
         $this->set('allowD', $allowD);
         $this->set('allowL', $allowL);
 
+        $unidadAcademica = 'Facultad de Ingeniería';
+        $sigla = 'I';
+        
+        $this->set('sigla', $sigla);
+        $this->set('unidadAcademica', $unidadAcademica);
         $this->set('uid', $this->Auth->user('id'));
         $this->set('nombre', $this->Auth->user('nombre'));
         $this->set('apellido', $this->Auth->user('apellido1'));

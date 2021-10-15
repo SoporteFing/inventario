@@ -1,0 +1,17 @@
+2019-08-09 22:55:19 Error: [Cake\Database\Exception] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'activos_final.techical_reports' doesn't exist in /var/www/html/Activos/vendor/cakephp/cakephp/src/Database/Schema/Collection.php on line 131
+Stack Trace:
+#0 /var/www/html/Activos/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(97): Cake\Database\Schema\Collection->_reflect('Column', 'techical_report...', Array, Object(Cake\Database\Schema\TableSchema))
+#1 /var/www/html/Activos/vendor/cakephp/cakephp/src/Database/Schema/CachedCollection.php(63): Cake\Database\Schema\Collection->describe('techical_report...', Array)
+#2 /var/www/html/Activos/vendor/cakephp/cakephp/src/ORM/Table.php(532): Cake\Database\Schema\CachedCollection->describe('techical_report...')
+#3 /var/www/html/Activos/vendor/cakephp/cakephp/src/ORM/Table.php(653): Cake\ORM\Table->getSchema()
+#4 /var/www/html/Activos/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(220): Cake\ORM\Table->getPrimaryKey()
+#5 /var/www/html/Activos/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(130): Bake\Shell\Task\ModelTask->getAssociations(Object(Cake\ORM\Table))
+#6 /var/www/html/Activos/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(113): Bake\Shell\Task\ModelTask->getTableContext(Object(Cake\ORM\Table), 'techical_report...', 'TechicalReports')
+#7 /var/www/html/Activos/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(100): Bake\Shell\Task\ModelTask->bake('TechicalReports')
+#8 /var/www/html/Activos/vendor/cakephp/cakephp/src/Console/Shell.php(507): Bake\Shell\Task\ModelTask->main('techical_report...')
+#9 /var/www/html/Activos/vendor/cakephp/cakephp/src/Console/Shell.php(500): Cake\Console\Shell->runCommand(Array, false, Array)
+#10 /var/www/html/Activos/vendor/cakephp/cakephp/src/Console/CommandRunner.php(141): Cake\Console\Shell->runCommand(Array, true)
+#11 /var/www/html/Activos/bin/cake.php(12): Cake\Console\CommandRunner->run(Array)
+#12 {main}
+
+

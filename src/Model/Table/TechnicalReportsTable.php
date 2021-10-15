@@ -38,6 +38,7 @@ class TechnicalReportsTable extends Table
         $this->setDisplayField('technical_report_id');
         $this->setPrimaryKey('technical_report_id');
 
+
         $this->addBehavior('Josegonzalez/Upload.Upload', [
             'file_name' => [
                 'fields' => [
@@ -45,7 +46,7 @@ class TechnicalReportsTable extends Table
                     'size' => 'file_size',
                     'type' => 'file_type',
                 ],
-                'path' => 'webroot{DS}files{DS}{model}{DS}{field}{DS}}{primaryKey}{DS}',
+                'path' => 'webroot{DS}files{DS}{model}{DS}{field}{DS}{primaryKey}{DS}',
                 'nameCallback' => function ($table, $entity, $data, $field, $settings) {
                     return strtolower($data['name']);
                 },
@@ -53,6 +54,7 @@ class TechnicalReportsTable extends Table
                 'keepFilesOnDelete' => false
             ]
         ]);
+
 
         $this->belongsTo('Assets', [
             'foreignKey' => 'assets_id',
@@ -62,7 +64,8 @@ class TechnicalReportsTable extends Table
             'foreignKey' => 'residues_id'
         ]);
         $this->belongsTo('Internals', [
-            'foreignKey' => 'internal_id'
+            'foreignKey' => 'internal_id',
+            'joinType' => 'INNER'
         ]);
     }
 
@@ -124,8 +127,19 @@ class TechnicalReportsTable extends Table
             ->allowEmpty('facultyInitials');
 
         $validator
-            ->boolean('descargado')
             ->allowEmpty('descargado');
+
+        $validator
+            ->allowEmpty('canceled');
+
+        $validator
+            ->integer('year_autonum')
+            ->allowEmpty('year_autonum');
+
+        $validator
+            ->scalar('initial')
+            ->maxLength('initial', 1)
+            ->allowEmpty('initial');
 
         return $validator;
     }

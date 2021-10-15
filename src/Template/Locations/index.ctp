@@ -8,16 +8,24 @@
             <table id="locations-grid" class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col" class="actions">Acciones</th>
+                        
 
                         <th scope="col">Ubicación</th>
 
                         <th scope="col">Descripción</th>
+                        
+                        <th scope="col" class="actions">Acciones</th>
+
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($locations as $location): ?>
                         <tr>
+                            
+
+                            <td><?= h($location->nombre) ?></td>
+                            <td><?= h($location->description) ?></td>
+
                             <td class="actions">
                                 
                                 <?php if($allowC) : ?>
@@ -34,16 +42,15 @@
 
                             </td>
 
-                            <td><?= h($location->nombre) ?></td>
-                            <td><?= h($location->description) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td></td>
+                        
                         <th>Ubicación</th>
                         <th>Descripción</th>
+                        <td></td>
                     </tr>
 
                 </tfoot>
@@ -61,7 +68,9 @@
 }
 </style>
 </div>
+<?php if($allowI) : ?>
 <?= $this->Html->link(__('Insertar Ubicación'), ['action' => 'add'] ,['class' => 'btn btn-primary']) ?>
+<?php endif; ?>
 
 <script type="text/javascript">
 
