@@ -38,7 +38,7 @@
           margin-left: 10px;
         }
 </style> 
-  
+ 
 <div class="form large-9 medium-8 columns content">
 <?= $this->Form->create($loan, ['type' => 'file']) ?>
 	<fieldset>
@@ -48,22 +48,40 @@
             }
         ?>
         
+				 <?php
+					$servername = "163.178.109.13";
+					$username = "activos";
+					$password = "activos.fing";
+
+					// Create connection
+					$base = mysqli_connect($servername, $username, $password);
+
+					$solicitud = 'SELECT id FROM Loans  ';
+					echo $base->$solicitud;
+					?> 
+
 		<br>
 
 		<div class="form-control sameLine">
 			<div class="row col-lg-5">
-				<label> <b>Responsable:</b><b style="color:red;">*</b> </label>
-				<?php echo $this->Form->imput('id_responsables', ['class'=>'"form-control col-sm-4 col-md-4 col-lg-4', 'value' => $loan->user->nombre, 'disabled']); ?>
+				<label> <b>Responsable:</b> </label>
+				<?php
+					
+//					$nombre = $this->Users->get($loan->id_respondables, ['contain' => ['Users']]);
+					echo 'holoalalaloalaloofdsaokfdsaokok'; //$users->id;//$loan->id_responsables; ?>
 			</div>
 
 			<div class="row">
-				<label> <b>Fecha inicio:</b><b style="color:red;">*</b> </label>
-				<?php echo $this->Form->imput('fecha_inicio', ['class'=>'form-control date', 'value' => date("y-m-d"), 'id'=>'datepicker', 'disabled']); ?>
+				<label> <b>Fecha inicio:</b> <p>(D/M/A)</p> </label>
+				<?php 
+					$fecha = explode('/', $loan->fecha_inicio);
+					$fecha = mktime(0, 0, 0, $fecha[0], $fecha[1], $fecha[2]);
+					echo date("d-m-Y", $fecha); ?>
 			</div>
 			
 			<div class="row">
-				<label> Fecha de devolución: </label>
-                <?php echo $this->Form->imput('fecha_devolucion', ['class'=>'form-control date', 'id'=>'datepicker2', 'disabled']); ?>
+				<label> <b>Fecha de devolució:</b> <p>(D/M/A)</p>  </label>
+                <?php echo date('d-m-Y'); ?>
 			</div>
 			
 		</div>

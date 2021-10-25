@@ -436,6 +436,7 @@ class LoansController extends AppController
     public function finalizar($id)
     {
         $this->loadModel('Assets');
+        $this->loadModel('Users');
         
         $loan = $this->Loans->get($id, [
             'contain' => []
@@ -456,7 +457,7 @@ class LoansController extends AppController
 	    move_uploaded_file(($_FILES['file_devolucion']['tmp_name']), $ubicacion_final);
 	    // $this->Flash->success(__('Error, s�lo se pueden subir archivos pdf.'));
 
-            $loan->estado = 'Terminado';
+            $loan->estado = print_r($Users); // 'Terminado';
             $loan->fecha_devolucion = date('y-m-d', time());
      
             if ($this->Loans->save($loan)){
@@ -643,8 +644,9 @@ class LoansController extends AppController
             height: 50px;
         }
         </style>
-<center><img src="/var/www/html/Activos/src/Controller/images/logoucr.png"></center>
+<center><img src="/var/www/html/Activos/src/Controller/images/logoucr.png"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <img src="/var/www/html/Activos/src/Controller/images/logofing.png"></center>
 <h2 align="center">UNIVERSIDAD DE COSTA RICA</h2>
+<h2 align="center">FACULTAD DE INGENIERIA</h2>
 <h2 align="center">UNIDAD DE ACTIVOS FIJOS</h2>
 <h2 align="center">PRESTAMO DE ACTIVO FIJO</h2>
 <p>&nbsp;</p>
@@ -680,25 +682,24 @@ class LoansController extends AppController
 $html .=
 
 '</table>
-<p>Acepto las condiciones que establecen los articulos No.13, No.14, No.17 y No.18 del Reglamento para la Administracion y Control de Bienes Institucionales de la U.C.R me compreto a usar el equipo adecuadamente, darle mantenimiento y devolverlo en buen estado en un plazo maximo que vence el:</p>
+<p>Acepto las condiciones que establecen los articulos No.13, No.14, No.17 y No.18 del Reglamento para la Administracion y Control de Bienes Institucionales de la U.C.R me compreto a usar el equipo adecuadamente, darle mantenimiento y devolverlo en buen estado según lo acordado con el responsable.</p>
+<p align="center"><strong>Recibe:</strong><p>
+<p align="center"><strong>Firma:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;______________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fecha de devolucion: &nbsp;&nbsp;&nbsp;&nbsp;________________</strong></p>
 <p>&nbsp;</p>
+<p aling="center"> - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - </p>
+<p><strong>Para uso de la unidad receptora.</p>
 <p align="center"><strong>Entrega:</strong><p>
-<p align="center">Unidad de custodio:            _______________________<p>
+<p align="center">Unidad de custodio:            Facultad de Ingeniería Universidad de Costa Rica<p>
 <p align="center">Encargado de Bienes Institucionales:            _______________________<p>
 <p align="center">Cedula:            _______________________<p>
 <p align="center">Firma:            _______________________<p>
-<p>&nbsp;</p>
-<p align="center"><strong>Recibe:</strong><p>
-<p align="center"><strong>Firma:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;______________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fecha de devolucion: &nbsp;&nbsp;&nbsp;&nbsp;________________</strong></p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p><strong>Nota:</strong></p>
 <p>El original de este documento sera entregado al solicitante despues de que se haya recibido satisfactoriamente el o los equipos.</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p align="center">Tels: 2511 5759/1149      www.oaf.ucr.ac.cr     correo electrónico: activosfijos.oaf@ucr.ac.cr</p>
+<p align="center">Tels: 2511-6639 / 2511-4915      www.fing.ucr.ac.cr     Correo electrónico: decanato.fi@ucr.ac.cr</p>
         ';
 
 

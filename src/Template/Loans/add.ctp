@@ -76,12 +76,12 @@
 
 			<div class="row">
 				<label> <b>Fecha inicio:</b><b style="color:red;">*</b> </label>
-				<?php echo $this->Form->imput('fecha_inicio', ['class'=>'form-control date', 'value' => date("y-m-d"), 'id'=>'datepicker']); ?>
+				<?php echo $this->Form->input('fecha_inicio', ['class'=>'form-control date', 'value' => date("y-m-d"), 'id'=>'datepicker']); ?>
 			</div>
 			
 			<!--div class="row">
 				<label> Fecha de devolución: </label>
-                <?php echo $this->Form->imput('fecha_devolucion', ['class'=>'form-control date', 'id'=>'datepicker2']); ?>
+               <?php // echo $this->Form->imput('fecha_devolucion', ['class'=>'form-control date', 'id'=>'datepicker2']); ?>
 			</div-->
 			
 		</div> <br>
