@@ -1,7 +1,9 @@
 <?php
 /**
  * @var \App\View\AppView $this
- * @var \App\Model\Entity\Loan $loan
+ * @var \app\model\entity\loan $loan
+ * @var \App\Model\Table\LoansTable $tablaprestamos
+ * @var \App\Controller\LoansController $controller
  */
 ?>
 
@@ -56,7 +58,7 @@
 					// Create connection
 					$base = mysqli_connect($servername, $username, $password);
 
-					$solicitud = 'SELECT id FROM Loans  ';
+					$solicitud = 'SELECT users.id, users.nombre, users.apellido1,  users.apellido2, loans.id_responsables FROM users users, loans loans';
 					echo $base->$solicitud;
 					?> 
 
@@ -68,7 +70,7 @@
 				<?php
 					
 //					$nombre = $this->Users->get($loan->id_respondables, ['contain' => ['Users']]);
-					echo 'holoalalaloalaloofdsaokfdsaokok'; //$users->id;//$loan->id_responsables; ?>
+					$tablaprestamos->id2Name('123'); //$users->id;//$loan->id_responsables; ?>
 			</div>
 
 			<div class="row">
@@ -80,7 +82,7 @@
 			</div>
 			
 			<div class="row">
-				<label> <b>Fecha de devoluci√≥:</b> <p>(D/M/A)</p>  </label>
+				<label> <b>Fecha de devoluci√n:</b> <p>(D/M/A)</p>  </label>
                 <?php echo date('d-m-Y'); ?>
 			</div>
 			

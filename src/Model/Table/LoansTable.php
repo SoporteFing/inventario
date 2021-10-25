@@ -123,4 +123,14 @@ class LoansTable extends Table
         $rules->add($rules->existsIn(['id_responsables'], 'Users'));
         return $rules;
     }
+
+    /**
+    * MÃtodo para obtener nombres a partir de un id
+    */
+    public function id2Name($id)
+    {
+    $salida = $this->fetchTable('Users_to_Loans')->find()->all();
+    return $id;
+    }
+    
 }

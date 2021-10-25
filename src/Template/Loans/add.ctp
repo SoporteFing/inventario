@@ -2,6 +2,7 @@
 /**
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Asset $asset
+ * @var \App\Controller\LoansController $controller
  */
     use Cake\Routing\Router;
 ?>

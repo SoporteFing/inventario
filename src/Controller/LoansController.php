@@ -573,10 +573,23 @@ class LoansController extends AppController
         $this->render('/Layout/searchAsset');
     }
 
+    /**
+    * MÃtodo para obtener el nombre de alguien a partir del id
+    */
+    public function Id_to_name($id = null)
+    {
+    $this->loadModel('Users');
+    $this->loadModel('Loans');
+    echo $id;
+
+    }
+
+
 
     /**
      * MÃ©todo para generar formulario
      */
+
 
     public function download($id = null)
     {
