@@ -657,7 +657,7 @@ class LoansController extends AppController
             height: 50px;
         }
         </style>
-<center><img src="/var/www/html/Activos/src/Controller/images/logoucr.png"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <img src="/var/www/html/Activos/src/Controller/images/logofing.png"></center>
+<center><img src="/var/www/html/inventario/src/Controller/images/logoucr.png"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <img src="/var/www/html/inventario/src/Controller/images/logofing.png"></center>
 <h2 align="center">UNIVERSIDAD DE COSTA RICA</h2>
 <h2 align="center">FACULTAD DE INGENIERIA</h2>
 <h2 align="center">UNIDAD DE ACTIVOS FIJOS</h2>

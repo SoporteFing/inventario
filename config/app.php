@@ -230,9 +230,9 @@ return [
              */
             //'port' => 'non_standard_port_number',
 
-            'username' => 'activos',
-            'password' => 'activos.fing',
-            'database' => 'activos',
+            'username' => 'cakephp',
+            'password' => 'n0s3.fing',
+            'database' => 'activosv2',
             'encoding' => 'utf8',
             'timezone' => 'UTC',
             'flags' => [],

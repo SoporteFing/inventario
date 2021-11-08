@@ -2,7 +2,6 @@
 /**
  * @var \App\View\AppView $this
  * @var \app\model\entity\loan $loan
- * @var \App\Model\Table\LoansTable $tablaprestamos
  * @var \App\Controller\LoansController $controller
  */
 ?>
@@ -49,28 +48,14 @@
                 echo "<legend>Insertar préstamo</legend>";
             }
         ?>
-        
-				 <?php
-					$servername = "163.178.109.13";
-					$username = "activos";
-					$password = "activos.fing";
-
-					// Create connection
-					$base = mysqli_connect($servername, $username, $password);
-
-					$solicitud = 'SELECT users.id, users.nombre, users.apellido1,  users.apellido2, loans.id_responsables FROM users users, loans loans';
-					echo $base->$solicitud;
-					?> 
-
 		<br>
 
 		<div class="form-control sameLine">
 			<div class="row col-lg-5">
-				<label> <b>Responsable:</b> </label>
-				<?php
-					
-//					$nombre = $this->Users->get($loan->id_respondables, ['contain' => ['Users']]);
-					$tablaprestamos->id2Name('123'); //$users->id;//$loan->id_responsables; ?>
+                                <label> <b>Responsable:</b><b style="color:red;">*</b> </label>
+                                <?php echo $this->Form->imput('id_responsables', ['class'=>'"form-control col-sm-4 col-md-4 col-lg-4', 'value' => $loan->user->nombre, 'disabled']); ?>
+                         </div>
+
 			</div>
 
 			<div class="row">
@@ -82,7 +67,7 @@
 			</div>
 			
 			<div class="row">
-				<label> <b>Fecha de devoluci�n:</b> <p>(D/M/A)</p>  </label>
+				<label> <b>Fecha de devolución:</b> <p>(D/M/A)</p>  </label>
                 <?php echo date('d-m-Y'); ?>
 			</div>
 			
