@@ -70,17 +70,16 @@
     <?= $this->Form->create($loan) ?>
 
     <div class="form-control sameLine">
-			<div class="row col-lg-5">
+			<div class="row">
 				<label> <b>Responsable:</b><b style="color:red;">*</b> </label>
 				<?php echo $this->Form->select('id_responsables', $users, array('empty' => true, 'class' => 'form-control col-md-7', 'id'=> 'userDropdown')); ?>
 			</div>
 
 			<div class="row">
-				<label> <b>Fecha inicio:</b><b style="color:red;">*</b> </label>
 				<?php echo $this->Form->input('fecha_inicio', ['class'=>'form-control date', 'value' => date("y-m-d"), 'id'=>'datepicker']); ?>
 			</div>
 			
-			<!--div class="row">
+			<!--div class="row">  Esto hay que implementarlo, pero de momento la fecha de devoluci√n es la fecha en la que se entrega el comprobante del pr√stamo.
 				<label> Fecha de devoluci√≥n: </label>
                <?php // echo $this->Form->imput('fecha_devolucion', ['class'=>'form-control date', 'id'=>'datepicker2']); ?>
 			</div-->
@@ -190,7 +189,7 @@
        
         <?= $this->Html->link(__('Cancelar'), ['action' => 'index'], ['class' => 'btn btn-primary']) ?>
 
-        <?= $this->Form->button(__('Siguiente'), ['class' => 'btn btn-primary', 'id' => 'acept']) ?>
+        <?= $this->Form->button(__('Siguiente'), ['class' => 'btn btn-primary', 'id' => 'acept']/*, ['action' => 'index']*/) ?>
 
 
 

@@ -54,21 +54,21 @@
 			<div class="row col-lg-5">
                                 <label> <b>Responsable:</b><b style="color:red;">*</b> </label>
                                 <?php echo $this->Form->imput('id_responsables', ['class'=>'"form-control col-sm-4 col-md-4 col-lg-4', 'value' => $loan->user->nombre, 'disabled']); ?>
-                         </div>
 
 			</div>
 
 			<div class="row">
-				<label> <b>Fecha inicio:</b> <p>(D/M/A)</p> </label>
+				<label> <b>Fecha inicio:</b> </label>
 				<?php 
 					$fecha = explode('/', $loan->fecha_inicio);
 					$fecha = mktime(0, 0, 0, $fecha[0], $fecha[1], $fecha[2]);
-					echo date("d-m-Y", $fecha); ?>
+					echo date("d-m-Y", $fecha) . " (D/M/A)"; ?>
 			</div>
 			
 			<div class="row">
-				<label> <b>Fecha de devolución:</b> <p>(D/M/A)</p>  </label>
-                <?php echo date('d-m-Y'); ?>
+				<label> <b>Fecha de devolución:</b>   </label>
+					<?php echo date('d-m-Y') . " (D/M/A)"; ?>
+			</div>
 			</div>
 			
 		</div>

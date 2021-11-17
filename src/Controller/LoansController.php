@@ -457,7 +457,7 @@ class LoansController extends AppController
 	    move_uploaded_file(($_FILES['file_devolucion']['tmp_name']), $ubicacion_final);
 	    // $this->Flash->success(__('Error, sÃlo se pueden subir archivos pdf.'));
 
-            $loan->estado = print_r($Users); // 'Terminado';
+            $loan->estado = 'Terminado';
             $loan->fecha_devolucion = date('y-m-d', time());
      
             if ($this->Loans->save($loan)){
