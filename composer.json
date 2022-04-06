@@ -9,7 +9,7 @@
         "cakephp/cakephp": "3.5.*",
         "cakephp/migrations": "^1.0",
         "cakephp/plugin-installer": "^1.0",
-        "dompdf/dompdf": "^0.8.2",
+        "dompdf/dompdf": "^1.2.1",
         "friendsofcake/cakepdf": "^3.5",
         "imagine/imagine": "^0.7.1",
         "josegonzalez/cakephp-upload": "^4.0",
